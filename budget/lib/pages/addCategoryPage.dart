@@ -174,10 +174,9 @@ class _AddCategoryPageState extends State<AddCategoryPage>
   }
 
   Future<TransactionCategory> createTransactionCategory() async {
-    TransactionCategory? currentInstance;
+    // TransactionCategory? currentInstance; // Unused variable removed
     if (widget.category != null) {
-      currentInstance =
-          await database.getCategoryInstance(widget.category!.categoryPk);
+      await database.getCategoryInstance(widget.category!.categoryPk);
     }
     return TransactionCategory(
       categoryPk: widget.category != null ? widget.category!.categoryPk : "-1",

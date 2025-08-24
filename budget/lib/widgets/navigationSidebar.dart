@@ -14,7 +14,6 @@ import 'package:budget/widgets/timeDigits.dart';
 import 'package:budget/widgets/util/showDatePicker.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:budget/colors.dart';
 import 'package:timer_builder/timer_builder.dart';
@@ -106,7 +105,7 @@ class NavigationSidebarState extends State<NavigationSidebar> {
         width: getWidthNavigationSidebar(context),
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             border: BorderDirectional(
               end: BorderSide(
                 color: appStateSettings["materialYou"]

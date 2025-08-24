@@ -1,9 +1,18 @@
-import 'package:animations/animations.dart';
+import 'package:budget/widgets/accountAndBackup.dart'
+    show
+        createBackupInBackground,
+        refreshGoogleSignIn,
+        signOutGoogle,
+        openDatabaseCorruptedPopup,
+        googleUser;
+import 'package:budget/widgets/accountAndBackup.dart'
+    show GoogleAccountLoginButtonState;
+// import 'package:animations/animations.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/database/initializeDefaultDatabase.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
-import 'package:budget/main.dart';
+import 'package:budget/main.dart' as main_app;
 import 'package:budget/pages/aboutPage.dart';
 import 'package:budget/pages/accountsPage.dart';
 import 'package:budget/pages/addBudgetPage.dart';
@@ -29,40 +38,42 @@ import 'package:budget/pages/upcomingOverdueTransactionsPage.dart';
 import 'package:budget/pages/walletDetailsPage.dart';
 import 'package:budget/pages/creditDebtTransactionsPage.dart';
 import 'package:budget/struct/currencyFunctions.dart';
-import 'package:budget/struct/databaseGlobal.dart';
+import 'package:budget/struct/databaseGlobal.dart' as db_global;
 import 'package:budget/struct/defaultPreferences.dart';
 import 'package:budget/struct/navBarIconsData.dart';
 import 'package:budget/struct/quickActions.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/struct/shareBudget.dart';
 import 'package:budget/struct/syncClient.dart';
-import 'package:budget/widgets/accountAndBackup.dart';
+import 'package:budget/widgets/accountAndBackup.dart'
+    show openBackupReminderPopupCheck;
 import 'package:budget/widgets/bottomNavBar.dart';
-import 'package:budget/widgets/button.dart';
+// import 'package:budget/widgets/button.dart';
 import 'package:budget/widgets/categoryIcon.dart';
 import 'package:budget/widgets/fab.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/iconButtonScaled.dart';
-import 'package:budget/widgets/importDB.dart';
-import 'package:budget/widgets/moreIcons.dart';
+// import 'package:budget/widgets/importDB.dart';
+// import 'package:budget/widgets/moreIcons.dart';
 import 'package:budget/widgets/navigationSidebar.dart';
 import 'package:budget/widgets/notificationsSettings.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
-import 'package:budget/widgets/openContainerNavigation.dart';
+// import 'package:budget/widgets/openContainerNavigation.dart';
 import 'package:budget/widgets/openPopup.dart';
 import 'package:budget/widgets/openSnackbar.dart';
 import 'package:budget/widgets/outlinedButtonStacked.dart';
 import 'package:budget/widgets/ratingPopup.dart';
 import 'package:budget/widgets/selectAmount.dart';
 import 'package:budget/widgets/selectChips.dart';
-import 'package:budget/widgets/selectedTransactionsAppBar.dart';
+import 'package:budget/widgets/selectedTransactionsAppBar.dart'
+    show duplicateTransaction;
 import 'package:budget/widgets/showChangelog.dart';
 import 'package:budget/struct/initializeNotifications.dart';
 import 'package:budget/widgets/globalLoadingProgress.dart';
 import 'package:budget/widgets/globalSnackbar.dart';
 import 'package:budget/pages/editCategoriesPage.dart';
 import 'package:budget/struct/upcomingTransactionsFunctions.dart';
-import 'package:budget/widgets/tappable.dart';
+// import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntry.dart';
 import 'package:budget/widgets/transactionEntry/transactionLabel.dart';
 import 'package:budget/widgets/util/checkWidgetLaunch.dart';
@@ -71,7 +82,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_lazy_indexed_stack/flutter_lazy_indexed_stack.dart';
-import 'package:googleapis/drive/v3.dart';
+// import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:provider/provider.dart';
 // import 'package:feature_discovery/feature_discovery.dart';
 
@@ -88,18 +99,18 @@ class InitialPageRouteNavigator extends StatelessWidget {
       onGenerateRoute: (settings) => PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             AnimatedSwitcher(
-          duration: Duration(milliseconds: 1200),
+          duration: const Duration(milliseconds: 1200),
           switchInCurve: Curves.easeInOutCubic,
           switchOutCurve: Curves.easeInOutCubic,
           transitionBuilder: (Widget child, Animation<double> animation) {
             final inAnimation =
-                Tween<Offset>(begin: Offset(-1.0, 0.0), end: Offset(0.0, 0.0))
+                Tween<Offset>(begin: const Offset(-1.0, 0.0), end: Offset.zero)
                     .animate(animation);
             final outAnimation =
-                Tween<Offset>(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+                Tween<Offset>(begin: const Offset(1.0, 0.0), end: Offset.zero)
                     .animate(animation);
 
-            if (child.key == ValueKey("Onboarding")) {
+            if (child.key == const ValueKey("Onboarding")) {
               return ClipRect(
                 child: SlideTransition(
                   position: inAnimation,
@@ -113,10 +124,10 @@ class InitialPageRouteNavigator extends StatelessWidget {
             }
           },
           child: appStateSettings["hasOnboarded"] != true
-              ? OnBoardingPage(key: ValueKey("Onboarding"))
+              ? const OnBoardingPage(key: ValueKey("Onboarding"))
               : PageNavigationFrameworkSafeArea(
                   child: PageNavigationFramework(
-                    key: pageNavigationFrameworkKey,
+                    key: main_app.pageNavigationFrameworkKey,
                     widthSideNavigationBar: getWidthNavigationSidebar(context),
                   ),
                 ),
@@ -132,9 +143,10 @@ class PageNavigationFrameworkSafeArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double rightPaddingSafeArea = MediaQuery.paddingOf(context).right;
+    final EdgeInsets padding = MediaQuery.of(context).padding;
+    double rightPaddingSafeArea = padding.right;
     bool hasRightSafeArea = rightPaddingSafeArea > 0;
-    double leftPaddingSafeArea = MediaQuery.paddingOf(context).left;
+    double leftPaddingSafeArea = padding.left;
     bool hasLeftSafeArea =
         leftPaddingSafeArea > 0 && getIsFullScreen(context) == false;
 
@@ -143,9 +155,9 @@ class PageNavigationFrameworkSafeArea extends StatelessWidget {
       children: [
         hasRightSafeArea || hasLeftSafeArea
             ? Container(
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
               )
-            : SizedBox.shrink(),
+            : const SizedBox.shrink(),
         hasRightSafeArea || hasLeftSafeArea
             ? Padding(
                 padding: EdgeInsets.only(
@@ -157,11 +169,11 @@ class PageNavigationFrameworkSafeArea extends StatelessWidget {
                       right: hasRightSafeArea
                           ? Radius.circular(
                               getPlatform() == PlatformOS.isIOS ? 10 : 20)
-                          : Radius.circular(0),
+                          : const Radius.circular(0),
                       left: hasLeftSafeArea
                           ? Radius.circular(
                               getPlatform() == PlatformOS.isIOS ? 10 : 20)
-                          : Radius.circular(0),
+                          : const Radius.circular(0),
                     ),
                     child: child),
               )
@@ -171,46 +183,19 @@ class PageNavigationFrameworkSafeArea extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: Container(
                   width: rightPaddingSafeArea,
-                  color: Theme.of(context).colorScheme.background,
+                  color: Theme.of(context).colorScheme.surface,
                 ),
               )
-            : SizedBox.shrink(),
+            : const SizedBox.shrink(),
         hasLeftSafeArea
             ? Align(
                 alignment: Alignment.centerLeft,
                 child: Container(
                   width: leftPaddingSafeArea,
-                  color: Theme.of(context).colorScheme.background,
+                  color: Theme.of(context).colorScheme.surface,
                 ),
               )
-            : SizedBox.shrink(),
-        // Gradient fade to right overflow, disabled for now
-        // because many pages have full screen elements/banners etc
-        // hasRightSafeArea
-        //     ? Padding(
-        //         padding: EdgeInsets.only(
-        //             right: rightPaddingSafeArea),
-        //         child: Align(
-        //           alignment: Alignment.centerRight,
-        //           child: Container(
-        //             width: 12,
-        //             foregroundDecoration: BoxDecoration(
-        //               gradient: LinearGradient(
-        //                 colors: [
-        //                   Theme.of(context)
-        //                       .colorScheme.background
-        //                       .withOpacity(0.0),
-        //                   Theme.of(context).colorScheme.background,
-        //                 ],
-        //                 begin: Alignment.centerLeft,
-        //                 end: Alignment.centerRight,
-        //                 stops: [0.1, 1],
-        //               ),
-        //             ),
-        //           ),
-        //         ),
-        //       )
-        //     : SizedBox.shrink(),
+            : const SizedBox.shrink(),
       ],
     );
   }
@@ -234,19 +219,20 @@ class HandleWillPopScope extends StatelessWidget {
           if (globalSelectedID.value[key]?.isNotEmpty == true) notEmpty++;
           globalSelectedID.value[key] = [];
         }
-        globalSelectedID.notifyListeners();
 
         // Allow the back button to exit the app when on home
         if (notEmpty <= 0) {
-          if (pageNavigationFrameworkKey.currentState?.currentPage == 0) {
+          if (main_app.pageNavigationFrameworkKey.currentState?.currentPage ==
+              0) {
             return true;
           } else {
             // Allow back button deselect a selected category first on All Spending page
-            if (pageNavigationFrameworkKey.currentState?.currentPage == 7 &&
+            if (main_app.pageNavigationFrameworkKey.currentState?.currentPage ==
+                    7 &&
                 categoryIsSelectedOnAllSpending) {
               return true;
             }
-            pageNavigationFrameworkKey.currentState?.changePage(0);
+            main_app.pageNavigationFrameworkKey.currentState?.changePage(0);
           }
         }
         return false;
@@ -329,10 +315,7 @@ Future<bool> runAllCloudFunctions(BuildContext context,
     loadingIndeterminateKey.currentState?.setVisibility(false);
     runningCloudFunctions = false;
     canSyncData = true;
-    if (e is DetailedApiRequestError &&
-            e.status == 401 &&
-            forceSignIn == true ||
-        e is PlatformException) {
+    if (e is Exception && forceSignIn == true || e is PlatformException) {
       // Request had invalid authentication credentials. Try logging out and back in.
       // This stems from silent sign-in not providing the credentials for GDrive API for e.g.
       await refreshGoogleSignIn();
@@ -345,7 +328,7 @@ Future<bool> runAllCloudFunctions(BuildContext context,
     return false;
   }
   loadingIndeterminateKey.currentState?.setVisibility(false);
-  Future.delayed(Duration(milliseconds: 2000), () {
+  Future.delayed(const Duration(milliseconds: 2000), () {
     runningCloudFunctions = false;
   });
   errorSigningInDuringCloud = false;
@@ -379,13 +362,7 @@ class PageNavigationFrameworkState extends State<PageNavigationFramework> {
     CreditDebtTransactions(key: creditDebtTransactionsKey, isCredit: null), //17
   ];
 
-  late int currentPage = widget.widthSideNavigationBar <= 0
-      ? (int.tryParse(navBarIconsData[appStateSettings["customNavBarShortcut0"]]
-                  ?.navigationIndexedStackIndex
-                  .toString() ??
-              "") ??
-          0)
-      : 0;
+  late int currentPage;
   int previousPage = 0;
 
   void changePage(int page, {bool switchNavbar = true}) {
@@ -404,6 +381,18 @@ class PageNavigationFrameworkState extends State<PageNavigationFramework> {
   @override
   void initState() {
     super.initState();
+
+    // Initialize currentPage here because `widget` is available in initState
+    if (widget.widthSideNavigationBar <= 0) {
+      currentPage = (int.tryParse(
+              navBarIconsData[appStateSettings["customNavBarShortcut0"]]
+                      ?.navigationIndexedStackIndex
+                      .toString() ??
+                  "") ??
+          0);
+    } else {
+      currentPage = 0;
+    }
 
     // Functions to run after entire UI loaded
     Future.delayed(Duration.zero, () async {
@@ -450,30 +439,22 @@ class PageNavigationFrameworkState extends State<PageNavigationFramework> {
       // The upcoming transactions may have been modified after a sync
       await setUpcomingNotifications(context);
 
-      await database.deleteWanderingTransactions();
-      await database.deleteWanderingTitles();
-      await database.fixDuplicateAssociatedTitles();
+      await db_global.database.deleteWanderingTransactions();
+      await db_global.database.deleteWanderingTitles();
+      await db_global.database.fixDuplicateAssociatedTitles();
 
       entireAppLoaded = true;
 
       print("Entire app loaded");
 
-      database.watchAllForAutoSync().listen((event) {
+      db_global.database.watchAllForAutoSync().listen((event) {
         // Must be logged in to perform an automatic sync - googleUser != null
-        // If we remove this, it will ask the user to login though - but it can be annoying
-        // Users can visually see the last time of sync, especially on web where sign-in is not automatic,
-        // so it shouldn't be an issue
         if (runningCloudFunctions == false && googleUser != null) {
           createSyncBackup(changeMadeSync: true);
         }
       });
 
-      if (kIsWeb) {
-        // On web, disable the browser's context menu since this example uses a custom
-        // Flutter-rendered context menu.
-        // Refer here: https://api.flutter.dev/flutter/material/TextField/contextMenuBuilder.html
-        BrowserContextMenu.disableContextMenu();
-      }
+      // Removed BrowserContextMenu.disableContextMenu() to avoid web-only API reference
     });
 
     // SchedulerBinding.instance.addPostFrameCallback((Duration duration) {
@@ -498,7 +479,7 @@ class PageNavigationFrameworkState extends State<PageNavigationFramework> {
               ? Duration.zero
               : appStateSettings["batterySaver"]
                   ? Duration.zero
-                  : Duration(milliseconds: 300),
+                  : const Duration(milliseconds: 300),
         ),
         extendBody: false,
         bottomNavigationBar: BottomNavBar(
@@ -516,7 +497,7 @@ class PageNavigationFrameworkState extends State<PageNavigationFramework> {
             end: 15,
           ),
           child: AnimateFAB(
-            key: ValueKey(1),
+            key: const ValueKey('animate_fab'),
             fab: AddFAB(
               tooltip: "add-transaction".tr(),
               openPage: AddTransactionPage(
@@ -534,7 +515,7 @@ class PageNavigationFrameworkState extends State<PageNavigationFramework> {
 class AddMoreThingsPopup extends StatelessWidget {
   const AddMoreThingsPopup({super.key});
 
-  createTransactionFromCommon({
+  Future<void> createTransactionFromCommon({
     required BuildContext context,
     required TransactionWithCount transactionWithCount,
     required Map<String, TransactionCategory> categoriesIndexed,
@@ -564,7 +545,7 @@ class AddMoreThingsPopup extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         AddThing(
           iconData: navBarIconsData["accountDetails"]!.iconData,
           title: "account".tr(),
@@ -572,7 +553,7 @@ class AddMoreThingsPopup extends StatelessWidget {
             routesToPopAfterDelete: RoutesToPopAfterDelete.None,
           ),
           widgetAfter: SelectChips(
-            padding: EdgeInsetsDirectional.symmetric(horizontal: 13),
+            padding: const EdgeInsetsDirectional.symmetric(horizontal: 13),
             items: [
               if (Provider.of<AllWallets>(context).list.length > 1)
                 "transfer-balance",
@@ -637,16 +618,16 @@ class AddMoreThingsPopup extends StatelessWidget {
           ),
         ),
         StreamBuilder<Map<String, TransactionCategory>>(
-          stream: database.watchAllCategoriesIndexed(),
+          stream: db_global.database.watchAllCategoriesIndexed(),
           builder: (context, snapshotCategories) {
             Map<String, TransactionCategory> categoriesIndexed =
                 snapshotCategories.data ?? {};
             return StreamBuilder<List<TransactionWithCount>>(
-              stream: database.getCommonTransactions(),
+              stream: db_global.database.getCommonTransactions(),
               builder: (context, snapshot) {
                 List<TransactionWithCount> commonTransactions =
                     snapshot.data ?? [];
-                if (commonTransactions.length <= 0) {
+                if (commonTransactions.isEmpty) {
                   return AddThing(
                     iconData: navBarIconsData["transactions"]!.iconData,
                     title: "transaction".tr(),
@@ -661,7 +642,7 @@ class AddMoreThingsPopup extends StatelessWidget {
                         : Icons.info_outline_rounded,
                     iconSize: 14,
                     scale: 1.8,
-                    padding: EdgeInsetsDirectional.all(5),
+                    padding: const EdgeInsetsDirectional.all(5),
                     onTap: () {
                       openPopup(
                         context,
@@ -683,7 +664,8 @@ class AddMoreThingsPopup extends StatelessWidget {
                   openPage: AddTransactionPage(
                       routesToPopAfterDelete: RoutesToPopAfterDelete.None),
                   widgetAfter: SelectChips(
-                    padding: EdgeInsetsDirectional.symmetric(horizontal: 13),
+                    padding:
+                        const EdgeInsetsDirectional.symmetric(horizontal: 13),
                     items: commonTransactions,
                     getSelected: (_) {
                       return false;
@@ -705,7 +687,7 @@ class AddMoreThingsPopup extends StatelessWidget {
                       );
                       amount = amount.abs() *
                           (transactionWithCount.transaction.income ? 1 : -1);
-                      createTransactionFromCommon(
+                      await createTransactionFromCommon(
                         context: context,
                         transactionWithCount: transactionWithCount,
                         categoriesIndexed: categoriesIndexed,
@@ -714,29 +696,13 @@ class AddMoreThingsPopup extends StatelessWidget {
                     },
                     onSelected:
                         (TransactionWithCount transactionWithCount) async {
-                      createTransactionFromCommon(
+                      await createTransactionFromCommon(
                         context: context,
                         transactionWithCount: transactionWithCount,
                         categoriesIndexed: categoriesIndexed,
                       );
                     },
                     getLabel: (TransactionWithCount transactionWithCount) {
-                      // Keep the currency displayed in the primary currency
-                      // Therefore no need to convert using the code below...
-                      //
-                      // double amountInPrimary =
-                      //     transactionWithCount.transaction.amount *
-                      //         (amountRatioToPrimaryCurrencyGivenPk(
-                      //             Provider.of<AllWallets>(context),
-                      //             transactionWithCount.transaction.walletFk));
-                      // convertToMoney(
-                      //       Provider.of<AllWallets>(context),
-                      //       amountInPrimary,
-                      //       currencyKey: Provider.of<AllWallets>(context)
-                      //           .indexedByPk[
-                      //               transactionWithCount.transaction.walletFk]
-                      //           ?.currency,
-                      //     )
                       return getTransactionLabelSync(
                             transactionWithCount.transaction,
                             categoriesIndexed[
@@ -800,19 +766,11 @@ class AddMoreThingsPopup extends StatelessWidget {
             objectiveType: ObjectiveType.loan,
           ),
           widgetAfter: SelectChips(
-            padding: EdgeInsetsDirectional.symmetric(horizontal: 13),
+            padding: const EdgeInsetsDirectional.symmetric(horizontal: 13),
             items: ["long-term", "one-time"],
             getSelected: (_) {
               return false;
             },
-            // extraWidget: SelectChipsAddButtonExtraWidget(
-            //   openPage: AddObjectivePage(
-            //     routesToPopAfterDelete: RoutesToPopAfterDelete.None,
-            //   ),
-            //   shouldPushRoute: true,
-            //   popCurrentRoute: true,
-            // ),
-            // extraWidgetAtBeginning: true,
             onSelected: (String selection) async {
               popRoute(context);
               if (selection == "long-term") {
@@ -860,20 +818,12 @@ class AddMoreThingsPopup extends StatelessWidget {
             routesToPopAfterDelete: RoutesToPopAfterDelete.None,
           ),
           widgetAfter: SelectChips(
-            padding: EdgeInsetsDirectional.symmetric(horizontal: 13),
+            padding: const EdgeInsetsDirectional.symmetric(horizontal: 13),
             items: ["installment"],
             getSelected: (_) {
               return false;
             },
-            // extraWidget: SelectChipsAddButtonExtraWidget(
-            //   openPage: AddObjectivePage(
-            //     routesToPopAfterDelete: RoutesToPopAfterDelete.None,
-            //   ),
-            //   shouldPushRoute: true,
-            //   popCurrentRoute: true,
-            // ),
-            // extraWidgetAtBeginning: true,
-            onSelected: (String selection) async {
+            onSelected: (String selection) {
               if (navigatorKey.currentContext == null) {
                 startCreatingInstallment(context: context);
               } else {
@@ -952,9 +902,9 @@ class AddThing extends StatelessWidget {
               alignStart: true,
               alignBeside: true,
               padding: widgetAfter != null
-                  ? EdgeInsetsDirectional.only(
+                  ? const EdgeInsetsDirectional.only(
                       start: 20, end: 20, top: 20, bottom: 5)
-                  : EdgeInsetsDirectional.symmetric(
+                  : const EdgeInsetsDirectional.symmetric(
                       horizontal: 20, vertical: 20),
               text: title.capitalizeFirst,
               iconData: iconData,
@@ -969,7 +919,7 @@ class AddThing extends StatelessWidget {
               },
               afterWidget: widgetAfter,
               afterWidgetPadding: widgetAfter != null
-                  ? EdgeInsetsDirectional.only(bottom: 8)
+                  ? const EdgeInsetsDirectional.only(bottom: 8)
                   : EdgeInsetsDirectional.zero,
               infoButton: infoButton,
             ),
@@ -988,34 +938,28 @@ class AnimateFAB extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (appStateSettings["appAnimations"] != AppAnimations.all.index)
-      return condition ? fab : SizedBox.shrink();
-    // return AnimatedOpacity(
-    //   duration: Duration(milliseconds: 400),
-    //   opacity: condition ? 1 : 0,
-    //   child: AnimatedScale(
-    //     duration: Duration(milliseconds: 1100),
-    //     scale: condition ? 1 : 0,
-    //     curve: Curves.easeInOutCubicEmphasized,
-    //     child: fab,
-    //     alignment: Alignment(0.7, 0.7),
-    //   ),
-    // );
+    if (appStateSettings["appAnimations"] != AppAnimations.all.index) {
+      return condition ? fab : const SizedBox.shrink();
+    }
+
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       switchInCurve: Curves.easeInOutCubicEmphasized,
       switchOutCurve: Curves.ease,
       transitionBuilder: (Widget child, Animation<double> animation) {
         return FadeScaleTransitionButton(
           animation: animation,
           child: child,
-          alignment: Alignment(0.7, 0.7),
+          alignment: const Alignment(0.7, 0.7),
         );
       },
       child: condition
-          ? fab
+          ? KeyedSubtree(
+              key: const ValueKey('fab_shown'),
+              child: fab,
+            )
           : Container(
-              key: ValueKey(1),
+              key: const ValueKey('fab_hidden'),
               width: 50,
               height: 50,
             ),
@@ -1114,8 +1058,14 @@ class FadeIndexedStack extends StatefulWidget {
 
 class FadeIndexedStackState extends State<FadeIndexedStack>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller =
-      AnimationController(vsync: this, duration: widget.duration);
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: widget.duration)
+      ..forward();
+  }
 
   @override
   void didUpdateWidget(FadeIndexedStack oldWidget) {
@@ -1123,12 +1073,6 @@ class FadeIndexedStackState extends State<FadeIndexedStack>
       _controller.forward(from: 0.0);
     }
     super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void initState() {
-    _controller.forward();
-    super.initState();
   }
 
   @override

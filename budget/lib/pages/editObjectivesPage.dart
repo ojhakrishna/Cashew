@@ -9,7 +9,7 @@ import 'package:budget/pages/objectivesListPage.dart';
 import 'package:budget/struct/currencyFunctions.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
-import 'package:budget/widgets/animatedExpanded.dart';
+// import 'package:budget/widgets/animatedExpanded.dart'; // Unused import removed
 import 'package:budget/widgets/categoryIcon.dart';
 import 'package:budget/widgets/dropdownSelect.dart';
 import 'package:budget/widgets/fab.dart';
@@ -33,10 +33,7 @@ import 'package:provider/provider.dart';
 import 'package:budget/pages/addButton.dart';
 
 class EditObjectivesPage extends StatefulWidget {
-  EditObjectivesPage({
-    required this.objectiveType,
-    Key? key,
-  }) : super(key: key);
+  EditObjectivesPage({required this.objectiveType, Key? key}) : super(key: key);
   final ObjectiveType objectiveType;
 
   @override
@@ -208,8 +205,9 @@ class _EditObjectivesPageState extends State<EditObjectivesPage> {
                           archived: !objective.archived,
                           pinned: objective.archived,
                         );
-                        await database
-                            .createOrUpdateObjective(updatedObjective);
+                        await database.createOrUpdateObjective(
+                          updatedObjective,
+                        );
                       },
                       opacity: objective.archived ? 0.5 : 1,
                       canReorder: searchValue == "" &&
@@ -217,7 +215,9 @@ class _EditObjectivesPageState extends State<EditObjectivesPage> {
                       currentReorder:
                           currentReorder != -1 && currentReorder != index,
                       padding: EdgeInsetsDirectional.symmetric(
-                          horizontal: 10, vertical: 5),
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       content: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -264,14 +264,18 @@ class _EditObjectivesPageState extends State<EditObjectivesPage> {
                                               ? "borrowed-funds".tr()
                                               : "expense-goal".tr(),
                                   fontSize: 14,
-                                  textColor: getColor(context, "black")
-                                      .withOpacity(0.65),
+                                  textColor: getColor(
+                                    context,
+                                    "black",
+                                  ).withOpacity(0.65),
                                 ),
                                 WatchTotalAndAmountOfObjective(
                                   objective: objective,
-                                  builder: (double objectiveAmount,
-                                      double totalAmount,
-                                      double percentageTowardsGoal) {
+                                  builder: (
+                                    double objectiveAmount,
+                                    double totalAmount,
+                                    double percentageTowardsGoal,
+                                  ) {
                                     bool showTotalSpent = appStateSettings[
                                         "showTotalSpentForObjective"];
                                     String amountSpentLabel =
@@ -293,9 +297,10 @@ class _EditObjectivesPageState extends State<EditObjectivesPage> {
                                             ? (percentageTowardsGoal == 1
                                                 ? "all-settled".tr()
                                                 : (getDifferenceOfLoan(
-                                                            objective,
-                                                            totalAmount,
-                                                            objectiveAmount) >
+                                                          objective,
+                                                          totalAmount,
+                                                          objectiveAmount,
+                                                        ) >
                                                         0)
                                                     ? "to-pay".tr()
                                                     : "to-collect".tr())
@@ -310,8 +315,10 @@ class _EditObjectivesPageState extends State<EditObjectivesPage> {
                                           : (amountSpentLabel +
                                               amountRemainingLabel),
                                       fontSize: 14,
-                                      textColor: getColor(context, "black")
-                                          .withOpacity(0.65),
+                                      textColor: getColor(
+                                        context,
+                                        "black",
+                                      ).withOpacity(0.65),
                                       maxLines: 2,
                                     );
                                   },
@@ -359,10 +366,11 @@ class _EditObjectivesPageState extends State<EditObjectivesPage> {
                       ),
                       index: index,
                       onDelete: () async {
-                        deleteObjectivePopup(context,
-                            objective: objective,
-                            routesToPopAfterDelete:
-                                RoutesToPopAfterDelete.None);
+                        deleteObjectivePopup(
+                          context,
+                          objective: objective,
+                          routesToPopAfterDelete: RoutesToPopAfterDelete.None,
+                        );
                         return true;
                       },
                       openPage: AddObjectivePage(
@@ -375,26 +383,28 @@ class _EditObjectivesPageState extends State<EditObjectivesPage> {
                   onReorder: (_intPrevious, _intNew) async {
                     Objective oldObjective = snapshot.data![_intPrevious];
                     if (_intNew > _intPrevious) {
-                      await database.moveObjective(oldObjective.objectivePk,
-                          _intNew - 1, oldObjective.order,
-                          objectiveType: widget.objectiveType);
+                      await database.moveObjective(
+                        oldObjective.objectivePk,
+                        _intNew - 1,
+                        oldObjective.order,
+                        objectiveType: widget.objectiveType,
+                      );
                     } else {
                       await database.moveObjective(
-                          oldObjective.objectivePk, _intNew, oldObjective.order,
-                          objectiveType: widget.objectiveType);
+                        oldObjective.objectivePk,
+                        _intNew,
+                        oldObjective.order,
+                        objectiveType: widget.objectiveType,
+                      );
                     }
                     return true;
                   },
                 );
               }
-              return SliverToBoxAdapter(
-                child: Container(),
-              );
+              return SliverToBoxAdapter(child: Container());
             },
           ),
-          SliverToBoxAdapter(
-            child: SizedBox(height: 75),
-          ),
+          SliverToBoxAdapter(child: SizedBox(height: 75)),
         ],
       ),
     );
@@ -527,8 +537,9 @@ Future<dynamic> selectObjectivePopup(
                                 convertToMoney(
                                   Provider.of<AllWallets>(context),
                                   objectiveAmountToPrimaryCurrency(
-                                          Provider.of<AllWallets>(context),
-                                          objective) *
+                                        Provider.of<AllWallets>(context),
+                                        objective,
+                                      ) *
                                       ((objective.income) ? 1 : -1),
                                 ) +
                                 ")")
@@ -572,7 +583,7 @@ Future<dynamic> selectObjectivePopup(
                   ),
                 ),
               ],
-            )
+            ),
         ],
       ),
     ),
@@ -604,9 +615,13 @@ List<double> getInstallmentPaymentCalculations({
   double amountPerInstallmentPaymentInCurrentCurrency =
       (amountPerInstallmentPayment ?? 0) *
           amountRatioToPrimaryCurrencyGivenPk(
-              allWallets, amountPerInstallmentPaymentWalletPk);
-  double objectiveTotalInCurrentCurrency =
-      objectiveAmountToPrimaryCurrency(allWallets, objective);
+            allWallets,
+            amountPerInstallmentPaymentWalletPk,
+          );
+  double objectiveTotalInCurrentCurrency = objectiveAmountToPrimaryCurrency(
+    allWallets,
+    objective,
+  );
   double numberOfInstallmentPaymentsDisplay =
       (numberOfInstallmentPayments ?? 0) * 1.0;
   double amountPerInstallmentPaymentDisplay =
@@ -627,6 +642,6 @@ List<double> getInstallmentPaymentCalculations({
       amountPerInstallmentPaymentDisplay * (objective.income ? 1 : -1);
   return [
     numberOfInstallmentPaymentsDisplay,
-    amountPerInstallmentPaymentDisplay
+    amountPerInstallmentPaymentDisplay,
   ];
 }

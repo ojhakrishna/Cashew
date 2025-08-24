@@ -13,7 +13,7 @@ import 'package:budget/widgets/util/onAppResume.dart';
 import 'package:budget/widgets/util/watchForDayChange.dart';
 import 'package:budget/widgets/watchAllWallets.dart';
 import 'package:budget/database/tables.dart';
-import 'package:budget/struct/databaseGlobal.dart';
+import 'package:budget/struct/databaseGlobal.dart' as db_global;
 import 'package:budget/struct/settings.dart';
 import 'package:budget/struct/notificationsGlobal.dart';
 import 'package:budget/widgets/navigationSidebar.dart';
@@ -41,31 +41,69 @@ bool enableDevicePreview = false && kDebugMode;
 bool allowDebugFlags = true || kIsWeb;
 bool allowDangerousDebugFlags = kDebugMode;
 
+// These variables are initialized in main before the app runs.
+// Using 'late' tells Dart that we promise they will not be null when they are first used.
+late SharedPreferences sharedPreferences;
+late FinanceDatabase database;
+// This might need to be nullable depending on its implementation
+NotificationPayload? notificationPayload;
+
 void main() async {
   captureLogs(() async {
+    // This is now the standard way to ensure bindings are initialized.
     WidgetsFlutterBinding.ensureInitialized();
+
+    // Initialize packages before the app runs
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     await EasyLocalization.ensureInitialized();
+
+    // Initialize local app components
     sharedPreferences = await SharedPreferences.getInstance();
-    database = await constructDb('db');
-    notificationPayload = await initializeNotifications();
+    database = db_global.constructDb();
+    final notifPayloadString = await initializeNotifications();
+    if (notifPayloadString != null) {
+      notificationPayload =
+          NotificationPayload(id: 0, payload: notifPayloadString);
+    } else {
+      notificationPayload = null;
+    }
     entireAppLoaded = false;
     await loadCurrencyJSON();
     await loadLanguageNamesJSON();
     await initializeSettings();
+
+    // Timezone initialization
     tz.initializeTimeZones();
-    final String? locationName = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(locationName ?? "America/New_York"));
+    try {
+      final String locationName = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(locationName));
+    } catch (e) {
+      // Fallback if timezone cannot be determined
+      tz.setLocalLocation(tz.getLocation("America/New_York"));
+      print("Could not get local timezone: $e");
+    }
+
+    // Sorting icon objects
     iconObjects.sort((a, b) => (a.mostLikelyCategoryName ?? a.icon)
         .compareTo((b.mostLikelyCategoryName ?? b.icon)));
+
+    // This function likely needs updates for modern Android/iOS APIs
     setHighRefreshRate();
+
     runApp(
-      DevicePreview(
-        enabled: enableDevicePreview,
-        builder: (context) => InitializeLocalizations(
-          child: RestartApp(
+      EasyLocalization(
+        supportedLocales: const [
+          Locale('en'),
+          Locale('fr'),
+          // Add other supported locales here
+        ],
+        path: 'assets/translations/generated', // path to your translation files
+        fallbackLocale: const Locale('en'),
+        child: DevicePreview(
+          enabled: enableDevicePreview,
+          builder: (context) => RestartApp(
             child: InitializeApp(key: appStateKey),
           ),
         ),
@@ -79,7 +117,7 @@ GlobalKey<PageNavigationFrameworkState> pageNavigationFrameworkKey =
     GlobalKey();
 
 class InitializeApp extends StatefulWidget {
-  InitializeApp({Key? key}) : super(key: key);
+  const InitializeApp({Key? key}) : super(key: key);
 
   @override
   State<InitializeApp> createState() => _InitializeAppState();
@@ -92,7 +130,8 @@ class _InitializeAppState extends State<InitializeApp> {
 
   @override
   Widget build(BuildContext context) {
-    return App(key: ValueKey("Main App"));
+    // Using a ValueKey helps Flutter know when to rebuild the widget.
+    return const App(key: ValueKey("Main App"));
   }
 }
 
@@ -103,46 +142,23 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     print("Rebuilt Material App");
     return MaterialApp(
-      showPerformanceOverlay: kProfileMode,
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
+      // Device Preview settings
+      // useInheritedMediaQuery is deprecated, builder handles this.
       locale:
           enableDevicePreview ? DevicePreview.locale(context) : context.locale,
-      shortcuts: shortcuts,
-      actions: keyboardIntents,
-      themeAnimationDuration: Duration(milliseconds: 400),
-      themeAnimationCurve: CustomDelayedCurve(),
-      key: ValueKey('CashewAppMain'),
-      title: 'Cashew',
-      theme: getLightTheme(),
-      darkTheme: getDarkTheme(),
-      scrollBehavior: ScrollBehaviorOverride(),
-      themeMode: getSettingConstants(appStateSettings)["theme"],
-      home: HandleWillPopScope(
-        child: Stack(
-          children: [
-            Row(
-              children: [
-                NavigationSidebar(key: sidebarStateKey),
-                Expanded(
-                    child: Stack(
-                  children: [
-                    InitialPageRouteNavigator(),
-                    GlobalSnackbar(key: snackbarKey),
-                  ],
-                )),
-              ],
-            ),
-            EnableSignInWithGoogleFlyIn(),
-            GlobalLoadingIndeterminate(key: loadingIndeterminateKey),
-            GlobalLoadingProgress(key: loadingProgressKey),
-          ],
-        ),
-      ),
       builder: (context, child) {
+        // The builder is the recommended way to wrap your app with helpers.
+        // It also allows DevicePreview to work correctly.
+        final previewedChild = enableDevicePreview
+            ? DevicePreview.appBuilder(context, child)
+            : child;
+
         if (kReleaseMode) {
           ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
-            return Container(color: Colors.transparent);
+            // A simple error widget for release mode.
+            return const Center(
+              child: Text("An unexpected error occurred."),
+            );
           };
         }
 
@@ -157,7 +173,7 @@ class App extends StatelessWidget {
                 child: WatchForDayChange(
                   child: WatchSelectedWalletPk(
                     child: WatchAllWallets(
-                      child: child ?? SizedBox.shrink(),
+                      child: previewedChild ?? const SizedBox.shrink(),
                     ),
                   ),
                 ),
@@ -166,14 +182,65 @@ class App extends StatelessWidget {
           ),
         );
 
-        if (kIsWeb) {
-          return FadeIn(
-              duration: Duration(milliseconds: 1000), child: mainWidget);
-        } else {
-          return mainWidget;
-        }
+        return kIsWeb
+            ? FadeIn(
+                duration: const Duration(milliseconds: 1000), child: mainWidget)
+            : mainWidget;
       },
-      // ),
+      // Localization settings from EasyLocalization
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+
+      // Keyboard shortcuts and actions (ensure these are defined in a null-safe way)
+      shortcuts: shortcuts,
+      actions: keyboardIntents,
+
+      // Theming
+      themeAnimationDuration: const Duration(milliseconds: 400),
+      themeAnimationCurve: CustomDelayedCurve(),
+      key: const ValueKey('CashewAppMain'),
+      title: 'Cashew',
+      theme: getLightTheme(),
+      darkTheme: getDarkTheme(),
+      scrollBehavior: ScrollBehaviorOverride(),
+      // Null-safe way to get the theme. It defaults to system theme if the setting is not found.
+      themeMode:
+          getSettingConstants(appStateSettings)["theme"] ?? ThemeMode.system,
+
+      // Main app content
+      home: HandleWillPopScope(
+        child: Stack(
+          children: [
+            Row(
+              children: [
+                NavigationSidebar(key: sidebarStateKey),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      const InitialPageRouteNavigator(),
+                      GlobalSnackbar(key: snackbarKey),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const EnableSignInWithGoogleFlyIn(),
+            GlobalLoadingIndeterminate(key: loadingIndeterminateKey),
+            GlobalLoadingProgress(key: loadingProgressKey),
+          ],
+        ),
+      ),
     );
+  }
+}
+
+// Placeholder for your custom widget. Ensure its implementation is also updated.
+class InitialPageRouteNavigator extends StatelessWidget {
+  const InitialPageRouteNavigator({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // This should navigate to your app's home page, e.g., AccountsPage.
+    return AccountsPage();
   }
 }

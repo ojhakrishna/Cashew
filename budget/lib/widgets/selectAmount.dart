@@ -35,10 +35,7 @@ String getDecimalSeparator() {
   return numberFormatSymbols[(locale).split("-")[0]]?.DECIMAL_SEP ?? ".";
 }
 
-enum NumberPadFormat {
-  format123,
-  format789,
-}
+enum NumberPadFormat { format123, format789 }
 
 NumberPadFormat getNumberPadFormat() {
   int? rawNumPadFormat = appStateSettings["numberPadFormat"] as int?;
@@ -115,16 +112,19 @@ class _SelectAmountState extends State<SelectAmount> {
   late String? selectedWalletPk = widget.selectedWalletPk;
 
   TransactionWallet? getSelectedWallet({required bool listen}) {
-    return Provider.of<AllWallets>(context, listen: listen)
-        .indexedByPk[selectedWalletPk];
+    return Provider.of<AllWallets>(
+      context,
+      listen: listen,
+    ).indexedByPk[selectedWalletPk];
   }
 
   int getDecimals({required bool listen}) {
     return widget.decimals ??
         getSelectedWallet(listen: listen)?.decimals ??
-        Provider.of<AllWallets>(context, listen: false)
-            .indexedByPk[appStateSettings["selectedWalletPk"]]
-            ?.decimals ??
+        Provider.of<AllWallets>(
+          context,
+          listen: false,
+        ).indexedByPk[appStateSettings["selectedWalletPk"]]?.decimals ??
         2;
   }
 
@@ -138,8 +138,9 @@ class _SelectAmountState extends State<SelectAmount> {
     try {
       amount = widget.allDecimals
           ? double.parse(widget.amountPassed).toString()
-          : double.parse(widget.amountPassed)
-              .toStringAsFixed(getDecimals(listen: false));
+          : double.parse(
+              widget.amountPassed,
+            ).toStringAsFixed(getDecimals(listen: false));
     } catch (e) {
       print(e.toString());
     }
@@ -150,138 +151,146 @@ class _SelectAmountState extends State<SelectAmount> {
     // if (amount.endsWith(".0")) {
     //   amount = widget.amountPassed.replaceAll(".0", "");
     // }
-    _focusAttachment = _focusNode.attach(context, onKeyEvent: (node, event) {
-      bool keyIsPressed = event.runtimeType == KeyDownEvent ||
-          event.runtimeType == KeyRepeatEvent;
-      if (event.logicalKey.keyLabel.toLowerCase().contains("control")) {
-        if (keyIsPressed) {
-          isControlPressed = true;
-        } else {
-          isControlPressed = false;
+    _focusAttachment = _focusNode.attach(
+      context,
+      onKeyEvent: (node, event) {
+        bool keyIsPressed = event.runtimeType == KeyDownEvent ||
+            event.runtimeType == KeyRepeatEvent;
+        if (event.logicalKey.keyLabel.toLowerCase().contains("control")) {
+          if (keyIsPressed) {
+            isControlPressed = true;
+          } else {
+            isControlPressed = false;
+          }
         }
-      }
-      if (keyIsPressed && event.logicalKey.keyLabel == "Go Back" ||
-          event.logicalKey == LogicalKeyboardKey.escape) {
-        popRoute(context);
-      } else if (isControlPressed &&
-          keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.keyC) {
-        copyToClipboard(amount);
-      } else if (isControlPressed &&
-          keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.keyV) {
-        pasteFromClipboard();
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit0) {
-        addToAmount("0");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit1) {
-        addToAmount("1");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit2) {
-        addToAmount("2");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit3) {
-        addToAmount("3");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit4) {
-        addToAmount("4");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit5) {
-        addToAmount("5");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit6) {
-        addToAmount("6");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit7) {
-        addToAmount("7");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit8) {
-        addToAmount("8");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit9) {
-        addToAmount("9");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad0) {
-        addToAmount("0");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad1) {
-        addToAmount("1");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad2) {
-        addToAmount("2");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad3) {
-        addToAmount("3");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad4) {
-        addToAmount("4");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad5) {
-        addToAmount("5");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad6) {
-        addToAmount("6");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad7) {
-        addToAmount("7");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad8) {
-        addToAmount("8");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad9) {
-        addToAmount("9");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.asterisk) {
-        addToAmount("×");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpadMultiply) {
-        addToAmount("×");
-      } else if (keyIsPressed && event.logicalKey == LogicalKeyboardKey.slash) {
-        addToAmount("÷");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpadDivide) {
-        addToAmount("÷");
-      } else if (keyIsPressed && event.logicalKey == LogicalKeyboardKey.add) {
-        addToAmount("+");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpadAdd) {
-        addToAmount("+");
-      } else if (keyIsPressed && event.logicalKey == LogicalKeyboardKey.minus) {
-        addToAmount("-");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpadSubtract) {
-        addToAmount("-");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.period) {
-        addToAmount(".");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpadDecimal) {
-        addToAmount(".");
-      } else if (keyIsPressed && event.logicalKey == LogicalKeyboardKey.comma) {
-        addToAmount(".");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.backspace) {
-        removeToAmount();
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.delete) {
-        removeToAmount();
-      } else if (keyIsPressed && event.logicalKey == LogicalKeyboardKey.enter) {
-        if (widget.next != null) {
-          widget.next!();
-        }
-        if (widget.popWithAmount) {
-          popRoute(
+        if (keyIsPressed && event.logicalKey.keyLabel == "Go Back" ||
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          popRoute(context);
+        } else if (isControlPressed &&
+            keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.keyC) {
+          copyToClipboard(amount);
+        } else if (isControlPressed &&
+            keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.keyV) {
+          pasteFromClipboard();
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit0) {
+          addToAmount("0");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit1) {
+          addToAmount("1");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit2) {
+          addToAmount("2");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit3) {
+          addToAmount("3");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit4) {
+          addToAmount("4");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit5) {
+          addToAmount("5");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit6) {
+          addToAmount("6");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit7) {
+          addToAmount("7");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit8) {
+          addToAmount("8");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit9) {
+          addToAmount("9");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad0) {
+          addToAmount("0");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad1) {
+          addToAmount("1");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad2) {
+          addToAmount("2");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad3) {
+          addToAmount("3");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad4) {
+          addToAmount("4");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad5) {
+          addToAmount("5");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad6) {
+          addToAmount("6");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad7) {
+          addToAmount("7");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad8) {
+          addToAmount("8");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad9) {
+          addToAmount("9");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.asterisk) {
+          addToAmount("×");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpadMultiply) {
+          addToAmount("×");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.slash) {
+          addToAmount("÷");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpadDivide) {
+          addToAmount("÷");
+        } else if (keyIsPressed && event.logicalKey == LogicalKeyboardKey.add) {
+          addToAmount("+");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpadAdd) {
+          addToAmount("+");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.minus) {
+          addToAmount("-");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpadSubtract) {
+          addToAmount("-");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.period) {
+          addToAmount(".");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpadDecimal) {
+          addToAmount(".");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.comma) {
+          addToAmount(".");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.backspace) {
+          removeToAmount();
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.delete) {
+          removeToAmount();
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.enter) {
+          if (widget.next != null) {
+            widget.next!();
+          }
+          if (widget.popWithAmount) {
+            popRoute(
               context,
               (amount == ""
                   ? 0
                   : includesOperations(amount, false)
                       ? calculateResult(amount)
-                      : double.tryParse(amount) ?? 0));
+                      : double.tryParse(amount) ?? 0),
+            );
+          }
         }
-      }
-      return KeyEventResult.handled;
-    });
+        return KeyEventResult.handled;
+      },
+    );
     _focusNode.requestFocus();
   }
 
@@ -345,12 +354,13 @@ class _SelectAmountState extends State<SelectAmount> {
       });
     }
     widget.setSelectedAmount(
-        (amount == ""
-            ? 0
-            : includesOperations(amount, false)
-                ? calculateResult(amount)
-                : double.tryParse(amount) ?? 0),
-        amount);
+      (amount == ""
+          ? 0
+          : includesOperations(amount, false)
+              ? calculateResult(amount)
+              : double.tryParse(amount) ?? 0),
+      amount,
+    );
     bottomSheetControllerGlobal.reMeasure();
   }
 
@@ -365,12 +375,13 @@ class _SelectAmountState extends State<SelectAmount> {
       }
     });
     widget.setSelectedAmount(
-        (amount == ""
-            ? 0
-            : includesOperations(amount, false)
-                ? calculateResult(amount)
-                : double.tryParse(amount) ?? 0),
-        amount);
+      (amount == ""
+          ? 0
+          : includesOperations(amount, false)
+              ? calculateResult(amount)
+              : double.tryParse(amount) ?? 0),
+      amount,
+    );
     bottomSheetControllerGlobal.reMeasure();
   }
 
@@ -379,12 +390,13 @@ class _SelectAmountState extends State<SelectAmount> {
       amount = "";
     });
     widget.setSelectedAmount(
-        (amount == ""
-            ? 0
-            : includesOperations(amount, false)
-                ? calculateResult(amount)
-                : double.tryParse(amount) ?? 0),
-        amount);
+      (amount == ""
+          ? 0
+          : includesOperations(amount, false)
+              ? calculateResult(amount)
+              : double.tryParse(amount) ?? 0),
+      amount,
+    );
     bottomSheetControllerGlobal.reMeasure();
   }
 
@@ -395,7 +407,7 @@ class _SelectAmountState extends State<SelectAmount> {
       "×",
       "-",
       "+",
-      (includeDecimal ? "." : "+")
+      (includeDecimal ? "." : "+"),
     ];
     for (String operation in operations) {
       if (input.contains(operation)) {
@@ -407,12 +419,7 @@ class _SelectAmountState extends State<SelectAmount> {
   }
 
   bool onlyOneOperationAndIsNegativeSign(String amount) {
-    List<String> operations = [
-      "÷",
-      "×",
-      "-",
-      "+",
-    ];
+    List<String> operations = ["÷", "×", "-", "+"];
 
     if (amount.startsWith("-")) {
       int operationCount = operations.fold<int>(
@@ -484,21 +491,19 @@ class _SelectAmountState extends State<SelectAmount> {
 
   pasteFromClipboard() async {
     double? amount = await readAmountFromClipboard();
+    setState(() {
+      this.amount = amount?.toString() ?? "";
+    });
     if (amount != null) {
-      setState(() {
-        this.amount = amount.toString();
-      });
       widget.setSelectedAmount(amount, amount.toString());
-      bottomSheetControllerGlobal.reMeasure();
     }
+    bottomSheetControllerGlobal.reMeasure();
   }
 
   pasteFromClipboardIntoCalculation() async {
     double? amount = await readAmountFromClipboard();
-    if (amount != null) {
-      for (String number in removeTrailingZeroes(amount.toString()).split("")) {
-        addToAmount(number, hapticFeedback: false);
-      }
+    for (String number in removeTrailingZeroes(amount.toString()).split("")) {
+      addToAmount(number, hapticFeedback: false);
     }
   }
 
@@ -517,8 +522,9 @@ class _SelectAmountState extends State<SelectAmount> {
       selectedWalletPk = wallet.walletPk;
       walletPkForCurrency = wallet.walletPk;
       try {
-        amount =
-            double.parse(amount).toStringAsFixed(getDecimals(listen: false));
+        amount = double.parse(
+          amount,
+        ).toStringAsFixed(getDecimals(listen: false));
       } catch (e) {}
       amount = removeTrailingZeroes(amount);
       addToAmount("");
@@ -529,8 +535,10 @@ class _SelectAmountState extends State<SelectAmount> {
     TransactionWallet? walletBefore = getSelectedWallet(listen: false);
     // get the index of the primary wallet
     int index = 0;
-    for (TransactionWallet wallet
-        in Provider.of<AllWallets>(context, listen: false).list) {
+    for (TransactionWallet wallet in Provider.of<AllWallets>(
+      context,
+      listen: false,
+    ).list) {
       if (wallet.walletPk == appStateSettings["selectedWalletPk"]) {
         break;
       }
@@ -539,19 +547,25 @@ class _SelectAmountState extends State<SelectAmount> {
 
     if (widget.setSelectedWalletPk != null)
       widget.setSelectedWalletPk!(
-          Provider.of<AllWallets>(context, listen: false).list[index].walletPk);
+        Provider.of<AllWallets>(context, listen: false).list[index].walletPk,
+      );
     setState(() {
-      selectedWalletPk =
-          Provider.of<AllWallets>(context, listen: false).list[index].walletPk;
-      walletPkForCurrency =
-          Provider.of<AllWallets>(context, listen: false).list[index].walletPk;
+      selectedWalletPk = Provider.of<AllWallets>(
+        context,
+        listen: false,
+      ).list[index].walletPk;
+      walletPkForCurrency = Provider.of<AllWallets>(
+        context,
+        listen: false,
+      ).list[index].walletPk;
       try {
         amount = (double.parse(amount) *
                 (walletBefore == null
                     ? 1
                     : (amountRatioToPrimaryCurrencyGivenPk(
                         Provider.of<AllWallets>(context, listen: false),
-                        walletBefore.walletPk))))
+                        walletBefore.walletPk,
+                      ))))
             .toStringAsFixed(getDecimals(listen: false));
       } catch (e) {}
       amount = removeTrailingZeroes(amount);
@@ -584,8 +598,10 @@ class _SelectAmountState extends State<SelectAmount> {
               ),
             ],
             tappableBuilder: (onLongPress) =>
-                widget.amountTappableBuilder
-                    ?.call(onLongPress, amountConverted) ??
+                widget.amountTappableBuilder?.call(
+                  onLongPress,
+                  amountConverted,
+                ) ??
                 Tappable(
                   color: Colors.transparent,
                   borderRadius: 10,
@@ -627,8 +643,9 @@ class _SelectAmountState extends State<SelectAmount> {
                     expand: (getSelectedWallet(listen: true)?.walletPk ==
                                 appStateSettings["selectedWalletPk"] ||
                             ((Provider.of<AllWallets>(context)
-                                    .indexedByPk[getSelectedWallet(listen: true)
-                                        ?.walletPk]
+                                    .indexedByPk[getSelectedWallet(
+                                      listen: true,
+                                    )?.walletPk]
                                     ?.currency) ==
                                 Provider.of<AllWallets>(context)
                                     .indexedByPk[
@@ -642,15 +659,14 @@ class _SelectAmountState extends State<SelectAmount> {
                       onTap: () => convertAmountToSelectedCurrency(),
                       child: Padding(
                         padding: const EdgeInsetsDirectional.symmetric(
-                            horizontal: 8, vertical: 7),
+                          horizontal: 8,
+                          vertical: 7,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.currency_exchange_rounded,
-                              size: 16,
-                            ),
+                            Icon(Icons.currency_exchange_rounded, size: 16),
                             SizedBox(height: 2),
                             TextFont(
                               text: Provider.of<AllWallets>(context)
@@ -668,8 +684,9 @@ class _SelectAmountState extends State<SelectAmount> {
                     ),
                   ),
                 ),
-                data: MediaQuery.of(context)
-                    .copyWith(textScaler: TextScaler.linear(1.0)),
+                data: MediaQuery.of(
+                  context,
+                ).copyWith(textScaler: TextScaler.linear(1.0)),
               ),
       ],
     );
@@ -681,9 +698,9 @@ class _SelectAmountState extends State<SelectAmount> {
     String amountConverted = amount;
     if (amountConverted == "") amountConverted = "0";
     amountConverted = widget.convertToMoney == false
-        ? calculateResult(amountConverted)
-            .toString()
-            .replaceAll(".", getDecimalSeparator())
+        ? calculateResult(
+            amountConverted,
+          ).toString().replaceAll(".", getDecimalSeparator())
         : convertToMoney(
             forceAbsoluteZero: false,
             Provider.of<AllWallets>(context),
@@ -702,7 +719,8 @@ class _SelectAmountState extends State<SelectAmount> {
                         getSelectedWallet(listen: false)?.decimals ?? 1000,
                         includesOperations(amount, false)
                             ? countDecimalDigits(
-                                calculateResult(amountConverted).toString())
+                                calculateResult(amountConverted).toString(),
+                              )
                             : countDecimalDigits(amount),
                       )),
           );
@@ -715,85 +733,91 @@ class _SelectAmountState extends State<SelectAmount> {
               if (widget.showEnteredNumber == true)
                 Padding(
                   padding: widget.padding,
-                  child: Builder(builder: (context) {
-                    String calculationString = (includesOperations(
-                                amount, false) &&
-                            onlyOneOperationAndIsNegativeSign(amount) == false
-                        ? operationsWithSpaces(amount)
-                        : "");
-                    Widget calculationWidget = calculationString == "" ||
-                            widget.showCalculation == false
-                        ? SizedBox.shrink()
-                        : CustomContextMenu(
-                            buttonItems: [
-                              ContextMenuButtonItem(
-                                type: ContextMenuButtonType.paste,
-                                onPressed: () {
-                                  ContextMenuController.removeAny();
-                                  pasteFromClipboardIntoCalculation();
+                  child: Builder(
+                    builder: (context) {
+                      String calculationString = (includesOperations(
+                                  amount, false) &&
+                              onlyOneOperationAndIsNegativeSign(amount) == false
+                          ? operationsWithSpaces(amount)
+                          : "");
+                      Widget calculationWidget = calculationString == "" ||
+                              widget.showCalculation == false
+                          ? SizedBox.shrink()
+                          : CustomContextMenu(
+                              buttonItems: [
+                                ContextMenuButtonItem(
+                                  type: ContextMenuButtonType.paste,
+                                  onPressed: () {
+                                    ContextMenuController.removeAny();
+                                    pasteFromClipboardIntoCalculation();
+                                  },
+                                ),
+                              ],
+                              tappableBuilder: (onLongPress) => Tappable(
+                                color: Colors.transparent,
+                                borderRadius: 10,
+                                onTap: () {
+                                  return;
                                 },
+                                onLongPress: onLongPress,
+                                child: Padding(
+                                  padding: const EdgeInsetsDirectional.only(
+                                    end: 8.0,
+                                    bottom: 5,
+                                    start: 5,
+                                    top: 5,
+                                  ),
+                                  child: TextFont(
+                                    text: calculationString,
+                                    textAlign: TextAlign.start,
+                                    fontSize: 18,
+                                    maxLines: 5,
+                                  ),
+                                ),
+                              ),
+                            );
+                      Widget amountWidget = amountWidgetBuilder(
+                        amountConverted,
+                      );
+                      return AnimatedSize(
+                        curve: Curves.easeInOut,
+                        clipBehavior: Clip.none,
+                        duration: Duration(milliseconds: 500),
+                        child: Directionality(
+                          textDirection: ui.TextDirection.rtl,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Wrap(
+                                  alignment: WrapAlignment.spaceBetween,
+                                  crossAxisAlignment: WrapCrossAlignment.start,
+                                  runAlignment: WrapAlignment.spaceBetween,
+                                  verticalDirection: VerticalDirection.up,
+                                  children: [
+                                    Directionality(
+                                      textDirection: ui.TextDirection.ltr,
+                                      child: amountWidget,
+                                    ),
+                                    Directionality(
+                                      textDirection: ui.TextDirection.ltr,
+                                      child: calculationWidget,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
-                            tappableBuilder: (onLongPress) => Tappable(
-                              color: Colors.transparent,
-                              borderRadius: 10,
-                              onTap: () {
-                                return;
-                              },
-                              onLongPress: onLongPress,
-                              child: Padding(
-                                padding: const EdgeInsetsDirectional.only(
-                                  end: 8.0,
-                                  bottom: 5,
-                                  start: 5,
-                                  top: 5,
-                                ),
-                                child: TextFont(
-                                  text: calculationString,
-                                  textAlign: TextAlign.start,
-                                  fontSize: 18,
-                                  maxLines: 5,
-                                ),
-                              ),
-                            ),
-                          );
-                    Widget amountWidget = amountWidgetBuilder(amountConverted);
-                    return AnimatedSize(
-                      curve: Curves.easeInOut,
-                      clipBehavior: Clip.none,
-                      duration: Duration(milliseconds: 500),
-                      child: Directionality(
-                        textDirection: ui.TextDirection.rtl,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Wrap(
-                                alignment: WrapAlignment.spaceBetween,
-                                crossAxisAlignment: WrapCrossAlignment.start,
-                                runAlignment: WrapAlignment.spaceBetween,
-                                verticalDirection: VerticalDirection.up,
-                                children: [
-                                  Directionality(
-                                      textDirection: ui.TextDirection.ltr,
-                                      child: amountWidget),
-                                  Directionality(
-                                    textDirection: ui.TextDirection.ltr,
-                                    child: calculationWidget,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    },
+                  ),
                 ),
               widget.enableWalletPicker == false ||
                       Provider.of<AllWallets>(context).list.length <= 1 ||
                       (widget.hideWalletPickerIfOneCurrency &&
-                          Provider.of<AllWallets>(context)
-                              .allContainSameCurrency())
+                          Provider.of<AllWallets>(
+                            context,
+                          ).allContainSameCurrency())
                   ? SizedBox.shrink()
                   : Padding(
                       padding: const EdgeInsetsDirectional.only(top: 3),
@@ -820,7 +844,9 @@ class _SelectAmountState extends State<SelectAmount> {
                         },
                         getLabel: (TransactionWallet wallet) {
                           return getWalletStringName(
-                              Provider.of<AllWallets>(context), wallet);
+                            Provider.of<AllWallets>(context),
+                            wallet,
+                          );
                         },
                         getCustomBorderColor: (TransactionWallet item) {
                           return dynamicPastel(
@@ -828,23 +854,25 @@ class _SelectAmountState extends State<SelectAmount> {
                             lightenPastel(
                               HexColor(
                                 item.colour,
-                                defaultColor:
-                                    Theme.of(context).colorScheme.primary,
+                                defaultColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
                               ),
                               amount: 0.3,
                             ),
                             amount: 0.4,
                           );
                         },
-                        extraWidgetBefore: Provider.of<AllWallets>(context,
-                                                listen: false)
-                                            .indexedByPk
-                                            .length >
+                        extraWidgetBefore: Provider.of<AllWallets>(
+                                          context,
+                                          listen: false,
+                                        ).indexedByPk.length >
                                         3 &&
                                     getIsFullScreen(context) == false ||
-                                Provider.of<AllWallets>(context, listen: false)
-                                            .indexedByPk
-                                            .length >
+                                Provider.of<AllWallets>(
+                                          context,
+                                          listen: false,
+                                        ).indexedByPk.length >
                                         5 &&
                                     getIsFullScreen(context) == true
                             ? SelectChipsAddButtonExtraWidget(
@@ -853,9 +881,9 @@ class _SelectAmountState extends State<SelectAmount> {
                                   dynamic result = await selectWalletPopup(
                                     context,
                                     selectedWallet: Provider.of<AllWallets>(
-                                            context,
-                                            listen: false)
-                                        .indexedByPk[selectedWalletPk],
+                                      context,
+                                      listen: false,
+                                    ).indexedByPk[selectedWalletPk],
                                     allowEditWallet: true,
                                     allowDeleteWallet: false,
                                   );
@@ -907,12 +935,13 @@ class _SelectAmountState extends State<SelectAmount> {
                               }
                               if (widget.popWithAmount) {
                                 popRoute(
-                                    context,
-                                    (amount == ""
-                                        ? 0
-                                        : includesOperations(amount, false)
-                                            ? calculateResult(amount)
-                                            : double.tryParse(amount) ?? 0));
+                                  context,
+                                  (amount == ""
+                                      ? 0
+                                      : includesOperations(amount, false)
+                                          ? calculateResult(amount)
+                                          : double.tryParse(amount) ?? 0),
+                                );
                               }
                             },
                           )
@@ -924,7 +953,7 @@ class _SelectAmountState extends State<SelectAmount> {
                             color: Colors.grey,
                           ),
                   ),
-                )
+                ),
             ],
           ),
         ),
@@ -972,63 +1001,71 @@ class NumberPadAmount extends StatelessWidget {
           },
         ),
         CalculatorButton(
-            disabled: !canChange(),
-            label: "2",
-            editAmount: () {
-              addToAmount("2");
-            }),
+          disabled: !canChange(),
+          label: "2",
+          editAmount: () {
+            addToAmount("2");
+          },
+        ),
         CalculatorButton(
-            disabled: !canChange(),
-            label: "3",
-            editAmount: () {
-              addToAmount("3");
-            }),
+          disabled: !canChange(),
+          label: "3",
+          editAmount: () {
+            addToAmount("3");
+          },
+        ),
       ],
     );
     Widget row456 = Row(
       textDirection: ui.TextDirection.ltr,
       children: [
         CalculatorButton(
-            disabled: !canChange(),
-            label: "4",
-            editAmount: () {
-              addToAmount("4");
-            }),
+          disabled: !canChange(),
+          label: "4",
+          editAmount: () {
+            addToAmount("4");
+          },
+        ),
         CalculatorButton(
-            disabled: !canChange(),
-            label: "5",
-            editAmount: () {
-              addToAmount("5");
-            }),
+          disabled: !canChange(),
+          label: "5",
+          editAmount: () {
+            addToAmount("5");
+          },
+        ),
         CalculatorButton(
-            disabled: !canChange(),
-            label: "6",
-            editAmount: () {
-              addToAmount("6");
-            }),
+          disabled: !canChange(),
+          label: "6",
+          editAmount: () {
+            addToAmount("6");
+          },
+        ),
       ],
     );
     Widget row789 = Row(
       textDirection: ui.TextDirection.ltr,
       children: [
         CalculatorButton(
-            disabled: !canChange(),
-            label: "7",
-            editAmount: () {
-              addToAmount("7");
-            }),
+          disabled: !canChange(),
+          label: "7",
+          editAmount: () {
+            addToAmount("7");
+          },
+        ),
         CalculatorButton(
-            disabled: !canChange(),
-            label: "8",
-            editAmount: () {
-              addToAmount("8");
-            }),
+          disabled: !canChange(),
+          label: "8",
+          editAmount: () {
+            addToAmount("8");
+          },
+        ),
         CalculatorButton(
-            disabled: !canChange(),
-            label: "9",
-            editAmount: () {
-              addToAmount("9");
-            }),
+          disabled: !canChange(),
+          label: "9",
+          editAmount: () {
+            addToAmount("9");
+          },
+        ),
       ],
     );
     return Padding(
@@ -1036,14 +1073,12 @@ class NumberPadAmount extends StatelessWidget {
       child: Center(
         child: ClipRRect(
           borderRadius: BorderRadiusDirectional.circular(
-              getPlatform() == PlatformOS.isIOS ? 10 : 20),
+            getPlatform() == PlatformOS.isIOS ? 10 : 20,
+          ),
           child: GestureDetector(
             onLongPress: () async {
               HapticFeedback.heavyImpact();
-              await openBottomSheet(
-                context,
-                NumberPadFormatSettingPopup(),
-              );
+              await openBottomSheet(context, NumberPadFormatSettingPopup());
               setState();
             },
             child: Container(
@@ -1091,22 +1126,25 @@ class NumberPadAmount extends StatelessWidget {
                                   },
                                 ),
                                 CalculatorButton(
-                                    disabled: !canChange(),
-                                    label: "0",
-                                    editAmount: () {
-                                      addToAmount("0");
-                                    }),
+                                  disabled: !canChange(),
+                                  label: "0",
+                                  editAmount: () {
+                                    addToAmount("0");
+                                  },
+                                ),
                                 if (enableCalculator)
                                   if (appStateSettings["extraZerosButton"] !=
                                       null)
                                     CalculatorButton(
-                                        disabled: !canChange(),
-                                        label: appStateSettings[
-                                            "extraZerosButton"],
-                                        editAmount: () {
-                                          addToAmount(appStateSettings[
-                                              "extraZerosButton"]);
-                                        }),
+                                      disabled: !canChange(),
+                                      label:
+                                          appStateSettings["extraZerosButton"],
+                                      editAmount: () {
+                                        addToAmount(
+                                          appStateSettings["extraZerosButton"],
+                                        );
+                                      },
+                                    ),
                                 if (appStateSettings["extraZerosButton"] ==
                                         null ||
                                     enableCalculator == false)
@@ -1212,7 +1250,7 @@ class NumberPadAmount extends StatelessWidget {
                                 ),
                             ],
                           ),
-                        )
+                        ),
                     ],
                   ),
                 ],
@@ -1252,8 +1290,12 @@ class CalculatorButton extends StatelessWidget {
         child: AnimatedContainer(
           duration: Duration(milliseconds: 200),
           color: disabled
-              ? dynamicPastel(context, buttonColor,
-                  amountDark: 0.15, amountLight: 0.3)
+              ? dynamicPastel(
+                  context,
+                  buttonColor,
+                  amountDark: 0.15,
+                  amountLight: 0.3,
+                )
               : buttonColor,
           child: AnimatedOpacity(
             duration: Duration(milliseconds: 200),
@@ -1268,13 +1310,12 @@ class CalculatorButton extends StatelessWidget {
                   height: height,
                   child: Center(
                     child: label == "<"
-                        ? Icon(appStateSettings["outlinedIcons"]
-                            ? Icons.backspace_outlined
-                            : Icons.backspace_rounded)
-                        : TextFont(
-                            fontSize: 24,
-                            text: label,
-                          ),
+                        ? Icon(
+                            appStateSettings["outlinedIcons"]
+                                ? Icons.backspace_outlined
+                                : Icons.backspace_rounded,
+                          )
+                        : TextFont(fontSize: 24, text: label),
                   ),
                 ),
               ),
@@ -1299,10 +1340,7 @@ class SelectAmountValue extends StatefulWidget {
     this.showEnteredNumber = true,
     this.extraWidgetAboveNumbers,
   }) : super(key: key);
-  final Function(
-    double amount,
-    String stringAmount,
-  ) setSelectedAmount;
+  final Function(double amount, String stringAmount) setSelectedAmount;
   final String amountPassed;
   final VoidCallback? next;
   final String? nextLabel;
@@ -1326,93 +1364,98 @@ class _SelectAmountValueState extends State<SelectAmountValue> {
   void initState() {
     super.initState();
     amount = widget.amountPassed;
-    _focusAttachment = _focusNode.attach(context, onKeyEvent: (node, event) {
-      bool keyIsPressed = event.runtimeType == KeyDownEvent ||
-          event.runtimeType == KeyRepeatEvent;
-      if (keyIsPressed && event.logicalKey.keyLabel == "Go Back" ||
-          event.logicalKey == LogicalKeyboardKey.escape) {
-        popRoute(context);
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit0) {
-        addToAmount("0");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit1) {
-        addToAmount("1");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit2) {
-        addToAmount("2");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit3) {
-        addToAmount("3");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit4) {
-        addToAmount("4");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit5) {
-        addToAmount("5");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit6) {
-        addToAmount("6");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit7) {
-        addToAmount("7");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit8) {
-        addToAmount("8");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.digit9) {
-        addToAmount("9");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad0) {
-        addToAmount("0");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad1) {
-        addToAmount("1");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad2) {
-        addToAmount("2");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad3) {
-        addToAmount("3");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad4) {
-        addToAmount("4");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad5) {
-        addToAmount("5");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad6) {
-        addToAmount("6");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad7) {
-        addToAmount("7");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad8) {
-        addToAmount("8");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpad9) {
-        addToAmount("9");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.period) {
-        addToAmount(".");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.numpadDecimal) {
-        addToAmount(".");
-      } else if (keyIsPressed && event.logicalKey == LogicalKeyboardKey.comma) {
-        addToAmount(".");
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.backspace) {
-        removeToAmount();
-      } else if (keyIsPressed &&
-          event.logicalKey == LogicalKeyboardKey.delete) {
-        removeToAmount();
-      } else if (keyIsPressed && event.logicalKey == LogicalKeyboardKey.enter) {
-        if (widget.next != null) {
-          widget.next!();
+    _focusAttachment = _focusNode.attach(
+      context,
+      onKeyEvent: (node, event) {
+        bool keyIsPressed = event.runtimeType == KeyDownEvent ||
+            event.runtimeType == KeyRepeatEvent;
+        if (keyIsPressed && event.logicalKey.keyLabel == "Go Back" ||
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          popRoute(context);
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit0) {
+          addToAmount("0");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit1) {
+          addToAmount("1");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit2) {
+          addToAmount("2");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit3) {
+          addToAmount("3");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit4) {
+          addToAmount("4");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit5) {
+          addToAmount("5");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit6) {
+          addToAmount("6");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit7) {
+          addToAmount("7");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit8) {
+          addToAmount("8");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.digit9) {
+          addToAmount("9");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad0) {
+          addToAmount("0");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad1) {
+          addToAmount("1");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad2) {
+          addToAmount("2");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad3) {
+          addToAmount("3");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad4) {
+          addToAmount("4");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad5) {
+          addToAmount("5");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad6) {
+          addToAmount("6");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad7) {
+          addToAmount("7");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad8) {
+          addToAmount("8");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpad9) {
+          addToAmount("9");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.period) {
+          addToAmount(".");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.numpadDecimal) {
+          addToAmount(".");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.comma) {
+          addToAmount(".");
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.backspace) {
+          removeToAmount();
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.delete) {
+          removeToAmount();
+        } else if (keyIsPressed &&
+            event.logicalKey == LogicalKeyboardKey.enter) {
+          if (widget.next != null) {
+            widget.next!();
+          }
         }
-      }
-      return KeyEventResult.handled;
-    });
+        return KeyEventResult.handled;
+      },
+    );
     _focusNode.requestFocus();
   }
 
@@ -1428,7 +1471,7 @@ class _SelectAmountValueState extends State<SelectAmountValue> {
     }
 
     if (input == "." && widget.enableDecimal == false) return;
-    String amountClone = amount;
+    // String amountClone = amount;
     if (input == "." && amount.contains(".")) {
     } else {
       if (amount == "0" || amount == "") {
@@ -1529,7 +1572,7 @@ class _SelectAmountValueState extends State<SelectAmountValue> {
                   onTap: () {},
                   color: Colors.grey,
                 ),
-        )
+        ),
       ],
     );
   }

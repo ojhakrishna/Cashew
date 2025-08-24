@@ -80,8 +80,10 @@ class _EditHomePageState extends State<EditHomePage> {
                 ? Icons.account_balance_wallet_outlined
                 : Icons.account_balance_wallet_rounded,
             name: "accounts".tr(),
-            isEnabled:
-                isHomeScreenSectionEnabled(context, "showWalletSwitcher"),
+            isEnabled: isHomeScreenSectionEnabled(
+              context,
+              "showWalletSwitcher",
+            ),
             onSwitched: (value) {
               switchHomeScreenSection(context, "showWalletSwitcher", value);
             },
@@ -148,8 +150,9 @@ class _EditHomePageState extends State<EditHomePage> {
               openBottomSheet(
                 context,
                 EditHomePagePinnedGoalsPopup(
-                    showGoalsTotalLabelSetting: true,
-                    objectiveType: ObjectiveType.goal),
+                  showGoalsTotalLabelSetting: true,
+                  objectiveType: ObjectiveType.goal,
+                ),
                 useCustomController: true,
               );
             },
@@ -157,8 +160,10 @@ class _EditHomePageState extends State<EditHomePage> {
           "overdueUpcoming": EditHomePageItem(
             icon: getTransactionTypeIcon(TransactionSpecialType.subscription),
             name: "overdue-and-upcoming".tr(),
-            isEnabled:
-                isHomeScreenSectionEnabled(context, "showOverdueUpcoming"),
+            isEnabled: isHomeScreenSectionEnabled(
+              context,
+              "showOverdueUpcoming",
+            ),
             onSwitched: (value) {
               switchHomeScreenSection(context, "showOverdueUpcoming", value);
             },
@@ -183,8 +188,10 @@ class _EditHomePageState extends State<EditHomePage> {
                 ? Icons.av_timer_outlined
                 : Icons.av_timer_rounded,
             name: "long-term-loans".tr(),
-            isEnabled:
-                isHomeScreenSectionEnabled(context, "showObjectiveLoans"),
+            isEnabled: isHomeScreenSectionEnabled(
+              context,
+              "showObjectiveLoans",
+            ),
             onSwitched: (value) {
               switchHomeScreenSection(context, "showObjectiveLoans", value);
             },
@@ -204,8 +211,10 @@ class _EditHomePageState extends State<EditHomePage> {
                 ? Icons.swap_vert_outlined
                 : Icons.swap_vert_rounded,
             name: "income-and-expenses".tr(),
-            isEnabled:
-                isHomeScreenSectionEnabled(context, "showAllSpendingSummary"),
+            isEnabled: isHomeScreenSectionEnabled(
+              context,
+              "showAllSpendingSummary",
+            ),
             onSwitched: (value) {
               switchHomeScreenSection(context, "showAllSpendingSummary", value);
             },
@@ -253,7 +262,7 @@ class _EditHomePageState extends State<EditHomePage> {
                       customLabel,
                       ...[
                         for (Budget budget in allBudgets)
-                          budget.budgetPk.toString()
+                          budget.budgetPk.toString(),
                       ],
                     ],
                     colorFilter: (budgetPk) {
@@ -264,8 +273,9 @@ class _EditHomePageState extends State<EditHomePage> {
                             lightenPastel(
                               HexColor(
                                 budget.colour,
-                                defaultColor:
-                                    Theme.of(context).colorScheme.primary,
+                                defaultColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
                               ),
                               amount: 0.2,
                             ),
@@ -313,16 +323,18 @@ class _EditHomePageState extends State<EditHomePage> {
                         DateTime? picked = await showCustomDatePicker(
                           context,
                           DateTime.parse(
-                              appStateSettings["lineGraphStartDate"]),
+                            appStateSettings["lineGraphStartDate"],
+                          ),
                         );
-                        if (picked == null || picked.isAfter(DateTime.now())) {
+                        if (picked != null && picked.isAfter(DateTime.now())) {
                           if (DateTime.parse(
-                                  appStateSettings["lineGraphStartDate"])
-                              .isAfter(DateTime.now())) {
+                            appStateSettings["lineGraphStartDate"],
+                          ).isAfter(DateTime.now())) {
                             picked = DateTime.now();
                           } else {
                             picked = DateTime.parse(
-                                appStateSettings["lineGraphStartDate"]);
+                              appStateSettings["lineGraphStartDate"],
+                            );
                           }
                         }
                         updateSettings(
@@ -390,8 +402,10 @@ class _EditHomePageState extends State<EditHomePage> {
           "transactionsList": EditHomePageItem(
             icon: navBarIconsData["transactions"]!.iconData,
             name: "transactions-list".tr(),
-            isEnabled:
-                isHomeScreenSectionEnabled(context, "showTransactionsList"),
+            isEnabled: isHomeScreenSectionEnabled(
+              context,
+              "showTransactionsList",
+            ),
             onSwitched: (value) {
               switchHomeScreenSection(context, "showTransactionsList", value);
             },
@@ -402,8 +416,10 @@ class _EditHomePageState extends State<EditHomePage> {
           ),
         };
         keyOrder = List<String>.from(
-            appStateSettings[getHomePageOrderSettingsKey(context)]
-                .map((element) => element.toString()));
+          appStateSettings[getHomePageOrderSettingsKey(context)].map(
+            (element) => element.toString(),
+          ),
+        );
         print(keyOrder);
       });
     });
@@ -411,8 +427,9 @@ class _EditHomePageState extends State<EditHomePage> {
   }
 
   toggleSwitch(String key) {
-    editHomePageItems[key]
-        ?.onSwitched(!(editHomePageItems[key]?.isEnabled ?? false));
+    editHomePageItems[key]?.onSwitched(
+      !(editHomePageItems[key]?.isEnabled ?? false),
+    );
     setState(() {
       editHomePageItems[key]?.isEnabled =
           !(editHomePageItems[key]?.isEnabled ?? false);
@@ -450,9 +467,7 @@ class _EditHomePageState extends State<EditHomePage> {
         slivers: [
           if (enableDoubleColumn(context))
             SliverToBoxAdapter(
-              child: PanelSectionSeparator(
-                orderKey: "ORDER:CENTER",
-              ),
+              child: PanelSectionSeparator(orderKey: "ORDER:CENTER"),
             ),
           SliverToBoxAdapter(
             child: HomePageEditRowEntryUsername(
@@ -460,14 +475,19 @@ class _EditHomePageState extends State<EditHomePage> {
                   ? Icons.edit_outlined
                   : Icons.edit_rounded,
               initialValue: isHomeScreenSectionEnabled(
-                  context, "showUsernameWelcomeBanner"),
+                context,
+                "showUsernameWelcomeBanner",
+              ),
               name: appStateSettings["username"] == null ||
                       appStateSettings["username"] == ""
                   ? "homepage-banner".tr()
                   : "username-banner".tr(),
               onChanged: (value) {
                 switchHomeScreenSection(
-                    context, "showUsernameWelcomeBanner", value);
+                  context,
+                  "showUsernameWelcomeBanner",
+                  value,
+                );
               },
             ),
           ),
@@ -487,22 +507,15 @@ class _EditHomePageState extends State<EditHomePage> {
             },
             itemBuilder: (context, index) {
               if (keyOrder.length <= index)
-                return Container(
-                  key: ValueKey(index),
-                );
+                return Container(key: ValueKey(index));
               String key = keyOrder[index];
 
               if (["ORDER:LEFT", "ORDER:RIGHT"].contains(key)) {
-                return PanelSectionSeparator(
-                  orderKey: key,
-                  key: ValueKey(key),
-                );
+                return PanelSectionSeparator(orderKey: key, key: ValueKey(key));
               }
 
               if (editHomePageItems[key] == null)
-                return Container(
-                  key: ValueKey(index),
-                );
+                return Container(key: ValueKey(index));
 
               return HomePageEditRowEntry(
                 key: ValueKey(key),
@@ -526,8 +539,12 @@ class _EditHomePageState extends State<EditHomePage> {
                 final String item = keyOrder.removeAt(oldIndex);
                 keyOrder.insert(newIndex, item);
               });
-              updateSettings(getHomePageOrderSettingsKey(context), keyOrder,
-                  pagesNeedingRefresh: [], updateGlobalState: false);
+              updateSettings(
+                getHomePageOrderSettingsKey(context),
+                keyOrder,
+                pagesNeedingRefresh: [],
+                updateGlobalState: false,
+              );
               return true;
             },
           ),
@@ -565,13 +582,17 @@ class HomePageEditRowEntry extends StatelessWidget {
       canReorder: canReorder,
       key: ValueKey(key),
       currentReorder: currentReorder,
-      padding:
-          EdgeInsetsDirectional.only(start: 18, end: 0, top: 16, bottom: 16),
+      padding: EdgeInsetsDirectional.only(
+        start: 18,
+        end: 0,
+        top: 16,
+        bottom: 16,
+      ),
       extraWidget: Row(
         children: [
           getPlatform() == PlatformOS.isIOS
               ? CupertinoSwitch(
-                  activeColor: Theme.of(context).colorScheme.primary,
+                  activeTrackColor: Theme.of(context).colorScheme.primary,
                   value: switchValue,
                   onChanged: (value) => toggleSwitch(),
                 )
@@ -586,10 +607,7 @@ class HomePageEditRowEntry extends StatelessWidget {
       content: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            iconData,
-            color: Theme.of(context).colorScheme.primary,
-          ),
+          Icon(iconData, color: Theme.of(context).colorScheme.primary),
           SizedBox(width: 13),
           Expanded(
             child: TextFont(
@@ -618,7 +636,11 @@ class PanelSectionSeparator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsetsDirectional.only(
-          start: 15, end: 15, top: 20, bottom: 10),
+        start: 15,
+        end: 15,
+        top: 20,
+        bottom: 10,
+      ),
       child: Row(
         children: [
           if (orderKey == "ORDER:LEFT")
@@ -628,9 +650,10 @@ class PanelSectionSeparator extends StatelessWidget {
               textAlign: TextAlign.start,
             ),
           Expanded(
-              child: HorizontalBreak(
-            padding: const EdgeInsetsDirectional.all(15),
-          )),
+            child: HorizontalBreak(
+              padding: const EdgeInsetsDirectional.all(15),
+            ),
+          ),
           if (orderKey == "ORDER:CENTER")
             TextFont(
               text: "top-center".tr(),
@@ -639,9 +662,10 @@ class PanelSectionSeparator extends StatelessWidget {
             ),
           if (orderKey == "ORDER:CENTER")
             Expanded(
-                child: HorizontalBreak(
-              padding: const EdgeInsetsDirectional.all(15),
-            )),
+              child: HorizontalBreak(
+                padding: const EdgeInsetsDirectional.all(15),
+              ),
+            ),
           if (orderKey == "ORDER:RIGHT")
             TextFont(
               text: "right-panel".tr(),
@@ -655,11 +679,9 @@ class PanelSectionSeparator extends StatelessWidget {
 }
 
 Future openTransactionsListHomePageBottomSheetSettings(
-    BuildContext context) async {
-  await openBottomSheet(
-    context,
-    TransactionsListHomePageBottomSheetSettings(),
-  );
+  BuildContext context,
+) async {
+  await openBottomSheet(context, TransactionsListHomePageBottomSheetSettings());
 }
 
 class TransactionsListHomePageBottomSheetSettings extends StatefulWidget {
@@ -693,8 +715,12 @@ class _TransactionsListHomePageBottomSheetSettingsState
             enableBorderRadius: true,
             items: ["0", "1", "4", "7", "14"],
             onChanged: (value) {
-              updateSettings("futureTransactionDaysHomePage", int.parse(value),
-                  pagesNeedingRefresh: [], updateGlobalState: false);
+              updateSettings(
+                "futureTransactionDaysHomePage",
+                int.parse(value),
+                pagesNeedingRefresh: [],
+                updateGlobalState: false,
+              );
               setState(() {
                 futureTransactionDaysHomePage = int.parse(value);
               });
@@ -731,8 +757,10 @@ class _TransactionsListHomePageBottomSheetSettingsState
                       true,
                   onChanged: (value) {
                     updateSettings(
-                        "homePageTransactionsListIncomeAndExpenseOnly", value,
-                        updateGlobalState: false);
+                      "homePageTransactionsListIncomeAndExpenseOnly",
+                      value,
+                      updateGlobalState: false,
+                    );
                   },
                 ),
               ],
@@ -764,8 +792,11 @@ Future openPieChartHomePageBottomSheetSettings(BuildContext context) async {
               initialValue:
                   appStateSettings["pieChartIncomeAndExpenseOnly"] == true,
               onChanged: (value) {
-                updateSettings("pieChartIncomeAndExpenseOnly", value,
-                    updateGlobalState: false);
+                updateSettings(
+                  "pieChartIncomeAndExpenseOnly",
+                  value,
+                  updateGlobalState: false,
+                );
               },
             ),
           ),
@@ -804,15 +835,15 @@ Future openPieChartHomePageBottomSheetSettings(BuildContext context) async {
 }
 
 Future openHeatMapHomePageBottomSheetSettings(BuildContext context) async {
-  await openBottomSheet(
-    context,
-    HomePageHeatMapSettings(),
-  );
+  await openBottomSheet(context, HomePageHeatMapSettings());
 }
 
 class IncomeAndExpenseOnlyPicker extends StatefulWidget {
-  const IncomeAndExpenseOnlyPicker(
-      {required this.initialValue, required this.onChanged, super.key});
+  const IncomeAndExpenseOnlyPicker({
+    required this.initialValue,
+    required this.onChanged,
+    super.key,
+  });
   final bool initialValue;
   final Function(bool) onChanged;
   @override
@@ -841,17 +872,17 @@ class _IncomeAndExpenseOnlyPickerState
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ListItem(
-                        "only-expense-income-description-1".tr(),
-                      ),
-                      ListItem(
-                        "only-expense-income-description-2".tr(),
-                      ),
+                      ListItem("only-expense-income-description-1".tr()),
+                      ListItem("only-expense-income-description-2".tr()),
                     ],
                   ),
                   text: "only-expense-income".tr(),
                   padding: EdgeInsetsDirectional.only(
-                      start: 20, end: 15, top: 15, bottom: 15),
+                    start: 20,
+                    end: 15,
+                    top: 15,
+                    bottom: 15,
+                  ),
                   iconData: null,
                   onTap: () {
                     widget.onChanged(!pieChartIncomeAndExpenseOnly);
@@ -880,17 +911,17 @@ class _IncomeAndExpenseOnlyPickerState
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ListItem(
-                        "all-outgoing-incoming-description-1".tr(),
-                      ),
-                      ListItem(
-                        "all-outgoing-incoming-description-2".tr(),
-                      ),
+                      ListItem("all-outgoing-incoming-description-1".tr()),
+                      ListItem("all-outgoing-incoming-description-2".tr()),
                     ],
                   ),
                   text: "all-outgoing-incoming".tr(),
                   padding: EdgeInsetsDirectional.only(
-                      start: 20, end: 15, top: 15, bottom: 15),
+                    start: 20,
+                    end: 15,
+                    top: 15,
+                    bottom: 15,
+                  ),
                   iconData: null,
                   onTap: () {
                     widget.onChanged(!pieChartIncomeAndExpenseOnly);
@@ -901,21 +932,22 @@ class _IncomeAndExpenseOnlyPickerState
                   },
                 ),
               ),
-            )
+            ),
           ],
-        )
+        ),
       ],
     );
   }
 }
 
 class HomePageEditRowEntryUsername extends StatefulWidget {
-  const HomePageEditRowEntryUsername(
-      {required this.initialValue,
-      required this.onChanged,
-      required this.iconData,
-      required this.name,
-      super.key});
+  const HomePageEditRowEntryUsername({
+    required this.initialValue,
+    required this.onChanged,
+    required this.iconData,
+    required this.name,
+    super.key,
+  });
 
   final bool initialValue;
   final Function(bool value) onChanged;
@@ -973,16 +1005,19 @@ class _HomePageBannerSettingsState extends State<HomePageBannerSettings> {
     return Column(
       children: [
         SettingsContainer(
-          afterWidget:
-              MoreChevron(color: Theme.of(context).colorScheme.secondary),
+          afterWidget: MoreChevron(
+            color: Theme.of(context).colorScheme.secondary,
+          ),
           enableBorderRadius: true,
           icon: appStateSettings["outlinedIcons"]
               ? Icons.edit_outlined
               : Icons.edit_rounded,
           title: "username".tr(),
           onTap: () async {
-            dynamic result =
-                await enterNameBottomSheet(context, updatePageWhenSet: false);
+            dynamic result = await enterNameBottomSheet(
+              context,
+              updatePageWhenSet: false,
+            );
             if (result is String)
               setState(() {
                 username = result;
@@ -1002,8 +1037,11 @@ class _HomePageBannerSettingsState extends State<HomePageBannerSettings> {
                 ? Icons.waving_hand_outlined
                 : Icons.waving_hand_rounded,
             onSwitched: (value) {
-              updateSettings("enableGreetingMessage", value,
-                  updateGlobalState: false);
+              updateSettings(
+                "enableGreetingMessage",
+                value,
+                updateGlobalState: false,
+              );
             },
             initialValue: appStateSettings["enableGreetingMessage"],
           ),
@@ -1014,13 +1052,24 @@ class _HomePageBannerSettingsState extends State<HomePageBannerSettings> {
 }
 
 void switchHomeScreenSection(
-    BuildContext context, String sectionSetting, bool value) {
+  BuildContext context,
+  String sectionSetting,
+  bool value,
+) {
   if (enableDoubleColumn(context)) {
-    updateSettings(sectionSetting + "FullScreen", value,
-        pagesNeedingRefresh: [], updateGlobalState: false);
+    updateSettings(
+      sectionSetting + "FullScreen",
+      value,
+      pagesNeedingRefresh: [],
+      updateGlobalState: false,
+    );
   } else {
-    updateSettings(sectionSetting, value,
-        pagesNeedingRefresh: [], updateGlobalState: false);
+    updateSettings(
+      sectionSetting,
+      value,
+      pagesNeedingRefresh: [],
+      updateGlobalState: false,
+    );
   }
 }
 
@@ -1046,9 +1095,11 @@ String getHomePageOrderSettingsKey(BuildContext context) {
 
 fixHomePageOrder(Map<String, dynamic> defaultPreferences, settingsKey) {
   List<String> defaultPrefPageOrder = List<String>.from(
-      defaultPreferences[settingsKey].map((element) => element.toString()));
+    defaultPreferences[settingsKey].map((element) => element.toString()),
+  );
   List<String> currentPageOrder = List<String>.from(
-      appStateSettings[settingsKey].map((element) => element.toString()));
+    appStateSettings[settingsKey].map((element) => element.toString()),
+  );
   int index = 0;
   for (String key in [...currentPageOrder]) {
     if (!defaultPrefPageOrder.contains(key)) {

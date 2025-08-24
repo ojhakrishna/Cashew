@@ -1053,7 +1053,7 @@ class _TodayIndicatorState extends State<TodayIndicator> {
                               textColor: getColor(context, "white"),
                             ),
                             data: MediaQuery.of(context)
-                                .copyWith(textScaleFactor: 1.0),
+                                .copyWith(textScaler: TextScaler.linear(1.0)),
                           ),
                         ),
                       ),

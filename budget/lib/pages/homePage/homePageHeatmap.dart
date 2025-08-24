@@ -64,8 +64,9 @@ class _HomePageHeatMapState extends State<HomePageHeatMap> {
           if (snapshot.hasData) {
             CalculatePointsParams p = CalculatePointsParams(
               transactions: snapshot.data ?? [],
-              customStartDate:
-                  DateTime.now().justDay(monthOffset: -monthsToLoad),
+              customStartDate: DateTime.now().justDay(
+                monthOffset: -monthsToLoad,
+              ),
               customEndDate: DateTime.now(),
               totalSpentBefore: 0,
               isIncome: null,
@@ -76,10 +77,7 @@ class _HomePageHeatMapState extends State<HomePageHeatMap> {
               cycleThroughAllDays: true, // needed for heatmap
             );
             List<Pair> points = calculatePoints(p);
-            return HeatMap(
-              points: points,
-              loadMoreMonths: loadMoreMonths,
-            );
+            return HeatMap(points: points, loadMoreMonths: loadMoreMonths);
           }
           return SizedBox.shrink();
         },
@@ -134,14 +132,15 @@ class HeatMap extends StatelessWidget {
     final int totalDaysBeforeFixed = points.length;
     final int lastDateWeekday =
         points[totalDaysBeforeFixed - 1].dateTime?.weekday ?? 0;
-    int extraDaysOffset = 7 -
+    int extraDaysOffset =
+        7 -
         lastDateWeekday -
         1 +
         // Follow the locale (1 is Monday, 0 if for Sunday)
         (appStateSettings["firstDayOfWeek"] == -1
             ? MaterialLocalizations.of(context).firstDayOfWeekIndex
             : (int.tryParse(appStateSettings["firstDayOfWeek"].toString()) ??
-                MaterialLocalizations.of(context).firstDayOfWeekIndex));
+                  MaterialLocalizations.of(context).firstDayOfWeekIndex));
     if (extraDaysOffset < 0) {
       extraDaysOffset = 7 - extraDaysOffset.abs();
     }
@@ -155,8 +154,10 @@ class HeatMap extends StatelessWidget {
     final double minExpense = getMinY(pointsOffsetFixed, false) ?? 0;
     final int totalDays = pointsOffsetFixed.length;
     final int totalWeeks = (totalDays / 7).ceil();
-    final Color backgroundColor =
-        getColor(context, "lightDarkAccentHeavyLight");
+    final Color backgroundColor = getColor(
+      context,
+      "lightDarkAccentHeavyLight",
+    );
 
     return Padding(
       padding: const EdgeInsetsDirectional.only(bottom: 13),
@@ -164,8 +165,12 @@ class HeatMap extends StatelessWidget {
         height:
             12 + 7 * dayWidth + 7 * 2 * dayPadding + bottomTitleSpacing + 15,
         margin: EdgeInsetsDirectional.symmetric(horizontal: 13),
-        padding:
-            EdgeInsetsDirectional.only(start: 0, end: 0, bottom: 12, top: 15),
+        padding: EdgeInsetsDirectional.only(
+          start: 0,
+          end: 0,
+          bottom: 12,
+          top: 15,
+        ),
         decoration: BoxDecoration(
           borderRadius: BorderRadiusDirectional.all(Radius.circular(15)),
           color: backgroundColor,
@@ -198,7 +203,9 @@ class HeatMap extends StatelessWidget {
                           message: "view-more".tr(),
                           child: Padding(
                             padding: EdgeInsetsDirectional.only(
-                                end: 8.0, bottom: bottomTitleSpacing),
+                              end: 8.0,
+                              bottom: bottomTitleSpacing,
+                            ),
                             child: ButtonIcon(
                               padding: EdgeInsetsDirectional.zero,
                               size: dayWidth * 2 + dayPadding * 4,
@@ -222,20 +229,28 @@ class HeatMap extends StatelessWidget {
                               child: Builder(
                                 builder: (context) {
                                   int index = totalDays - (itemIndex * 7 + j);
-                                  double? amount = nullIfIndexOutOfRange(
-                                              pointsOffsetFixed, index) ==
+                                  double? amount =
+                                      nullIfIndexOutOfRange(
+                                            pointsOffsetFixed,
+                                            index,
+                                          ) ==
                                           null
                                       ? null
                                       : nullIfIndexOutOfRange(
-                                              pointsOffsetFixed, index)
-                                          ?.y;
-                                  DateTime? day = nullIfIndexOutOfRange(
-                                              pointsOffsetFixed, index) ==
+                                          pointsOffsetFixed,
+                                          index,
+                                        )?.y;
+                                  DateTime? day =
+                                      nullIfIndexOutOfRange(
+                                            pointsOffsetFixed,
+                                            index,
+                                          ) ==
                                           null
                                       ? null
                                       : nullIfIndexOutOfRange(
-                                              pointsOffsetFixed, index)
-                                          ?.dateTime;
+                                          pointsOffsetFixed,
+                                          index,
+                                        )?.dateTime;
                                   Color color = getHeatMapColor(
                                     context: context,
                                     amount: amount,
@@ -255,9 +270,10 @@ class HeatMap extends StatelessWidget {
                                           ),
                                     child: Tappable(
                                       onTap: () {
-                                        if (amount != null)
-                                          openTransactionsOnDayBottomSheet(
-                                              context, day);
+                                        openTransactionsOnDayBottomSheet(
+                                          context,
+                                          day,
+                                        );
                                       },
                                       child: Container(
                                         height: dayWidth,
@@ -265,17 +281,19 @@ class HeatMap extends StatelessWidget {
                                         decoration: BoxDecoration(
                                           border: Border.all(
                                             color: amount == null
-                                                ? Theme.of(context)
-                                                            .brightness ==
-                                                        Brightness.light
-                                                    ? color.withOpacity(0.05)
-                                                    : color.withOpacity(0.2)
+                                                ? Theme.of(
+                                                            context,
+                                                          ).brightness ==
+                                                          Brightness.light
+                                                      ? color.withOpacity(0.05)
+                                                      : color.withOpacity(0.2)
                                                 : color.withOpacity(0.3),
                                             width: 1,
                                           ),
                                           borderRadius:
                                               BorderRadiusDirectional.circular(
-                                                  5),
+                                                5,
+                                              ),
                                         ),
                                       ),
                                       borderRadius: 5,
@@ -284,7 +302,7 @@ class HeatMap extends StatelessWidget {
                                   );
                                 },
                               ),
-                            )
+                            ),
                         ],
                       ),
                       itemIndex % 4 == 4 - 1
@@ -296,18 +314,17 @@ class HeatMap extends StatelessWidget {
                                 alignment: Alignment.bottomLeft,
                                 child: HeatMapMonthLabel(
                                   label: getWordedDateShort(
-                                    nullIfIndexOutOfRange(pointsOffsetFixed,
-                                                totalDays - (itemIndex * 7 + 1))
-                                            ?.dateTime ??
+                                    nullIfIndexOutOfRange(
+                                          pointsOffsetFixed,
+                                          totalDays - (itemIndex * 7 + 1),
+                                        )?.dateTime ??
                                         DateTime.now(),
                                     showTodayTomorrow: false,
                                   ),
                                 ),
                               ),
                             )
-                          : SizedBox(
-                              height: bottomTitleSpacing,
-                            )
+                          : SizedBox(height: bottomTitleSpacing),
                     ],
                   ),
                 );
@@ -357,7 +374,9 @@ Color getHeatMapColor({
 }
 
 Future<dynamic> openTransactionsOnDayBottomSheet(
-    BuildContext context, DateTime? day) {
+  BuildContext context,
+  DateTime? day,
+) {
   return openBottomSheet(
     context,
     PopupFramework(
@@ -377,7 +396,8 @@ Future<dynamic> openTransactionsOnDayBottomSheet(
           if (snapshot.hasData && snapshot.data != null) {
             return Padding(
               padding: EdgeInsetsDirectional.only(
-                  top: getPlatform() == PlatformOS.isIOS ? 4 : 1),
+                top: getPlatform() == PlatformOS.isIOS ? 4 : 1,
+              ),
               child: AmountWithColorAndArrow(
                 showIncomeArrow: true,
                 totalSpent: snapshot.data ?? 0,
@@ -404,8 +424,10 @@ Future<dynamic> openTransactionsOnDayBottomSheet(
         includeDateDivider: false,
         allowSelect: false,
         useHorizontalPaddingConstrained: false,
-        noResultsPadding:
-            EdgeInsetsDirectional.symmetric(horizontal: 10, vertical: 10),
+        noResultsPadding: EdgeInsetsDirectional.symmetric(
+          horizontal: 10,
+          vertical: 10,
+        ),
         limitPerDay: 50,
         enableFutureTransactionsCollapse: false,
       ),
@@ -431,9 +453,12 @@ class HeatMapMonthLabel extends StatelessWidget {
         textAlign: TextAlign.center,
         fontSize: 13,
         text: label,
-        textColor: dynamicPastel(context, Theme.of(context).colorScheme.primary,
-                amount: 0.8, inverse: true)
-            .withOpacity(0.5),
+        textColor: dynamicPastel(
+          context,
+          Theme.of(context).colorScheme.primary,
+          amount: 0.8,
+          inverse: true,
+        ).withOpacity(0.5),
       ),
     );
   }

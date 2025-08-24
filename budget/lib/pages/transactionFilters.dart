@@ -47,19 +47,23 @@ class SearchFilters {
   }) {
     walletPks = this.walletPks.isEmpty ? [] : this.walletPks;
     categoryPks = this.categoryPks.isEmpty ? [] : this.categoryPks;
-    subcategoryPks =
-        this.subcategoryPks?.isEmpty == true ? [] : this.subcategoryPks;
+    subcategoryPks = this.subcategoryPks?.isEmpty == true
+        ? []
+        : this.subcategoryPks;
     budgetPks = this.budgetPks.isEmpty ? [] : this.budgetPks;
-    excludedBudgetPks =
-        this.excludedBudgetPks.isEmpty ? [] : this.excludedBudgetPks;
+    excludedBudgetPks = this.excludedBudgetPks.isEmpty
+        ? []
+        : this.excludedBudgetPks;
     objectivePks = this.objectivePks.isEmpty ? [] : this.objectivePks;
-    objectiveLoanPks =
-        this.objectiveLoanPks.isEmpty ? [] : this.objectiveLoanPks;
+    objectiveLoanPks = this.objectiveLoanPks.isEmpty
+        ? []
+        : this.objectiveLoanPks;
     expenseIncome = this.expenseIncome.isEmpty ? [] : this.expenseIncome;
     positiveCashFlow = this.positiveCashFlow;
     paidStatus = this.paidStatus.isEmpty ? [] : this.paidStatus;
-    transactionTypes =
-        this.transactionTypes.isEmpty ? [] : this.transactionTypes;
+    transactionTypes = this.transactionTypes.isEmpty
+        ? []
+        : this.transactionTypes;
     budgetTransactionFilters = this.budgetTransactionFilters.isEmpty
         ? []
         : this.budgetTransactionFilters;
@@ -71,7 +75,7 @@ class SearchFilters {
   List<String> walletPks;
   List<String> categoryPks;
   List<String>?
-      subcategoryPks; // if this is null, it means any transaction WITHOUT a subcategory (blank list means all)
+  subcategoryPks; // if this is null, it means any transaction WITHOUT a subcategory (blank list means all)
   List<String?> budgetPks;
   List<String> excludedBudgetPks;
   List<String?> objectivePks;
@@ -182,8 +186,11 @@ class SearchFilters {
       return false;
   }
 
-  void loadFilterString(String? filterString,
-      {bool skipDateTimeRange = false, bool skipSearchQuery = false}) {
+  void loadFilterString(
+    String? filterString, {
+    bool skipDateTimeRange = false,
+    bool skipSearchQuery = false,
+  }) {
     if (filterString == null) return;
     List<String> filterElements = filterString.split(":-:");
     clearSearchFilters();
@@ -192,7 +199,7 @@ class SearchFilters {
       if (i >= filterElements.length - 1) break;
       String? key = nullIfIndexOutOfRange(filterElements, i);
       String? value = nullIfIndexOutOfRange(filterElements, i + 1);
-      if (key == null || value == null) break;
+      if (value == null) break;
       try {
         switch (key) {
           case 'walletPks':
@@ -249,13 +256,15 @@ class SearchFilters {
             if (value == "null") {
               transactionTypes.add(null);
             } else {
-              transactionTypes
-                  .add(TransactionSpecialType.values[int.parse(value)]);
+              transactionTypes.add(
+                TransactionSpecialType.values[int.parse(value)],
+              );
             }
             break;
           case 'budgetTransactionFilters':
-            budgetTransactionFilters
-                .add(BudgetTransactionFilters.values[int.parse(value)]);
+            budgetTransactionFilters.add(
+              BudgetTransactionFilters.values[int.parse(value)],
+            );
             break;
           case 'methodAdded':
             methodAdded.add(MethodAdded.values[int.parse(value)]);
@@ -485,8 +494,11 @@ List<DateTimeRange> createDateTimeRanges(ParsedDateTimeQuery? parsed) {
       if (day != null) {
         // Exact date
         final startDate = DateTime(year, month, day);
-        final endDate =
-            DateTime(year, month, day + 1).subtract(Duration(milliseconds: 1));
+        final endDate = DateTime(
+          year,
+          month,
+          day + 1,
+        ).subtract(Duration(milliseconds: 1));
         ranges.add(DateTimeRange(start: startDate, end: endDate));
       } else {
         // Full month
@@ -506,8 +518,11 @@ List<DateTimeRange> createDateTimeRanges(ParsedDateTimeQuery? parsed) {
       // No year, month provided, day is not null
       for (int i = -200; i < 100; i++) {
         final rangeStart = DateTime(startDate.year + i, month, day);
-        final rangeEnd = DateTime(startDate.year + i, month, day + 1)
-            .subtract(Duration(milliseconds: 1));
+        final rangeEnd = DateTime(
+          startDate.year + i,
+          month,
+          day + 1,
+        ).subtract(Duration(milliseconds: 1));
         ranges.add(DateTimeRange(start: rangeStart, end: rangeEnd));
       }
     } else {
@@ -527,7 +542,7 @@ class HighlightStringInList extends TextEditingController {
   final Pattern pattern;
 
   HighlightStringInList({String? initialText})
-      : pattern = RegExp(r'\b[^,]+(?=|$)') {
+    : pattern = RegExp(r'\b[^,]+(?=|$)') {
     this.text = initialText ?? '';
   }
 
@@ -569,11 +584,12 @@ class HighlightStringInList extends TextEditingController {
 }
 
 class TransactionFiltersSelection extends StatefulWidget {
-  const TransactionFiltersSelection(
-      {required this.searchFilters,
-      required this.setSearchFilters,
-      required this.clearSearchFilters,
-      super.key});
+  const TransactionFiltersSelection({
+    required this.searchFilters,
+    required this.setSearchFilters,
+    required this.clearSearchFilters,
+    super.key,
+  });
 
   final SearchFilters searchFilters;
   final Function(SearchFilters searchFilters) setSearchFilters;
@@ -621,10 +637,10 @@ class _TransactionFiltersSelectionState
             // Remove any subcategories that are selected that no longer
             // have the primary category selected
             for (String subCategoryPk in ([
-              ...selectedFilters.subcategoryPks ?? []
+              ...selectedFilters.subcategoryPks ?? [],
             ])) {
-              TransactionCategory subCategory =
-                  await database.getCategoryInstance(subCategoryPk);
+              TransactionCategory subCategory = await database
+                  .getCategoryInstance(subCategoryPk);
               if ((categories ?? []).contains(subCategory.mainCategoryPk) ==
                   false) {
                 (selectedFilters.subcategoryPks ?? []).remove(subCategoryPk);
@@ -661,15 +677,14 @@ class _TransactionFiltersSelectionState
         ),
         StreamBuilder<RangeValues>(
           stream: database.getHighestLowestAmount(
-            SearchFilters(
-              dateTimeRange: selectedFilters.dateTimeRange,
-            ),
+            SearchFilters(dateTimeRange: selectedFilters.dateTimeRange),
           ),
           builder: ((context, snapshot) {
             if (snapshot.hasData) {
               RangeValues rangeLimit = RangeValues(
-                  (snapshot.data?.start ?? -0.00000001),
-                  (snapshot.data?.end ?? 0.00000001));
+                (snapshot.data?.start ?? -0.00000001),
+                (snapshot.data?.end ?? 0.00000001),
+              );
               if ((selectedFilters.amountRange?.start ?? 0) <
                       rangeLimit.start ||
                   (selectedFilters.amountRange?.end ?? 0) > rangeLimit.end) {
@@ -700,8 +715,8 @@ class _TransactionFiltersSelectionState
             return item == ExpenseIncome.expense
                 ? "expense".tr()
                 : item == ExpenseIncome.income
-                    ? "income".tr()
-                    : "";
+                ? "income".tr()
+                : "";
           },
           getCustomBorderColor: (ExpenseIncome item) {
             Color? customBorderColor;
@@ -770,10 +785,10 @@ class _TransactionFiltersSelectionState
             return item == PaidStatus.paid
                 ? "paid".tr()
                 : item == PaidStatus.notPaid
-                    ? "not-paid".tr()
-                    : item == PaidStatus.skipped
-                        ? "skipped".tr()
-                        : "";
+                ? "not-paid".tr()
+                : item == PaidStatus.skipped
+                ? "skipped".tr()
+                : "";
           },
           onSelected: (PaidStatus item) {
             if (selectedFilters.paidStatus.contains(item)) {
@@ -963,8 +978,9 @@ class _TransactionFiltersSelectionState
                       return "excluded-from".tr() + " " + item.name;
                     },
                     onSelected: (Budget item) {
-                      if (selectedFilters.excludedBudgetPks
-                          .contains(item.budgetPk)) {
+                      if (selectedFilters.excludedBudgetPks.contains(
+                        item.budgetPk,
+                      )) {
                         selectedFilters.excludedBudgetPks.remove(item.budgetPk);
                       } else {
                         selectedFilters.excludedBudgetPks.add(item.budgetPk);
@@ -972,8 +988,9 @@ class _TransactionFiltersSelectionState
                       setSearchFilters();
                     },
                     getSelected: (Budget item) {
-                      return selectedFilters.excludedBudgetPks
-                          .contains(item.budgetPk);
+                      return selectedFilters.excludedBudgetPks.contains(
+                        item.budgetPk,
+                      );
                     },
                     getCustomBorderColor: (Budget? item) {
                       if (item == null) return null;
@@ -1000,7 +1017,9 @@ class _TransactionFiltersSelectionState
 
         StreamBuilder<List<Objective>>(
           stream: database.watchAllObjectives(
-              objectiveType: ObjectiveType.goal, archivedLast: true),
+            objectiveType: ObjectiveType.goal,
+            archivedLast: true,
+          ),
           builder: (context, snapshot) {
             if (snapshot.data != null && snapshot.data!.length <= 0)
               return SizedBox.shrink();
@@ -1022,8 +1041,9 @@ class _TransactionFiltersSelectionState
                   return item.name;
                 },
                 onSelected: (Objective? item) {
-                  if (selectedFilters.objectivePks
-                      .contains(item?.objectivePk)) {
+                  if (selectedFilters.objectivePks.contains(
+                    item?.objectivePk,
+                  )) {
                     selectedFilters.objectivePks.remove(item?.objectivePk);
                   } else {
                     selectedFilters.objectivePks.add(item?.objectivePk);
@@ -1031,8 +1051,9 @@ class _TransactionFiltersSelectionState
                   setSearchFilters();
                 },
                 getSelected: (Objective? item) {
-                  return selectedFilters.objectivePks
-                      .contains(item?.objectivePk);
+                  return selectedFilters.objectivePks.contains(
+                    item?.objectivePk,
+                  );
                 },
                 getCustomBorderColor: (Objective? item) {
                   if (item == null) return null;
@@ -1057,7 +1078,9 @@ class _TransactionFiltersSelectionState
 
         StreamBuilder<List<Objective>>(
           stream: database.watchAllObjectives(
-              objectiveType: ObjectiveType.loan, archivedLast: true),
+            objectiveType: ObjectiveType.loan,
+            archivedLast: true,
+          ),
           builder: (context, snapshot) {
             if (snapshot.data != null && snapshot.data!.length <= 0)
               return SizedBox.shrink();
@@ -1080,8 +1103,9 @@ class _TransactionFiltersSelectionState
                   return item.name;
                 },
                 onSelected: (Objective? item) {
-                  if (selectedFilters.objectiveLoanPks
-                      .contains(item?.objectivePk)) {
+                  if (selectedFilters.objectiveLoanPks.contains(
+                    item?.objectivePk,
+                  )) {
                     selectedFilters.objectiveLoanPks.remove(item?.objectivePk);
                   } else {
                     selectedFilters.objectiveLoanPks.add(item?.objectivePk);
@@ -1089,8 +1113,9 @@ class _TransactionFiltersSelectionState
                   setSearchFilters();
                 },
                 getSelected: (Objective? item) {
-                  return selectedFilters.objectiveLoanPks
-                      .contains(item?.objectivePk);
+                  return selectedFilters.objectiveLoanPks.contains(
+                    item?.objectivePk,
+                  );
                 },
                 getCustomBorderColor: (Objective? item) {
                   if (item == null) return null;
@@ -1112,6 +1137,7 @@ class _TransactionFiltersSelectionState
             }
           },
         ),
+
         // SelectChips(
         //   items: MethodAdded.values,
         //   getLabel: (item) {
@@ -1135,7 +1161,6 @@ class _TransactionFiltersSelectionState
         //     return selectedFilters.methodAdded.contains(item);
         //   },
         // ),
-
         SizedBox(height: 5),
         Padding(
           padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
@@ -1162,35 +1187,41 @@ class _TransactionFiltersSelectionState
                 onNewRecommendedTitle: () {},
                 onRecommendedTitleTapped:
                     (TransactionAssociatedTitleWithCategory title) async {
-                  List<String> splitTitles = titleContainsController.text
-                      .trim()
-                      .replaceAll(", ", ",")
-                      .split(",");
-                  if (splitTitles.length <= 0) return;
-                  splitTitles.last = title.title.title;
-                  titleContainsController.text = splitTitles.join(", ") + ", ";
+                      List<String> splitTitles = titleContainsController.text
+                          .trim()
+                          .replaceAll(", ", ",")
+                          .split(",");
+                      if (splitTitles.length <= 0) return;
+                      splitTitles.last = title.title.title;
+                      titleContainsController.text =
+                          splitTitles.join(", ") + ", ";
 
-                  if (titleContainsController.text == "") {
-                    selectedFilters.titleContains = null;
-                  } else {
-                    selectedFilters.titleContains =
-                        titleContainsController.text.trim();
-                  }
+                      if (titleContainsController.text == "") {
+                        selectedFilters.titleContains = null;
+                      } else {
+                        selectedFilters.titleContains = titleContainsController
+                            .text
+                            .trim();
+                      }
 
-                  // Scroll to the end of the text input
-                  titleContainsController.selection =
-                      TextSelection.fromPosition(
-                    TextPosition(offset: titleContainsController.text.length),
-                  );
-                  Future.delayed(Duration(milliseconds: 50), () {
-                    // delay cannot be zero
-                    titleContainsScrollController.animateTo(
-                      titleContainsScrollController.position.maxScrollExtent,
-                      curve: Curves.easeInOutCubicEmphasized,
-                      duration: Duration(milliseconds: 500),
-                    );
-                  });
-                },
+                      // Scroll to the end of the text input
+                      titleContainsController.selection =
+                          TextSelection.fromPosition(
+                            TextPosition(
+                              offset: titleContainsController.text.length,
+                            ),
+                          );
+                      Future.delayed(Duration(milliseconds: 50), () {
+                        // delay cannot be zero
+                        titleContainsScrollController.animateTo(
+                          titleContainsScrollController
+                              .position
+                              .maxScrollExtent,
+                          curve: Curves.easeInOutCubicEmphasized,
+                          duration: Duration(milliseconds: 500),
+                        );
+                      });
+                    },
                 textToSearchFilter: (String text) {
                   return (text.split(",").lastOrNull ?? "").trim();
                 },
@@ -1219,14 +1250,16 @@ class _TransactionFiltersSelectionState
                 icon: appStateSettings["outlinedIcons"]
                     ? Icons.sticky_note_2_outlined
                     : Icons.sticky_note_2_rounded,
-              )
+              ),
             ],
           ),
         ),
 
         Padding(
           padding: const EdgeInsetsDirectional.symmetric(
-              horizontal: 20, vertical: 10),
+            horizontal: 20,
+            vertical: 10,
+          ),
           child: Row(
             children: [
               Flexible(
@@ -1253,7 +1286,7 @@ class _TransactionFiltersSelectionState
               ),
             ],
           ),
-        )
+        ),
       ],
     );
   }
@@ -1279,92 +1312,114 @@ class AppliedFilterChips extends StatelessWidget {
     List<Widget> out = [];
     // Title contains
     if (searchFilters.titleContains != null) {
-      out.add(AppliedFilterChip(
-        label:
-            "title-contains".tr() + ": " + (searchFilters.titleContains ?? ""),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label:
+              "title-contains".tr() +
+              ": " +
+              (searchFilters.titleContains ?? ""),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Notes contains
     if (searchFilters.noteContains != null) {
-      out.add(AppliedFilterChip(
-        label: "notes-contain".tr() + ": " + (searchFilters.noteContains ?? ""),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label:
+              "notes-contain".tr() + ": " + (searchFilters.noteContains ?? ""),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Categories
     for (TransactionCategory category in await database.getAllCategories(
-        categoryFks: searchFilters.categoryPks, allCategories: false)) {
-      out.add(AppliedFilterChip(
-        label: category.name,
-        customBorderColor: HexColor(
-          category.colour,
-          defaultColor: Theme.of(context).colorScheme.primary,
+      categoryFks: searchFilters.categoryPks,
+      allCategories: false,
+    )) {
+      out.add(
+        AppliedFilterChip(
+          label: category.name,
+          customBorderColor: HexColor(
+            category.colour,
+            defaultColor: Theme.of(context).colorScheme.primary,
+          ),
+          openFiltersSelection: openFiltersSelection,
         ),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      );
     }
     for (TransactionCategory category in await database.getAllCategories(
-        categoryFks: searchFilters.subcategoryPks,
-        allCategories: false,
-        includeSubCategories: true)) {
-      out.add(AppliedFilterChip(
-        label: category.name,
-        customBorderColor: HexColor(
-          category.colour,
-          defaultColor: Theme.of(context).colorScheme.primary,
+      categoryFks: searchFilters.subcategoryPks,
+      allCategories: false,
+      includeSubCategories: true,
+    )) {
+      out.add(
+        AppliedFilterChip(
+          label: category.name,
+          customBorderColor: HexColor(
+            category.colour,
+            defaultColor: Theme.of(context).colorScheme.primary,
+          ),
+          openFiltersSelection: openFiltersSelection,
         ),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      );
     }
     if (searchFilters.subcategoryPks == null) {
-      out.add(AppliedFilterChip(
-        label: "no-subcategory".tr(),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "no-subcategory".tr(),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Amount range
     if (searchFilters.amountRange != null) {
       out.add(
         AppliedFilterChip(
-          label: convertToMoney(allWallets, searchFilters.amountRange!.start) +
+          label:
+              convertToMoney(allWallets, searchFilters.amountRange!.start) +
               " – " +
-              convertToMoney(
-                allWallets,
-                searchFilters.amountRange!.end,
-              ),
+              convertToMoney(allWallets, searchFilters.amountRange!.end),
           openFiltersSelection: openFiltersSelection,
         ),
       );
     }
     // Expense Income
     if (searchFilters.expenseIncome.contains(ExpenseIncome.expense)) {
-      out.add(AppliedFilterChip(
-        label: "expense".tr(),
-        customBorderColor: getColor(context, "expenseAmount"),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "expense".tr(),
+          customBorderColor: getColor(context, "expenseAmount"),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     if (searchFilters.expenseIncome.contains(ExpenseIncome.income)) {
-      out.add(AppliedFilterChip(
-        label: "income".tr(),
-        customBorderColor: getColor(context, "incomeAmount"),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "income".tr(),
+          customBorderColor: getColor(context, "incomeAmount"),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Cash Flow
     if (searchFilters.positiveCashFlow == false) {
-      out.add(AppliedFilterChip(
-        label: "outgoing".tr(),
-        customBorderColor: getColor(context, "expenseAmount"),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "outgoing".tr(),
+          customBorderColor: getColor(context, "expenseAmount"),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     } else if (searchFilters.positiveCashFlow == true) {
-      out.add(AppliedFilterChip(
-        label: "incoming".tr(),
-        customBorderColor: getColor(context, "incomeAmount"),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "incoming".tr(),
+          customBorderColor: getColor(context, "incomeAmount"),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Transaction Types
     for (TransactionSpecialType? transactionType
@@ -1375,160 +1430,199 @@ class AppliedFilterChips extends StatelessWidget {
       } else if (transactionType == TransactionSpecialType.debt) {
         customBorderColor = getColor(context, "unPaidOverdue");
       }
-      out.add(AppliedFilterChip(
-        label: transactionTypeDisplayToEnum[transactionType]
-                ?.toString()
-                .toLowerCase()
-                .tr() ??
-            "default".tr(),
-        customBorderColor: customBorderColor,
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label:
+              transactionTypeDisplayToEnum[transactionType]
+                  ?.toString()
+                  .toLowerCase()
+                  .tr() ??
+              "default".tr(),
+          customBorderColor: customBorderColor,
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Paid status
     if (searchFilters.paidStatus.contains(PaidStatus.paid)) {
-      out.add(AppliedFilterChip(
-        label: "paid".tr(),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "paid".tr(),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     if (searchFilters.paidStatus.contains(PaidStatus.notPaid)) {
-      out.add(AppliedFilterChip(
-        label: "not-paid".tr(),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "not-paid".tr(),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     if (searchFilters.paidStatus.contains(PaidStatus.skipped)) {
-      out.add(AppliedFilterChip(
-        label: "skipped".tr(),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "skipped".tr(),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Budget Transaction Filters
-    if (searchFilters.budgetTransactionFilters
-        .contains(BudgetTransactionFilters.sharedToOtherBudget)) {
-      out.add(AppliedFilterChip(
-        label: "added-to-other-budgets".tr(),
-        openFiltersSelection: openFiltersSelection,
-      ));
+    if (searchFilters.budgetTransactionFilters.contains(
+      BudgetTransactionFilters.sharedToOtherBudget,
+    )) {
+      out.add(
+        AppliedFilterChip(
+          label: "added-to-other-budgets".tr(),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
-    if (searchFilters.budgetTransactionFilters
-        .contains(BudgetTransactionFilters.addedToOtherBudget)) {
-      out.add(AppliedFilterChip(
-        label: "added-to-other-budgets".tr(),
-        openFiltersSelection: openFiltersSelection,
-      ));
+    if (searchFilters.budgetTransactionFilters.contains(
+      BudgetTransactionFilters.addedToOtherBudget,
+    )) {
+      out.add(
+        AppliedFilterChip(
+          label: "added-to-other-budgets".tr(),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Wallets
     for (String walletPk in searchFilters.walletPks) {
-      out.add(AppliedFilterChip(
-        label: getWalletStringName(
+      out.add(
+        AppliedFilterChip(
+          label: getWalletStringName(
             Provider.of<AllWallets>(context, listen: false),
-            allWallets.indexedByPk[walletPk]),
-        customBorderColor: HexColor(
-          allWallets.indexedByPk[walletPk]?.colour,
-          defaultColor: Theme.of(context).colorScheme.primary,
+            allWallets.indexedByPk[walletPk],
+          ),
+          customBorderColor: HexColor(
+            allWallets.indexedByPk[walletPk]?.colour,
+            defaultColor: Theme.of(context).colorScheme.primary,
+          ),
+          openFiltersSelection: openFiltersSelection,
         ),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      );
     }
     // Budgets
     for (Budget budget in await database.getAllBudgets()) {
       if (searchFilters.budgetPks.contains(budget.budgetPk))
-        out.add(AppliedFilterChip(
-          label: budget.name,
-          customBorderColor: HexColor(
-            budget.colour,
-            defaultColor: Theme.of(context).colorScheme.primary,
+        out.add(
+          AppliedFilterChip(
+            label: budget.name,
+            customBorderColor: HexColor(
+              budget.colour,
+              defaultColor: Theme.of(context).colorScheme.primary,
+            ),
+            openFiltersSelection: openFiltersSelection,
           ),
-          openFiltersSelection: openFiltersSelection,
-        ));
+        );
     }
     // Excluded Budgets
     for (Budget budget in await database.getAllBudgets()) {
       if (searchFilters.excludedBudgetPks.contains(budget.budgetPk))
-        out.add(AppliedFilterChip(
-          label: "excluded-from".tr() + ": " + budget.name,
-          customBorderColor: HexColor(
-            budget.colour,
-            defaultColor: Theme.of(context).colorScheme.primary,
+        out.add(
+          AppliedFilterChip(
+            label: "excluded-from".tr() + ": " + budget.name,
+            customBorderColor: HexColor(
+              budget.colour,
+              defaultColor: Theme.of(context).colorScheme.primary,
+            ),
+            openFiltersSelection: openFiltersSelection,
           ),
-          openFiltersSelection: openFiltersSelection,
-        ));
+        );
     }
     if (searchFilters.budgetPks.contains(null)) {
-      out.add(AppliedFilterChip(
-        label: "no-budget".tr(),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "no-budget".tr(),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Objectives
-    for (Objective objective
-        in await database.getAllObjectives(objectiveType: ObjectiveType.goal)) {
+    for (Objective objective in await database.getAllObjectives(
+      objectiveType: ObjectiveType.goal,
+    )) {
       if (searchFilters.objectivePks.contains(objective.objectivePk))
-        out.add(AppliedFilterChip(
-          label: objective.name,
-          customBorderColor: HexColor(
-            objective.colour,
-            defaultColor: Theme.of(context).colorScheme.primary,
+        out.add(
+          AppliedFilterChip(
+            label: objective.name,
+            customBorderColor: HexColor(
+              objective.colour,
+              defaultColor: Theme.of(context).colorScheme.primary,
+            ),
+            openFiltersSelection: openFiltersSelection,
           ),
-          openFiltersSelection: openFiltersSelection,
-        ));
+        );
     }
     if (searchFilters.objectivePks.contains(null)) {
-      out.add(AppliedFilterChip(
-        label: "no-goal".tr(),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "no-goal".tr(),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Loan Objectives
-    for (Objective objective
-        in await database.getAllObjectives(objectiveType: ObjectiveType.loan)) {
+    for (Objective objective in await database.getAllObjectives(
+      objectiveType: ObjectiveType.loan,
+    )) {
       if (searchFilters.objectiveLoanPks.contains(objective.objectivePk))
-        out.add(AppliedFilterChip(
-          label: objective.name,
-          customBorderColor: HexColor(
-            objective.colour,
-            defaultColor: Theme.of(context).colorScheme.primary,
+        out.add(
+          AppliedFilterChip(
+            label: objective.name,
+            customBorderColor: HexColor(
+              objective.colour,
+              defaultColor: Theme.of(context).colorScheme.primary,
+            ),
+            openFiltersSelection: openFiltersSelection,
           ),
-          openFiltersSelection: openFiltersSelection,
-        ));
+        );
     }
     if (searchFilters.objectiveLoanPks.contains(null)) {
-      out.add(AppliedFilterChip(
-        label: "no-loan".tr(),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: "no-loan".tr(),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
     // Date and time range
     if (out.length > 0 &&
         openSelectDate != null &&
         searchFilters.dateTimeRange != null) {
-      out.add(AppliedFilterChip(
-        label: getWordedDateShortMore(
-              searchFilters.dateTimeRange!.start,
-              includeYear:
-                  searchFilters.dateTimeRange!.start != DateTime.now().year,
-            ) +
-            " – " +
-            getWordedDateShortMore(
-              searchFilters.dateTimeRange!.end,
-              includeYear:
-                  searchFilters.dateTimeRange!.end != DateTime.now().year,
-            ),
-        openFiltersSelection: () => {openSelectDate!()},
-      ));
+      out.add(
+        AppliedFilterChip(
+          label:
+              getWordedDateShortMore(
+                searchFilters.dateTimeRange!.start,
+                includeYear:
+                    searchFilters.dateTimeRange!.start != DateTime.now().year,
+              ) +
+              " – " +
+              getWordedDateShortMore(
+                searchFilters.dateTimeRange!.end,
+                includeYear:
+                    searchFilters.dateTimeRange!.end != DateTime.now().year,
+              ),
+          openFiltersSelection: () => {openSelectDate!()},
+        ),
+      );
     }
     // Date from search text
     ParsedDateTimeQuery? parsedDateTimeQuery = searchFilters.searchQuery == null
         ? null
         : parseSearchQueryForDateTimeText(searchFilters.searchQuery ?? "");
     if (parsedDateTimeQuery != null) {
-      out.add(AppliedFilterChip(
-        customBorderColor: Theme.of(context).colorScheme.tertiary,
-        label: parsedDateTimeQuery.formatDate(context.locale.toString()),
-        openFiltersSelection: () => {openSelectDate!()},
-      ));
+      out.add(
+        AppliedFilterChip(
+          customBorderColor: Theme.of(context).colorScheme.tertiary,
+          label: parsedDateTimeQuery.formatDate(context.locale.toString()),
+          openFiltersSelection: () => {openSelectDate!()},
+        ),
+      );
     }
     // Amount from search text
     (double, double)? bounds = searchFilters.searchQuery == null
@@ -1536,19 +1630,23 @@ class AppliedFilterChips extends StatelessWidget {
         : parseSearchQueryForAmountText(searchFilters.searchQuery ?? "");
     if (bounds != null) {
       double lowerBound = bounds.$1;
-      out.add(AppliedFilterChip(
-        customBorderColor: Theme.of(context).colorScheme.tertiary,
-        label: "= " + lowerBound.toString(),
-        openFiltersSelection: () => {openSelectDate!()},
-      ));
+      out.add(
+        AppliedFilterChip(
+          customBorderColor: Theme.of(context).colorScheme.tertiary,
+          label: "= " + lowerBound.toString(),
+          openFiltersSelection: () => {openSelectDate!()},
+        ),
+      );
     }
 
     // Method Added
     for (MethodAdded? methodAdded in searchFilters.methodAdded) {
-      out.add(AppliedFilterChip(
-        label: methodAdded?.name.toString().capitalizeFirst ?? "default".tr(),
-        openFiltersSelection: openFiltersSelection,
-      ));
+      out.add(
+        AppliedFilterChip(
+          label: methodAdded?.name.toString().capitalizeFirst ?? "default".tr(),
+          openFiltersSelection: openFiltersSelection,
+        ),
+      );
     }
 
     return out;
@@ -1566,7 +1664,8 @@ class AppliedFilterChips extends StatelessWidget {
           return AnimatedSize(
             curve: Curves.easeInOutCubicEmphasized,
             duration: Duration(milliseconds: 1000),
-            child: snapshot.hasData &&
+            child:
+                snapshot.hasData &&
                     snapshot.data != null &&
                     snapshot.data!.length > 0
                 ? Padding(
@@ -1589,7 +1688,7 @@ class AppliedFilterChips extends StatelessWidget {
                               },
                             ),
                             SizedBox(width: 2),
-                            ...(snapshot.data ?? [])
+                            ...(snapshot.data ?? []),
                           ],
                         ),
                       ),

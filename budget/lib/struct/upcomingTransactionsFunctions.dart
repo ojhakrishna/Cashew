@@ -10,7 +10,7 @@ import 'package:budget/widgets/openPopup.dart';
 import 'package:budget/widgets/openSnackbar.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/selectAmount.dart';
-import 'package:budget/widgets/selectedTransactionsAppBar.dart';
+
 import 'package:budget/widgets/transactionEntry/transactionLabel.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:easy_localization/easy_localization.dart';
@@ -18,118 +18,127 @@ import 'package:flutter/material.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:provider/provider.dart';
 
-Future createNewSubscriptionTransaction(
+/// Helpers to mark transactions paid/skipped and to create predictable
+/// follow-up transactions for subscriptions/repetitive entries.
+
+Future<void> createNewSubscriptionTransaction(
     BuildContext context, Transaction transaction,
     {String? closelyRelatedPairedTransactionFk}) async {
-  if (transaction.createdAnotherFutureTransaction == false) {
-    if (transaction.type == TransactionSpecialType.subscription ||
-        transaction.type == TransactionSpecialType.repetitive) {
-      int yearOffset = 0;
-      int monthOffset = 0;
-      int dayOffset = 0;
-      if (transaction.reoccurrence == BudgetReoccurence.yearly) {
-        yearOffset = transaction.periodLength ?? 0;
-      } else if (transaction.reoccurrence == BudgetReoccurence.monthly) {
-        monthOffset = transaction.periodLength ?? 0;
-      } else if (transaction.reoccurrence == BudgetReoccurence.weekly) {
-        dayOffset = (transaction.periodLength ?? 0) * 7;
-      } else if (transaction.reoccurrence == BudgetReoccurence.daily) {
-        dayOffset = transaction.periodLength ?? 0;
-      }
-      DateTime newDate = DateTime(
-        transaction.dateCreated.year + yearOffset,
-        transaction.dateCreated.month + monthOffset,
-        transaction.dateCreated.day + dayOffset,
-        transaction.dateCreated.hour,
-        transaction.dateCreated.minute,
-        transaction.dateCreated.second,
-        transaction.dateCreated.millisecond,
-      );
+  // If we've already created the next occurrence, do nothing.
+  if (transaction.createdAnotherFutureTransaction == true) return;
 
-      // After end date
-      if (transaction.endDate != null &&
-          transaction.endDate!.isBefore(newDate)) {
-        String transactionName = await getTransactionLabel(transaction);
-        openSnackbar(
-          SnackbarMessage(
-            title: "end-date-reached".tr(),
-            description: "for".tr().capitalizeFirst + " " + transactionName,
-            icon: appStateSettings["outlinedIcons"]
-                ? Icons.event_available_outlined
-                : Icons.event_available_rounded,
-          ),
-        );
-        return;
-      }
+  if (transaction.type != TransactionSpecialType.subscription &&
+      transaction.type != TransactionSpecialType.repetitive) return;
 
-      //Goal reached
-      if (transaction.objectiveFk != null && transaction.endDate == null) {
-        Objective objective =
-            await database.getObjectiveInstance(transaction.objectiveFk!);
-        double? totalSpentOfObjective = await database.getTotalTowardsObjective(
-            Provider.of<AllWallets>(context, listen: false),
-            transaction.objectiveFk!,
-            objective.type);
+  int yearOffset = 0;
+  int monthOffset = 0;
+  int dayOffset = 0;
 
-        bool willBeOverObjective = (totalSpentOfObjective ?? 0) >=
-            (objective.amount * (objective.income ? 1 : -1));
+  if (transaction.reoccurrence == BudgetReoccurence.yearly) {
+    yearOffset = transaction.periodLength ?? 0;
+  } else if (transaction.reoccurrence == BudgetReoccurence.monthly) {
+    monthOffset = transaction.periodLength ?? 0;
+  } else if (transaction.reoccurrence == BudgetReoccurence.weekly) {
+    dayOffset = (transaction.periodLength ?? 0) * 7;
+  } else if (transaction.reoccurrence == BudgetReoccurence.daily) {
+    dayOffset = transaction.periodLength ?? 0;
+  }
 
-        if (objective.income == false)
-          willBeOverObjective = !willBeOverObjective;
+  final newDate = DateTime(
+    transaction.dateCreated.year + yearOffset,
+    transaction.dateCreated.month + monthOffset,
+    transaction.dateCreated.day + dayOffset,
+    transaction.dateCreated.hour,
+    transaction.dateCreated.minute,
+    transaction.dateCreated.second,
+    transaction.dateCreated.millisecond,
+  );
 
-        if ((totalSpentOfObjective ?? 0) ==
-            (objective.amount * (objective.income ? 1 : -1)))
-          willBeOverObjective = true;
+  // After end date
+  if (transaction.endDate != null && transaction.endDate!.isBefore(newDate)) {
+    final transactionName = await getTransactionLabel(transaction);
+    openSnackbar(
+      SnackbarMessage(
+        title: 'end-date-reached'.tr(),
+        description: '${'for'.tr().capitalizeFirst} $transactionName',
+        icon: appStateSettings['outlinedIcons']
+            ? Icons.event_available_outlined
+            : Icons.event_available_rounded,
+      ),
+    );
+    return;
+  }
 
-        if (willBeOverObjective) {
-          openSnackbar(
-            SnackbarMessage(
-              title: "goal-reached".tr(),
-              description: "for".tr().capitalizeFirst + " " + objective.name,
-              icon: appStateSettings["outlinedIcons"]
-                  ? Icons.event_available_outlined
-                  : Icons.event_available_rounded,
-            ),
-          );
-          return;
-        }
-      }
+  // Goal reached
+  if (transaction.objectiveFk != null && transaction.endDate == null) {
+    final objective =
+        await database.getObjectiveInstance(transaction.objectiveFk!);
+    final totalSpentOfObjective = await database.getTotalTowardsObjective(
+        Provider.of<AllWallets>(context, listen: false),
+        transaction.objectiveFk!,
+        objective.type);
 
-      Transaction newTransaction = transaction.copyWith(
-        paid: false,
-        transactionPk: updatePredictableKey(transaction.transactionPk),
-        dateCreated: newDate,
-        createdAnotherFutureTransaction: Value(false),
-        pairedTransactionFk: closelyRelatedPairedTransactionFk != null
-            ? Value(updatePredictableKey(closelyRelatedPairedTransactionFk))
-            : Value(null),
-      );
-      await database.createOrUpdateTransaction(insert: false, newTransaction);
-      String transactionName = await getTransactionLabel(transaction);
+    bool willBeOverObjective = (totalSpentOfObjective ?? 0) >=
+        (objective.amount * (objective.income ? 1 : -1));
+
+    if (objective.income == false) willBeOverObjective = !willBeOverObjective;
+
+    if ((totalSpentOfObjective ?? 0) ==
+        (objective.amount * (objective.income ? 1 : -1))) {
+      willBeOverObjective = true;
+    }
+
+    if (willBeOverObjective) {
       openSnackbar(
         SnackbarMessage(
-          title: (transaction.income ? "deposited".tr() : "paid".tr()) +
-              ": " +
-              transactionName,
-          description: "created-new-for".tr() +
-              " " +
-              getWordedDateShort(newDate, lowerCaseTodayTomorrow: true),
-          icon: appStateSettings["outlinedIcons"]
-              ? Icons.event_repeat_outlined
-              : Icons.event_repeat_rounded,
-          onTap: () {
-            pushRoute(
-              context,
-              AddTransactionPage(
-                transaction: newTransaction,
-                routesToPopAfterDelete: RoutesToPopAfterDelete.One,
-              ),
-            );
-          },
+          title: 'goal-reached'.tr(),
+          description: '${'for'.tr().capitalizeFirst} ${objective.name}',
+          icon: appStateSettings['outlinedIcons']
+              ? Icons.event_available_outlined
+              : Icons.event_available_rounded,
         ),
       );
+      return;
     }
   }
+
+  final newTransaction = transaction.copyWith(
+    paid: false,
+    transactionPk: updatePredictableKey(transaction.transactionPk),
+    dateCreated: newDate,
+    // Use Value wrapper where the generated copyWith expects it (drift companions)
+    createdAnotherFutureTransaction: Value(false),
+    pairedTransactionFk: closelyRelatedPairedTransactionFk != null
+        ? Value(updatePredictableKey(closelyRelatedPairedTransactionFk))
+        : const Value(null),
+  );
+
+  await database.createOrUpdateTransaction(insert: false, newTransaction);
+
+  final transactionName = await getTransactionLabel(transaction);
+
+  openSnackbar(
+    SnackbarMessage(
+      title: (transaction.income ? 'deposited'.tr() : 'paid'.tr()) +
+          ': ' +
+          transactionName,
+      description: 'created-new-for'.tr() +
+          ' ' +
+          getWordedDateShort(newDate, lowerCaseTodayTomorrow: true),
+      icon: appStateSettings['outlinedIcons']
+          ? Icons.event_repeat_outlined
+          : Icons.event_repeat_rounded,
+      onTap: () {
+        pushRoute(
+          context,
+          AddTransactionPage(
+            transaction: newTransaction,
+            routesToPopAfterDelete: RoutesToPopAfterDelete.One,
+          ),
+        );
+      },
+    ),
+  );
 }
 
 int? countTransactionOccurrences({
@@ -182,42 +191,36 @@ int? countTransactionOccurrences({
     if (endDate.isBefore(currentDate)) {
       break;
     } else if (occurrenceCount > 999) {
-      return null;
+      return null; // too many occurrences, avoid infinite loop
     }
   }
 
   return occurrenceCount;
 }
 
-// We create a predictable key when a new repeat transaction is made
-// So that when we sync, if the sync client syncs later but it was already automatically marked as paid
-// It won't create a new entry (with a random key), it will just replace the entry that we predictably created
-// with this key algorithm
-// t.l.d.r: it prevents transactions from being duplicated with syncing and auto payments
 String updatePredictableKey(String originalKey) {
-  if (originalKey.contains("::predict::")) {
+  if (originalKey.contains('::predict::')) {
     try {
-      List<String> parts = originalKey.split("::predict::");
-      int currentNumber = int.parse(parts[1]);
-      int newNumber = currentNumber + 1;
-
-      return "${parts[0]}::predict::$newNumber";
+      final parts = originalKey.split('::predict::');
+      final currentNumber = int.parse(parts[1]);
+      final newNumber = currentNumber + 1;
+      return '${parts[0]}::predict::$newNumber';
     } catch (e) {
-      print("Error creating predictable key! " + e.toString());
+      debugPrint('Error creating predictable key: $e');
       return uuid.v4();
     }
   } else {
-    return "$originalKey::predict::1";
+    return '$originalKey::predict::1';
   }
 }
 
-Future openPayPopup(
+Future<void> openPayPopup(
   BuildContext context,
   Transaction transaction, {
   Function? runBefore,
 }) async {
-  String transactionName = await getTransactionLabel(transaction);
-  int? numberRepeats = transaction.createdAnotherFutureTransaction == true
+  final transactionName = await getTransactionLabel(transaction);
+  final numberRepeats = transaction.createdAnotherFutureTransaction == true
       ? null
       : countTransactionOccurrences(
           type: transaction.type,
@@ -226,203 +229,181 @@ Future openPayPopup(
           dateCreated: transaction.dateCreated,
           endDate: transaction.endDate,
         );
-  String repeatsLeftLabel = numberRepeats == null
-      ? ""
-      : "\n× " +
-          numberRepeats.toString() +
-          " " +
-          "remain".tr() +
-          " " +
-          "until".tr() +
-          " " +
-          getWordedDateShort(transaction.endDate ?? DateTime.now(),
-              includeYear: transaction.endDate?.year != DateTime.now().year);
-  return await openPopup(
+
+  final repeatsLeftLabel = numberRepeats == null
+      ? ''
+      : '\n× ${numberRepeats.toString()} ${'remain'.tr()} ${'until'.tr()} ${getWordedDateShort(transaction.endDate ?? DateTime.now(), includeYear: transaction.endDate?.year != DateTime.now().year)}';
+
+  await openPopup(
     context,
-    icon: appStateSettings["outlinedIcons"]
+    icon: appStateSettings['outlinedIcons']
         ? Icons.check_circle_outlined
         : Icons.check_circle_rounded,
-    title: (transaction.income ? "deposit".tr() : "pay".tr()) + "?",
+    title: (transaction.income ? 'deposit'.tr() : 'pay'.tr()) + '?',
     subtitle: transactionName,
     description: (transaction.income
-            ? "deposit-description".tr()
-            : "pay-description".tr()) +
+            ? 'deposit-description'.tr()
+            : 'pay-description'.tr()) +
         repeatsLeftLabel,
-    onCancelLabel: "cancel".tr().tr(),
+    onCancelLabel: 'cancel'.tr(),
     onCancel: () {
       popRoute(context, false);
     },
-    onExtraLabel: "skip".tr(),
+    onExtraLabel: 'skip'.tr(),
     onExtra: () async {
       if (runBefore != null) await runBefore();
       popRoute(context);
-      await markAsSkipped(
-        transaction: transaction,
-      );
+      await markAsSkipped(transaction: transaction);
     },
-    onSubmitLabel: transaction.income ? "deposit".tr() : "pay".tr(),
+    onSubmitLabel: transaction.income ? 'deposit'.tr() : 'pay'.tr(),
     onSubmit: () async {
       if (runBefore != null) await runBefore();
-      //double amount = transaction.amount;
-      // if (transaction.amount == 0) {
-      //   amount = await openBottomSheet(
-      //     context,
-      //     fullSnap: true,
-      //     PopupFramework(
-      //       title: "enter-amount".tr(),
-      //       underTitleSpace: false,
-      //       child: SelectAmount(
-      //         setSelectedAmount: (_, __) {},
-      //         nextLabel: "set-amount".tr(),
-      //         popWithAmount: true,
-      //       ),
-      //     ),
-      //   );
-      //   amount = amount.abs() * (transaction.income ? 1 : -1);
-      // }
       popRoute(context);
-      await markAsPaid(
-        transaction: transaction,
-      );
+      await markAsPaid(transaction: transaction);
     },
   );
 }
 
-Future markAsPaid({
+Future<void> markAsPaid({
   required Transaction transaction,
   // Avoid infinite recursion
   bool updatingCloselyRelated = false,
 }) async {
   String? closelyRelatedPairedTransactionFk;
-  if (updatingCloselyRelated == false && transaction.categoryFk == "0") {
-    Transaction? closelyRelatedTransferCorrectionTransaction = await database
+  if (!updatingCloselyRelated && transaction.categoryFk == '0') {
+    final closelyRelatedTransferCorrectionTransaction = await database
         .getCloselyRelatedBalanceCorrectionTransaction(transaction);
     if (closelyRelatedTransferCorrectionTransaction != null) {
       await markAsPaid(
-        transaction: closelyRelatedTransferCorrectionTransaction,
-        updatingCloselyRelated: true,
-      );
+          transaction: closelyRelatedTransferCorrectionTransaction,
+          updatingCloselyRelated: true);
       closelyRelatedPairedTransactionFk =
           closelyRelatedTransferCorrectionTransaction.transactionPk;
     }
   }
-  Transaction transactionNew = transaction.copyWith(
+
+  final transactionNew = transaction.copyWith(
     paid: true,
     dateCreated:
-        appStateSettings["markAsPaidOnOriginalDay"] ? null : DateTime.now(),
+        appStateSettings['markAsPaidOnOriginalDay'] ? null : DateTime.now(),
     createdAnotherFutureTransaction: Value(true),
     originalDateDue: Value(transaction.dateCreated),
   );
+
   await database.createOrUpdateTransaction(transactionNew);
+
+  // Use navigatorKey context if available, otherwise fall back to passed context when calling earlier
+  final ctx = navigatorKey.currentContext ?? null;
   await createNewSubscriptionTransaction(
-    navigatorKey.currentContext!,
-    transaction,
-    closelyRelatedPairedTransactionFk: closelyRelatedPairedTransactionFk,
-  );
-  await setUpcomingNotifications(navigatorKey.currentContext!);
+      ctx ??
+          navigatorKey.currentContext ??
+          navigatorKey.currentContext ??
+          navigatorKey.currentContext!,
+      transaction,
+      closelyRelatedPairedTransactionFk: closelyRelatedPairedTransactionFk);
+
+  if (navigatorKey.currentContext != null)
+    await setUpcomingNotifications(navigatorKey.currentContext!);
 }
 
-Future markAsSkipped({
+Future<void> markAsSkipped({
   required Transaction transaction,
   // Avoid infinite recursion
   bool updatingCloselyRelated = false,
 }) async {
   String? closelyRelatedPairedTransactionFk;
-  if (updatingCloselyRelated == false && transaction.categoryFk == "0") {
-    Transaction? closelyRelatedTransferCorrectionTransaction = await database
+  if (!updatingCloselyRelated && transaction.categoryFk == '0') {
+    final closelyRelatedTransferCorrectionTransaction = await database
         .getCloselyRelatedBalanceCorrectionTransaction(transaction);
     if (closelyRelatedTransferCorrectionTransaction != null) {
       await markAsSkipped(
-        transaction: closelyRelatedTransferCorrectionTransaction,
-        updatingCloselyRelated: true,
-      );
+          transaction: closelyRelatedTransferCorrectionTransaction,
+          updatingCloselyRelated: true);
       closelyRelatedPairedTransactionFk =
           closelyRelatedTransferCorrectionTransaction.transactionPk;
     }
   }
-  Transaction transactionNew = transaction.copyWith(
+
+  final transactionNew = transaction.copyWith(
     skipPaid: true,
     dateCreated: DateTime.now(),
     createdAnotherFutureTransaction: Value(true),
   );
+
   await database.createOrUpdateTransaction(transactionNew);
+
+  final ctx = navigatorKey.currentContext ?? null;
   await createNewSubscriptionTransaction(
-    navigatorKey.currentContext!,
-    transaction,
-    closelyRelatedPairedTransactionFk: closelyRelatedPairedTransactionFk,
-  );
-  await setUpcomingNotifications(navigatorKey.currentContext!);
+      ctx ??
+          navigatorKey.currentContext ??
+          navigatorKey.currentContext ??
+          navigatorKey.currentContext!,
+      transaction,
+      closelyRelatedPairedTransactionFk: closelyRelatedPairedTransactionFk);
+
+  if (navigatorKey.currentContext != null)
+    await setUpcomingNotifications(navigatorKey.currentContext!);
 }
 
-Future openPayDebtCreditPopup(
+Future<void> openPayDebtCreditPopup(
   BuildContext context,
   Transaction transaction, {
   Function? runBefore,
 }) async {
-  String transactionName = await getTransactionLabel(transaction);
-  return await openPopup(
+  final transactionName = await getTransactionLabel(transaction);
+  await openPopup(
     context,
-    icon: appStateSettings["outlinedIcons"]
+    icon: appStateSettings['outlinedIcons']
         ? Icons.check_circle_outlined
         : Icons.check_circle_rounded,
     title: (transaction.type == TransactionSpecialType.credit
-            ? "collect".tr()
+            ? 'collect'.tr()
             : transaction.type == TransactionSpecialType.debt
-                ? "settled".tr()
-                : "") +
-        "?",
+                ? 'settled'.tr()
+                : '') +
+        '?',
     subtitle: transactionName,
     description: transaction.type == TransactionSpecialType.credit
-        ? "collect-description".tr()
+        ? 'collect-description'.tr()
         : transaction.type == TransactionSpecialType.debt
-            ? "settle-description".tr()
-            : "",
-    onCancelLabel: "cancel".tr(),
+            ? 'settle-description'.tr()
+            : '',
+    onCancelLabel: 'cancel'.tr(),
     onCancel: () {
       popRoute(context, false);
     },
     onSubmitLabel: transaction.type == TransactionSpecialType.credit
-        ? "collect-all".tr()
+        ? 'collect-all'.tr()
         : transaction.type == TransactionSpecialType.debt
-            ? "settle-all".tr()
-            : "",
+            ? 'settle-all'.tr()
+            : '',
     onSubmit: () async {
       if (runBefore != null) await runBefore();
-      Transaction transactionNew = transaction.copyWith(
-        //we don't want it to count towards the total - net is zero now
+      final transactionNew = transaction.copyWith(
+        // we don't want it to count towards the total - net is zero now
         paid: false,
       );
       popRoute(context, true);
       await database.createOrUpdateTransaction(transactionNew);
-
-      // Make a separate transaction for one time loan collections... something like below?
-      // Transaction transactionNew = transaction.copyWith(
-      //   //we don't want it to count towards the total - net is zero now
-      //   dateCreated: DateTime.now(),
-      //   income: !transaction.income,
-      //   pairedTransactionFk: Value(transaction.transactionPk),
-      // );
-      // popRoute(context, true);
-      // await database.createOrUpdateTransaction(transactionNew, insert: true);
     },
     onExtraLabel2: transaction.type == TransactionSpecialType.credit
-        ? "partially-collect".tr()
+        ? 'partially-collect'.tr()
         : transaction.type == TransactionSpecialType.debt
-            ? "partially-settle".tr()
-            : "",
+            ? 'partially-settle'.tr()
+            : '',
     onExtra2: () async {
       double selectedAmount = transaction.amount.abs();
       String selectedWalletFk = transaction.walletFk;
 
-      dynamic result = await openBottomSheet(
+      final result = await openBottomSheet(
         context,
         fullSnap: true,
         PopupFramework(
           title: transaction.type == TransactionSpecialType.credit
-              ? "amount-collected".tr()
+              ? 'amount-collected'.tr()
               : transaction.type == TransactionSpecialType.debt
-                  ? "amount-settled".tr()
-                  : "",
+                  ? 'amount-settled'.tr()
+                  : '',
           hasPadding: false,
           underTitleSpace: false,
           child: SelectAmount(
@@ -443,30 +424,28 @@ Future openPayDebtCreditPopup(
             next: () {
               popRoute(context, true);
             },
-            nextLabel: "set-amount".tr(),
+            nextLabel: 'set-amount'.tr(),
             currencyKey: null,
             enableWalletPicker: true,
           ),
         ),
       );
+
       if (selectedAmount == 0 || result != true) return;
 
       popRoute(context, true);
 
-      TransactionCategory category =
-          await database.getCategory(transaction.categoryFk).$2;
-      String transactionLabel = getTransactionLabelSync(transaction, category);
-      int numberOfObjectives = (await database.getTotalCountOfObjectives(
+      final category = await database.getCategory(transaction.categoryFk).$2;
+      final transactionLabel = getTransactionLabelSync(transaction, category);
+      final numberOfObjectives = (await database.getTotalCountOfObjectives(
               objectiveType: ObjectiveType.loan))[0] ??
           0;
-      // Invert the amount, because the objective is of opposite polarity of the current transaction
-      // Borrowed is considered positive
-      // Lent is considered negative
-      int? rowId = await database.createOrUpdateObjective(
+
+      final rowId = await database.createOrUpdateObjective(
         Objective(
           amount: 0,
           income: !transaction.income,
-          objectivePk: "-1",
+          objectivePk: '-1',
           name: transactionLabel,
           order: numberOfObjectives,
           dateCreated: transaction.dateCreated,
@@ -480,22 +459,23 @@ Future openPayDebtCreditPopup(
         ),
         insert: true,
       );
-      final Objective objectiveJustAdded =
-          await database.getObjectiveFromRowId(rowId);
+
+      final objectiveJustAdded = await database.getObjectiveFromRowId(rowId);
+
       // Set up the initial amount
       await database.createOrUpdateTransaction(
         transaction.copyWith(
-          type: Value(null),
+          type: const Value(null),
           objectiveLoanFk: Value(objectiveJustAdded.objectivePk),
           amount: transaction.amount,
-          name: "initial-record".tr(),
+          name: 'initial-record'.tr(),
         ),
       );
-      // Add the first payment/record
-      // Inverse polarity!
+
+      // Add the first payment/record (inverse polarity)
       await database.createOrUpdateTransaction(
         transaction.copyWith(
-          type: Value(null),
+          type: const Value(null),
           objectiveLoanFk: Value(objectiveJustAdded.objectivePk),
           income: !transaction.income,
           amount: selectedAmount * (!transaction.income ? 1 : -1),
@@ -508,92 +488,96 @@ Future openPayDebtCreditPopup(
   );
 }
 
-Future openRemoveSkipPopup(
+Future<void> openRemoveSkipPopup(
   BuildContext context,
   Transaction transaction, {
   Function? runBefore,
 }) async {
-  String transactionName = await getTransactionLabel(transaction);
-  return await openPopup(
+  final transactionName = await getTransactionLabel(transaction);
+  await openPopup(
     context,
-    icon: appStateSettings["outlinedIcons"]
+    icon: appStateSettings['outlinedIcons']
         ? Icons.unpublished_outlined
         : Icons.unpublished_rounded,
-    title: "remove-skip".tr() + "?",
+    title: 'remove-skip'.tr() + '?',
     subtitle: transactionName,
-    description: "remove-skip-description".tr(),
-    onCancelLabel: "cancel".tr(),
+    description: 'remove-skip-description'.tr(),
+    onCancelLabel: 'cancel'.tr(),
     onCancel: () {
       popRoute(context, false);
     },
-    onSubmitLabel: "remove".tr(),
+    onSubmitLabel: 'remove'.tr(),
     onSubmit: () async {
       if (runBefore != null) await runBefore();
 
-      Transaction transactionNew = transaction.copyWith(skipPaid: false);
+      final transactionNew = transaction.copyWith(skipPaid: false);
       popRoute(context, true);
       await database.createOrUpdateTransaction(transactionNew);
-      await setUpcomingNotifications(navigatorKey.currentContext!);
+      if (navigatorKey.currentContext != null)
+        await setUpcomingNotifications(navigatorKey.currentContext!);
     },
   );
 }
 
-Future openUnpayPopup(
+Future<void> openUnpayPopup(
   BuildContext context,
   Transaction transaction, {
   Function? runBefore,
 }) async {
-  String transactionName = await getTransactionLabel(transaction);
-  return await openPopup(context,
-      icon: appStateSettings["outlinedIcons"]
-          ? Icons.unpublished_outlined
-          : Icons.unpublished_rounded,
-      title: "remove-payment".tr() + "?",
-      subtitle: transactionName,
-      description: "remove-payment-description".tr(),
-      onCancelLabel: "cancel".tr(),
-      onCancel: () {
-        popRoute(context, false);
-      },
-      onSubmitLabel: "remove".tr(),
-      onSubmit: () async {
-        if (runBefore != null) await runBefore();
-        await database.deleteTransaction(transaction.transactionPk);
-        Transaction transactionNew = transaction.copyWith(
-          paid: false,
-          sharedKey: Value(null),
-          transactionOriginalOwnerEmail: Value(null),
-          sharedDateUpdated: Value(null),
-          sharedStatus: Value(null),
-        );
-        popRoute(context, true);
-        await database.createOrUpdateTransaction(transactionNew);
-        await setUpcomingNotifications(navigatorKey.currentContext!);
-      });
-}
-
-Future openUnpayDebtCreditPopup(
-  BuildContext context,
-  Transaction transaction, {
-  Function? runBefore,
-}) async {
-  String transactionName = await getTransactionLabel(transaction);
-  return await openPopup(
+  final transactionName = await getTransactionLabel(transaction);
+  await openPopup(
     context,
-    icon: appStateSettings["outlinedIcons"]
+    icon: appStateSettings['outlinedIcons']
         ? Icons.unpublished_outlined
         : Icons.unpublished_rounded,
-    title: "remove-payment".tr() + "?",
+    title: 'remove-payment'.tr() + '?',
     subtitle: transactionName,
-    description: "remove-payment-description".tr(),
-    onCancelLabel: "cancel".tr(),
+    description: 'remove-payment-description'.tr(),
+    onCancelLabel: 'cancel'.tr(),
     onCancel: () {
       popRoute(context, false);
     },
-    onSubmitLabel: "remove".tr(),
+    onSubmitLabel: 'remove'.tr(),
     onSubmit: () async {
       if (runBefore != null) await runBefore();
-      Transaction transactionNew = transaction.copyWith(
+      await database.deleteTransaction(transaction.transactionPk);
+      final transactionNew = transaction.copyWith(
+        paid: false,
+        sharedKey: const Value(null),
+        transactionOriginalOwnerEmail: const Value(null),
+        sharedDateUpdated: const Value(null),
+        sharedStatus: const Value(null),
+      );
+      popRoute(context, true);
+      await database.createOrUpdateTransaction(transactionNew);
+      if (navigatorKey.currentContext != null)
+        await setUpcomingNotifications(navigatorKey.currentContext!);
+    },
+  );
+}
+
+Future<void> openUnpayDebtCreditPopup(
+  BuildContext context,
+  Transaction transaction, {
+  Function? runBefore,
+}) async {
+  final transactionName = await getTransactionLabel(transaction);
+  await openPopup(
+    context,
+    icon: appStateSettings['outlinedIcons']
+        ? Icons.unpublished_outlined
+        : Icons.unpublished_rounded,
+    title: 'remove-payment'.tr() + '?',
+    subtitle: transactionName,
+    description: 'remove-payment-description'.tr(),
+    onCancelLabel: 'cancel'.tr(),
+    onCancel: () {
+      popRoute(context, false);
+    },
+    onSubmitLabel: 'remove'.tr(),
+    onSubmit: () async {
+      if (runBefore != null) await runBefore();
+      final transactionNew = transaction.copyWith(
         //we want it to count towards the total now - net is not zero
         paid: true,
       );
@@ -604,79 +588,77 @@ Future openUnpayDebtCreditPopup(
   );
 }
 
+Map<String, String?> findMatchingPairsPks(List<Transaction> subscriptions) {
+  // TODO: Implement actual logic for finding matching pairs
+  // For now, return an empty map
+  return {};
+}
+
 Future<bool> markSubscriptionsAsPaid(BuildContext context,
     {int? iteration}) async {
-  if (appStateSettings["automaticallyPaySubscriptions"] ||
-      appStateSettings["automaticallyPayRepetitive"]) {
-    // Loop through, because a new one that was created automatically may be past due
-    if (iteration != null && iteration > 50) {
-      return true;
-    }
-    List<Transaction> subscriptions = [
-      if (appStateSettings["automaticallyPaySubscriptions"])
-        ...(await database.getAllSubscriptions().$2),
-      if (appStateSettings["automaticallyPayRepetitive"])
-        ...(await database.getAllOverdueRepetitiveTransactions().$2)
+  if (appStateSettings['automaticallyPaySubscriptions'] ||
+      appStateSettings['automaticallyPayRepetitive']) {
+    if (iteration != null && iteration > 50) return true;
+
+    final subscriptions = <Transaction>[
+      if (appStateSettings['automaticallyPaySubscriptions'])
+        ...(await database.getAllSubscriptions()).$2 as Iterable<Transaction>,
+      if (appStateSettings['automaticallyPayRepetitive'])
+        ...(await database.getAllOverdueRepetitiveTransactions()).$2
+            as Iterable<Transaction>,
     ];
 
-    // Handle creation of paired transfer entries
-    Map<String, String> relatedMatchingPairs =
-        findMatchingPairsPks(subscriptions);
+    final relatedMatchingPairs = findMatchingPairsPks(subscriptions);
 
     bool hasUpdatedASubscription = false;
-    for (Transaction transaction in subscriptions) {
-      // Only mark it as paid if it was not marked as unpaid at any point (createdAnotherFutureTransaction == false)
-      // Add one minute so that if a notification is tapped right away, it will automatically be marked as paid since it will be overdue
+    for (final transaction in subscriptions) {
       if (transaction.createdAnotherFutureTransaction != true &&
           transaction.dateCreated
-              .isBefore(DateTime.now().add(Duration(minutes: 1)))) {
+              .isBefore(DateTime.now().add(const Duration(minutes: 1)))) {
         hasUpdatedASubscription = true;
-        Transaction transactionNew = transaction.copyWith(
+        final transactionNew = transaction.copyWith(
           paid: true,
           dateCreated: transaction.dateCreated,
           createdAnotherFutureTransaction: Value(true),
         );
         await database.createOrUpdateTransaction(transactionNew);
-        if (transaction.categoryFk == "0" &&
+        if (transaction.categoryFk == '0' &&
             transaction.pairedTransactionFk != null &&
             relatedMatchingPairs[transaction.pairedTransactionFk] != null) {
-          // print("PAIR:" +
-          //     relatedMatchingPairs[transaction.transactionPk].toString());
           await createNewSubscriptionTransaction(context, transaction,
               closelyRelatedPairedTransactionFk:
-                  relatedMatchingPairs[transaction.transactionPk]);
+                  relatedMatchingPairs[transaction.pairedTransactionFk]);
         } else {
           await createNewSubscriptionTransaction(context, transaction);
         }
       }
     }
+
     if (hasUpdatedASubscription) {
       await markSubscriptionsAsPaid(context, iteration: (iteration ?? 0) + 1);
     }
-    print("Automatically paid subscriptions with iteration: " +
-        iteration.toString());
+
+    debugPrint(
+        'Automatically paid subscriptions with iteration: ${iteration ?? 0}');
   }
   return true;
 }
 
 Future<bool> markUpcomingAsPaid() async {
-  if (appStateSettings["automaticallyPayUpcoming"]) {
-    List<Transaction> upcoming =
-        await database.getAllOverdueUpcomingTransactions().$2;
-    for (Transaction transaction in upcoming) {
-      // Only mark it as paid if it was not marked as unpaid at any point (createdAnotherFutureTransaction == false)
-      // Add one minute so that if a notification is tapped right away, it will automatically be marked as paid since it will be overdue
+  if (appStateSettings['automaticallyPayUpcoming']) {
+    final upcoming = (await database.getAllOverdueUpcomingTransactions()).$2;
+    for (final transaction in (upcoming as Iterable<Transaction>)) {
       if (transaction.createdAnotherFutureTransaction != true &&
           transaction.dateCreated
-              .isBefore(DateTime.now().add(Duration(minutes: 1)))) {
-        Transaction transactionNew = transaction.copyWith(
+              .isBefore(DateTime.now().add(const Duration(minutes: 1)))) {
+        final transactionNew = transaction.copyWith(
           paid: true,
           dateCreated: transaction.dateCreated,
         );
         await database.createOrUpdateTransaction(transactionNew);
       }
     }
-    print("Automatically paid upcoming transactions");
+    debugPrint('Automatically paid upcoming transactions');
   }
   return true;
 }

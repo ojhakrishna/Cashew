@@ -132,10 +132,10 @@ class TransactionEntries extends StatefulWidget {
 class _TransactionEntriesState extends State<TransactionEntries> {
   late bool loadAll =
       appStateSettings["restrictAmountOfInitiallyLoadedTransactions"] == true
-          ? widget.initialLoadLimit == null
-              ? true
-              : false
-          : true;
+      ? widget.initialLoadLimit == null
+            ? true
+            : false
+      : true;
 
   Widget createTransactionEntry(
     List<TransactionWithCategory> transactionListForDay,
@@ -144,10 +144,14 @@ class _TransactionEntriesState extends State<TransactionEntries> {
     bool enableFutureTransactionsDivider,
   ) {
     return TransactionEntry(
-      transactionBefore:
-          nullIfIndexOutOfRange(transactionListForDay, index - 1)?.transaction,
-      transactionAfter:
-          nullIfIndexOutOfRange(transactionListForDay, index + 1)?.transaction,
+      transactionBefore: nullIfIndexOutOfRange(
+        transactionListForDay,
+        index - 1,
+      )?.transaction,
+      transactionAfter: nullIfIndexOutOfRange(
+        transactionListForDay,
+        index + 1,
+      )?.transaction,
       categoryTintColor: widget.categoryTintColor,
       useHorizontalPaddingConstrained: widget.useHorizontalPaddingConstrained,
       containerColor: widget.transactionBackgroundColor,
@@ -212,17 +216,22 @@ class _TransactionEntriesState extends State<TransactionEntries> {
           double totalExpense = 0;
           int totalNumberTransactions = data.length;
           Set<String> futureTransactionPks = (data
-              .where((transactionWithCategory) => transactionWithCategory
-                  .transaction.dateCreated
-                  .justDay()
-                  .isAfter(DateTime.now().justDay()))
-              .map((transactionWithCategory) =>
-                  transactionWithCategory.transaction.transactionPk)
+              .where(
+                (transactionWithCategory) => transactionWithCategory
+                    .transaction
+                    .dateCreated
+                    .justDay()
+                    .isAfter(DateTime.now().justDay()),
+              )
+              .map(
+                (transactionWithCategory) =>
+                    transactionWithCategory.transaction.transactionPk,
+              )
               .toSet());
 
           bool enableFutureTransactionsDivider =
               widget.enableFutureTransactionsCollapse &&
-                  futureTransactionPks.length >= 3;
+              futureTransactionPks.length >= 3;
           bool notYetAddedPastTransactionsDivider = true;
 
           if (totalNumberTransactions <= 0 &&
@@ -231,21 +240,25 @@ class _TransactionEntriesState extends State<TransactionEntries> {
               children: [
                 if (widget.showNoResults)
                   NoResults(
-                    message: widget.noResultsMessage ??
+                    message:
+                        widget.noResultsMessage ??
                         "no-transactions-within-time-range".tr() +
                             "." +
                             (widget.budget != null
                                 ? ("\n" +
-                                    "(" +
-                                    getWordedDateShortMore(
-                                        widget.startDay ?? DateTime.now()) +
-                                    " – " +
-                                    getWordedDateShortMore(
-                                        widget.endDay ?? DateTime.now()) +
-                                    ")")
+                                      "(" +
+                                      getWordedDateShortMore(
+                                        widget.startDay ?? DateTime.now(),
+                                      ) +
+                                      " – " +
+                                      getWordedDateShortMore(
+                                        widget.endDay ?? DateTime.now(),
+                                      ) +
+                                      ")")
                                 : ""),
-                    tintColor:
-                        Theme.of(context).colorScheme.primary.withOpacity(0.6),
+                    tintColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.6),
                     noSearchResultsVariation: widget.noSearchResultsVariation,
                     padding: widget.noResultsPadding,
                   ),
@@ -285,14 +298,18 @@ class _TransactionEntriesState extends State<TransactionEntries> {
 
           for (TransactionWithCategory transactionWithCategory in data ?? []) {
             if (widget.pastDaysLimitToShow != null &&
-                totalPastUniqueDays > widget.pastDaysLimitToShow!) break;
+                totalPastUniqueDays > widget.pastDaysLimitToShow!)
+              break;
 
-            DateTime currentTransactionDate =
-                transactionWithCategory.transaction.dateCreated.justDay();
+            DateTime currentTransactionDate = transactionWithCategory
+                .transaction
+                .dateCreated
+                .justDay();
             if (currentDate == null) {
               currentDate = currentTransactionDate;
               if (currentDate.millisecondsSinceEpoch <
-                  DateTime.now().millisecondsSinceEpoch) totalPastUniqueDays++;
+                  DateTime.now().millisecondsSinceEpoch)
+                totalPastUniqueDays++;
             }
             if (currentDate == currentTransactionDate) {
               transactionListForDay.add(transactionWithCategory);
@@ -300,17 +317,19 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                 // Include balance correction when calculating the net
                 totalSpentForDayWithBalanceCorrection +=
                     transactionWithCategory.transaction.amount *
-                        (amountRatioToPrimaryCurrencyGivenPk(
-                            Provider.of<AllWallets>(context),
-                            transactionWithCategory.transaction.walletFk));
+                    (amountRatioToPrimaryCurrencyGivenPk(
+                      Provider.of<AllWallets>(context),
+                      transactionWithCategory.transaction.walletFk,
+                    ));
               }
               if (transactionWithCategory.transaction.paid &&
                   transactionWithCategory.transaction.categoryFk != "0") {
                 double amountForDay =
                     transactionWithCategory.transaction.amount *
-                        (amountRatioToPrimaryCurrencyGivenPk(
-                            Provider.of<AllWallets>(context),
-                            transactionWithCategory.transaction.walletFk));
+                    (amountRatioToPrimaryCurrencyGivenPk(
+                      Provider.of<AllWallets>(context),
+                      transactionWithCategory.transaction.walletFk,
+                    ));
                 totalSpentForDay += amountForDay;
                 if (amountForDay < 0) {
                   totalExpense += amountForDay;
@@ -321,13 +340,12 @@ class _TransactionEntriesState extends State<TransactionEntries> {
               }
             }
 
-            DateTime? nextTransactionDate = totalNumberTransactions ==
-                    currentTotalIndex + 1
+            DateTime? nextTransactionDate =
+                totalNumberTransactions == currentTotalIndex + 1
                 ? null
                 : data[currentTotalIndex + 1].transaction.dateCreated.justDay();
 
-            if (nextTransactionDate == null ||
-                nextTransactionDate != currentTransactionDate) {
+            if (nextTransactionDate != currentTransactionDate) {
               if (transactionListForDay.length > 0) {
                 int daysDifference = DateTime.now()
                     .justDay()
@@ -336,17 +354,17 @@ class _TransactionEntriesState extends State<TransactionEntries> {
 
                 Widget? pastTransactionsDivider =
                     enableFutureTransactionsDivider &&
-                            notYetAddedPastTransactionsDivider &&
-                            currentTransactionDate
-                                    .justDay()
-                                    .isAfter(DateTime.now().justDay()) ==
-                                false
-                        ? PastTransactionsDivider(
-                            listID: widget.listID,
-                            useHorizontalPaddingConstrained:
-                                widget.useHorizontalPaddingConstrained,
-                          )
-                        : null;
+                        notYetAddedPastTransactionsDivider &&
+                        currentTransactionDate.justDay().isAfter(
+                              DateTime.now().justDay(),
+                            ) ==
+                            false
+                    ? PastTransactionsDivider(
+                        listID: widget.listID,
+                        useHorizontalPaddingConstrained:
+                            widget.useHorizontalPaddingConstrained,
+                      )
+                    : null;
 
                 if (pastTransactionsDivider != null)
                   notYetAddedPastTransactionsDivider = false;
@@ -359,31 +377,33 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                         dateToCompare: currentTransactionDate,
                         listID: widget.listID,
                         child: DateDivider(
-                            useHorizontalPaddingConstrained:
-                                widget.useHorizontalPaddingConstrained,
-                            color: widget.dateDividerColor,
-                            date: currentTransactionDate,
-                            afterDate: daysDifference >= 0 ||
-                                    widget.showNumberOfDaysUntilForFutureDates ==
-                                        false
-                                ? ""
-                                : " • " +
+                          useHorizontalPaddingConstrained:
+                              widget.useHorizontalPaddingConstrained,
+                          color: widget.dateDividerColor,
+                          date: currentTransactionDate,
+                          afterDate:
+                              daysDifference >= 0 ||
+                                  widget.showNumberOfDaysUntilForFutureDates ==
+                                      false
+                              ? ""
+                              : " • " +
                                     (daysDifference * -1).toString() +
                                     " " +
                                     (daysDifference * -1 == 1
                                         ? "day".tr()
                                         : "days".tr()),
-                            info:
-                                appStateSettings["netSpendingDayTotal"] == true
-                                    ? convertToMoney(
-                                        Provider.of<AllWallets>(context),
-                                        netSpent,
-                                      )
-                                    : transactionListForDay.length > 1
-                                        ? convertToMoney(
-                                            Provider.of<AllWallets>(context),
-                                            totalSpentForDay)
-                                        : ""),
+                          info: appStateSettings["netSpendingDayTotal"] == true
+                              ? convertToMoney(
+                                  Provider.of<AllWallets>(context),
+                                  netSpent,
+                                )
+                              : transactionListForDay.length > 1
+                              ? convertToMoney(
+                                  Provider.of<AllWallets>(context),
+                                  totalSpentForDay,
+                                )
+                              : "",
+                        ),
                       );
 
                 if (widget.renderType == TransactionEntriesRenderType.slivers) {
@@ -403,14 +423,17 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                         child: dateDividerWidget,
                       )
                       ..items = [
-                        for (int index = 0;
-                            index < transactionListForDay.length;
-                            index++)
+                        for (
+                          int index = 0;
+                          index < transactionListForDay.length;
+                          index++
+                        )
                           createTransactionEntry(
-                              transactionListForDay,
-                              transactionListForDay[index],
-                              index,
-                              enableFutureTransactionsDivider),
+                            transactionListForDay,
+                            transactionListForDay[index],
+                            index,
+                            enableFutureTransactionsDivider,
+                          ),
                       ],
                   );
                 } else if (widget.renderType ==
@@ -419,9 +442,11 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                     widgetsOut.add(pastTransactionsDivider);
                   }
                   widgetsOut.add(dateDividerWidget);
-                  for (int index = 0;
-                      index < transactionListForDay.length;
-                      index++) {
+                  for (
+                    int index = 0;
+                    index < transactionListForDay.length;
+                    index++
+                  ) {
                     widgetsOut.add(
                       createTransactionEntry(
                         transactionListForDay,
@@ -434,47 +459,53 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                 } else if (widget.renderType ==
                     TransactionEntriesRenderType.implicitlyAnimatedSlivers) {
                   List<TransactionWithCategory> transactionListForDayCopy = [
-                    ...transactionListForDay
+                    ...transactionListForDay,
                   ];
                   if (pastTransactionsDivider != null)
                     widgetsOut.add(
-                        SliverToBoxAdapter(child: pastTransactionsDivider));
+                      SliverToBoxAdapter(child: pastTransactionsDivider),
+                    );
                   widgetsOut.add(
                     SliverStickyHeader(
                       header: Transform.translate(
-                          offset: Offset(0, -1),
-                          child: transactionListForDay.length > 0
-                              ? widget.includeDateDivider == false
+                        offset: Offset(0, -1),
+                        child: transactionListForDay.length > 0
+                            ? widget.includeDateDivider == false
                                   ? SizedBox.shrink()
                                   : dateDividerWidget
-                              : SizedBox.shrink()),
+                            : SizedBox.shrink(),
+                      ),
                       sticky: true,
                       sliver:
                           SliverImplicitlyAnimatedList<TransactionWithCategory>(
-                        spawnIsolate: false,
-                        items: transactionListForDay,
-                        areItemsTheSame: (a, b) =>
-                            a.transaction.transactionPk ==
-                            b.transaction.transactionPk,
-                        insertDuration: Duration(milliseconds: 500),
-                        removeDuration: Duration(milliseconds: 500),
-                        updateDuration: Duration(milliseconds: 500),
-                        itemBuilder: (BuildContext context,
-                            Animation<double> animation,
-                            TransactionWithCategory item,
-                            int index) {
-                          return SizeFadeTransition(
-                            sizeFraction: 0.7,
-                            curve: Curves.easeInOut,
-                            animation: animation,
-                            child: createTransactionEntry(
-                                transactionListForDayCopy,
-                                item,
-                                index,
-                                enableFutureTransactionsDivider),
-                          );
-                        },
-                      ),
+                            spawnIsolate: false,
+                            items: transactionListForDay,
+                            areItemsTheSame: (a, b) =>
+                                a.transaction.transactionPk ==
+                                b.transaction.transactionPk,
+                            insertDuration: Duration(milliseconds: 500),
+                            removeDuration: Duration(milliseconds: 500),
+                            updateDuration: Duration(milliseconds: 500),
+                            itemBuilder:
+                                (
+                                  BuildContext context,
+                                  Animation<double> animation,
+                                  TransactionWithCategory item,
+                                  int index,
+                                ) {
+                                  return SizeFadeTransition(
+                                    sizeFraction: 0.7,
+                                    curve: Curves.easeInOut,
+                                    animation: animation,
+                                    child: createTransactionEntry(
+                                      transactionListForDayCopy,
+                                      item,
+                                      index,
+                                      enableFutureTransactionsDivider,
+                                    ),
+                                  );
+                                },
+                          ),
                     ),
                   );
                 } else if (widget.renderType ==
@@ -487,8 +518,14 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                   widgetsOut.add(dateDividerWidget);
                   for (int i = 0; i < transactionListForDay.length; i++) {
                     TransactionWithCategory item = transactionListForDay[i];
-                    widgetsOut.add(createTransactionEntry(transactionListForDay,
-                        item, i, enableFutureTransactionsDivider));
+                    widgetsOut.add(
+                      createTransactionEntry(
+                        transactionListForDay,
+                        item,
+                        i,
+                        enableFutureTransactionsDivider,
+                      ),
+                    );
                   }
                 }
 
@@ -517,10 +554,13 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                         bottom: 8,
                       ),
                       child: TextFont(
-                        text: "total-cash-flow".tr() +
+                        text:
+                            "total-cash-flow".tr() +
                             ": " +
                             convertToMoney(
-                                Provider.of<AllWallets>(context), totalSpent) +
+                              Provider.of<AllWallets>(context),
+                              totalSpent,
+                            ) +
                             "\n" +
                             totalNumberTransactions.toString() +
                             " " +
@@ -587,7 +627,9 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                 onLongPress: widget.onLongPressSpendingSummary,
                 dateTimeRange: widget.startDay != null && widget.endDay != null
                     ? DateTimeRange(
-                        start: widget.startDay!, end: widget.endDay!)
+                        start: widget.startDay!,
+                        end: widget.endDay!,
+                      )
                     : null,
               ),
             );
@@ -601,20 +643,16 @@ class _TransactionEntriesState extends State<TransactionEntries> {
                     sectionList: sectionsOut,
                     headerBuilder:
                         (BuildContext context, int sectionIndex, int index) {
-                      return sectionsOut[sectionIndex].header;
-                    },
+                          return sectionsOut[sectionIndex].header;
+                        },
                     itemBuilder: (context, sectionIndex, itemIndex, index) {
                       Widget item = sectionsOut[sectionIndex].items[itemIndex];
                       return item;
                     },
                   ),
                 ),
-                SliverToBoxAdapter(
-                  child: totalCashFlowWidget,
-                ),
-                SliverToBoxAdapter(
-                  child: viewAllTransactionsWidget,
-                ),
+                SliverToBoxAdapter(child: totalCashFlowWidget),
+                SliverToBoxAdapter(child: viewAllTransactionsWidget),
               ],
             );
           } else if (widget.renderType ==
@@ -640,15 +678,20 @@ class _TransactionEntriesState extends State<TransactionEntries> {
               insertDuration: Duration(milliseconds: 500),
               removeDuration: Duration(milliseconds: 500),
               updateDuration: Duration(milliseconds: 500),
-              itemBuilder: (BuildContext context, Animation<double> animation,
-                  Widget item, int index) {
-                return SizeFadeTransition(
-                  sizeFraction: 0.7,
-                  curve: Curves.easeInOut,
-                  animation: animation,
-                  child: item,
-                );
-              },
+              itemBuilder:
+                  (
+                    BuildContext context,
+                    Animation<double> animation,
+                    Widget item,
+                    int index,
+                  ) {
+                    return SizeFadeTransition(
+                      sizeFraction: 0.7,
+                      curve: Curves.easeInOut,
+                      animation: animation,
+                      child: item,
+                    );
+                  },
               physics: ClampingScrollPhysics(),
               shrinkWrap: true,
             );
@@ -700,17 +743,17 @@ class _TransactionEntriesState extends State<TransactionEntries> {
       // get the net at that point in time
       //
       // Ideally we refactor all the queries so they only rely on the search filters!
-
       stream: database.watchTotalNetBeforeStartDateTransactionCategoryWithDay(
-        end: widget.endDay == null &&
+        end:
+            widget.endDay == null &&
                 widget.searchFilters?.dateTimeRange?.end == null
             ? null
             : (widget.endDay ??
-                    widget.searchFilters?.dateTimeRange?.end ??
-                    DateTime.now())
-                //Add one because want the total from the start of the next day because we get everything BEFORE this date,
-                // Only add one if not a budget! because a different query is used if it is a budget
-                .justDay(dayOffset: widget.budget == null ? 1 : 0),
+                      widget.searchFilters?.dateTimeRange?.end ??
+                      DateTime.now())
+                  //Add one because want the total from the start of the next day because we get everything BEFORE this date,
+                  // Only add one if not a budget! because a different query is used if it is a budget
+                  .justDay(dayOffset: widget.budget == null ? 1 : 0),
         start: widget.startDay,
         allWallets: Provider.of<AllWallets>(context),
         search: widget.search,
@@ -727,16 +770,15 @@ class _TransactionEntriesState extends State<TransactionEntries> {
         budget: widget.budget,
       ),
       builder: (context, snapshotNetTotal) {
-        if (snapshotNetTotal.hasData == false) if (widget.renderType ==
-                TransactionEntriesRenderType.slivers ||
-            widget.renderType ==
-                TransactionEntriesRenderType.implicitlyAnimatedSlivers ||
-            widget.renderType == TransactionEntriesRenderType.sliversNotSticky)
-          return SliverToBoxAdapter(
-            child: SizedBox.shrink(),
-          );
-        else
-          return SizedBox.shrink();
+        if (snapshotNetTotal.hasData == false)
+          if (widget.renderType == TransactionEntriesRenderType.slivers ||
+              widget.renderType ==
+                  TransactionEntriesRenderType.implicitlyAnimatedSlivers ||
+              widget.renderType ==
+                  TransactionEntriesRenderType.sliversNotSticky)
+            return SliverToBoxAdapter(child: SizedBox.shrink());
+          else
+            return SizedBox.shrink();
         return transactionEntryListBuilder(snapshotNetTotal.data);
       },
     );
@@ -744,10 +786,11 @@ class _TransactionEntriesState extends State<TransactionEntries> {
 }
 
 class PastTransactionsDivider extends StatelessWidget {
-  const PastTransactionsDivider(
-      {required this.listID,
-      required this.useHorizontalPaddingConstrained,
-      super.key});
+  const PastTransactionsDivider({
+    required this.listID,
+    required this.useHorizontalPaddingConstrained,
+    super.key,
+  });
   final String? listID;
   final bool useHorizontalPaddingConstrained;
 
@@ -755,59 +798,67 @@ class PastTransactionsDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     Color color = appStateSettings["materialYou"]
         ? dynamicPastel(
-            context, Theme.of(context).colorScheme.secondaryContainer,
-            amountDark: 0.5, amountLight: 0)
+            context,
+            Theme.of(context).colorScheme.secondaryContainer,
+            amountDark: 0.5,
+            amountLight: 0,
+          )
         : getColor(context, "canvasContainer");
     return ValueListenableBuilder(
-        valueListenable: globalCollapsedFutureID
-            .select((controller) => controller.value[listID ?? "0"]),
-        builder: (context, _, __) {
-          return AnimatedPadding(
-            duration: const Duration(milliseconds: 425),
-            curve: Curves.fastOutSlowIn,
-            padding: EdgeInsetsDirectional.only(
-              top: globalCollapsedFutureID.value[listID ?? "0"] == true ? 0 : 8,
-            ),
-            child: Padding(
-              padding: const EdgeInsetsDirectional.only(bottom: 3),
-              child: Tappable(
-                color: color,
+      valueListenable: globalCollapsedFutureID.select(
+        (controller) => controller.value[listID ?? "0"],
+      ),
+      builder: (context, _, __) {
+        return AnimatedPadding(
+          duration: const Duration(milliseconds: 425),
+          curve: Curves.fastOutSlowIn,
+          padding: EdgeInsetsDirectional.only(
+            top: globalCollapsedFutureID.value[listID ?? "0"] == true ? 0 : 8,
+          ),
+          child: Padding(
+            padding: const EdgeInsetsDirectional.only(bottom: 3),
+            child: Tappable(
+              color: color,
+              child: Padding(
+                padding: EdgeInsetsDirectional.symmetric(
+                  horizontal: useHorizontalPaddingConstrained == false
+                      ? 0
+                      : getHorizontalPaddingConstrained(context),
+                ),
                 child: Padding(
                   padding: EdgeInsetsDirectional.symmetric(
-                    horizontal: useHorizontalPaddingConstrained == false
-                        ? 0
-                        : getHorizontalPaddingConstrained(context),
+                    horizontal: 16,
+                    vertical: 8,
                   ),
-                  child: Padding(
-                    padding: EdgeInsetsDirectional.symmetric(
-                        horizontal: 16, vertical: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextFont(
-                            text: "past-transactions".tr(),
-                            maxLines: 1,
-                            textAlign: TextAlign.start,
-                            fontSize: 15,
-                          ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextFont(
+                          text: "past-transactions".tr(),
+                          maxLines: 1,
+                          textAlign: TextAlign.start,
+                          fontSize: 15,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }
 
 class FutureTransactionsDivider extends StatelessWidget {
-  const FutureTransactionsDivider(
-      {required this.listID,
-      required this.futureTransactionPks,
-      required this.useHorizontalPaddingConstrained,
-      super.key});
+  const FutureTransactionsDivider({
+    required this.listID,
+    required this.futureTransactionPks,
+    required this.useHorizontalPaddingConstrained,
+    super.key,
+  });
   final String? listID;
   final Set<String> futureTransactionPks;
   final bool useHorizontalPaddingConstrained;
@@ -816,8 +867,11 @@ class FutureTransactionsDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     Color color = appStateSettings["materialYou"]
         ? dynamicPastel(
-            context, Theme.of(context).colorScheme.secondaryContainer,
-            amountDark: 0.5, amountLight: 0)
+            context,
+            Theme.of(context).colorScheme.secondaryContainer,
+            amountDark: 0.5,
+            amountLight: 0,
+          )
         : getColor(context, "canvasContainer");
     return Padding(
       padding: const EdgeInsetsDirectional.only(bottom: 3),
@@ -835,117 +889,127 @@ class FutureTransactionsDivider extends StatelessWidget {
           child: Padding(
             padding: EdgeInsetsDirectional.only(start: 16),
             child: ValueListenableBuilder(
-                valueListenable: globalCollapsedFutureID
-                    .select((controller) => controller.value[listID ?? "0"]),
-                builder: (context, _, __) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextFont(
-                                text: "future-transactions".tr(),
-                                maxLines: 1,
-                                textAlign: TextAlign.start,
-                                fontSize: 15,
-                              ),
+              valueListenable: globalCollapsedFutureID.select(
+                (controller) => controller.value[listID ?? "0"],
+              ),
+              builder: (context, _, __) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFont(
+                              text: "future-transactions".tr(),
+                              maxLines: 1,
+                              textAlign: TextAlign.start,
+                              fontSize: 15,
                             ),
-                            ValueListenableBuilder(
-                                valueListenable: globalSelectedID.select(
-                                    (controller) =>
-                                        (controller.value[listID] ?? [])
-                                            .length),
-                                builder: (context, _, __) {
-                                  int count = (globalSelectedID.value[listID] ??
-                                          [])
-                                      .where((item) =>
-                                          futureTransactionPks.contains(item))
-                                      .length;
+                          ),
+                          ValueListenableBuilder(
+                            valueListenable: globalSelectedID.select(
+                              (controller) =>
+                                  (controller.value[listID] ?? []).length,
+                            ),
+                            builder: (context, _, __) {
+                              int count = (globalSelectedID.value[listID] ?? [])
+                                  .where(
+                                    (item) =>
+                                        futureTransactionPks.contains(item),
+                                  )
+                                  .length;
 
-                                  return AnimatedOpacity(
-                                    key: ValueKey("HiddenText"),
-                                    duration: const Duration(milliseconds: 425),
-                                    opacity: globalCollapsedFutureID
-                                                .value[listID ?? "0"] ==
-                                            true
-                                        ? 1
-                                        : 0,
-                                    child: AnimatedSizeSwitcher(
-                                      child: count > 0
-                                          ? TextFont(
-                                              key: ValueKey("SelectedText"),
-                                              text: addAmountToString(
-                                                "",
-                                                count,
-                                                extraText: "selected".tr(),
-                                                addCommaWithExtraText: false,
-                                              ),
-                                              maxLines: 1,
-                                              textAlign: TextAlign.start,
-                                              fontSize: 14,
-                                              textColor:
-                                                  getColor(context, "black"),
-                                            )
-                                          : TextFont(
-                                              text: addAmountToString(
-                                                "",
-                                                futureTransactionPks.length,
-                                                extraText: "hidden".tr(),
-                                                addCommaWithExtraText: false,
-                                              ),
-                                              maxLines: 1,
-                                              textAlign: TextAlign.start,
-                                              fontSize: 14,
-                                              textColor: getColor(
-                                                  context, "textLight"),
-                                            ),
-                                    ),
-                                  );
-                                }),
-                          ],
-                        ),
+                              return AnimatedOpacity(
+                                key: ValueKey("HiddenText"),
+                                duration: const Duration(milliseconds: 425),
+                                opacity:
+                                    globalCollapsedFutureID.value[listID ??
+                                            "0"] ==
+                                        true
+                                    ? 1
+                                    : 0,
+                                child: AnimatedSizeSwitcher(
+                                  child: count > 0
+                                      ? TextFont(
+                                          key: ValueKey("SelectedText"),
+                                          text: addAmountToString(
+                                            "",
+                                            count,
+                                            extraText: "selected".tr(),
+                                            addCommaWithExtraText: false,
+                                          ),
+                                          maxLines: 1,
+                                          textAlign: TextAlign.start,
+                                          fontSize: 14,
+                                          textColor: getColor(context, "black"),
+                                        )
+                                      : TextFont(
+                                          text: addAmountToString(
+                                            "",
+                                            futureTransactionPks.length,
+                                            extraText: "hidden".tr(),
+                                            addCommaWithExtraText: false,
+                                          ),
+                                          maxLines: 1,
+                                          textAlign: TextAlign.start,
+                                          fontSize: 14,
+                                          textColor: getColor(
+                                            context,
+                                            "textLight",
+                                          ),
+                                        ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsetsDirectional.only(
-                            top: 2, bottom: 2, start: 8, end: 2),
-                        child: Tappable(
-                          onTap: () {
-                            toggleFutureTransactionsSection(listID);
-                          },
-                          color: Theme.of(context)
-                              .colorScheme
-                              .secondary
-                              .withOpacity(Theme.of(context).brightness ==
-                                      Brightness.dark
+                    ),
+                    Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        top: 2,
+                        bottom: 2,
+                        start: 8,
+                        end: 2,
+                      ),
+                      child: Tappable(
+                        onTap: () {
+                          toggleFutureTransactionsSection(listID);
+                        },
+                        color: Theme.of(context).colorScheme.secondary
+                            .withOpacity(
+                              Theme.of(context).brightness == Brightness.dark
                                   ? 0.1
-                                  : 0.2),
-                          borderRadius: 5,
-                          child: Padding(
-                            padding: const EdgeInsetsDirectional.symmetric(
-                                horizontal: 10),
-                            child: AnimatedRotation(
-                              turns: globalCollapsedFutureID
-                                          .value[listID ?? "0"] ==
-                                      true
-                                  ? 0
-                                  : 0.5,
-                              duration: const Duration(milliseconds: 425),
-                              curve: Curves.fastOutSlowIn,
-                              child: Icon(
-                                appStateSettings["outlinedIcons"]
-                                    ? Icons.arrow_drop_down_outlined
-                                    : Icons.arrow_drop_down_rounded,
-                                size: 30,
-                              ),
+                                  : 0.2,
+                            ),
+                        borderRadius: 5,
+                        child: Padding(
+                          padding: const EdgeInsetsDirectional.symmetric(
+                            horizontal: 10,
+                          ),
+                          child: AnimatedRotation(
+                            turns:
+                                globalCollapsedFutureID.value[listID ?? "0"] ==
+                                    true
+                                ? 0
+                                : 0.5,
+                            duration: const Duration(milliseconds: 425),
+                            curve: Curves.fastOutSlowIn,
+                            child: Icon(
+                              appStateSettings["outlinedIcons"]
+                                  ? Icons.arrow_drop_down_outlined
+                                  : Icons.arrow_drop_down_rounded,
+                              size: 30,
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  );
-                }),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -1007,17 +1071,18 @@ class TransactionsEntriesSpendingSummary extends StatelessWidget {
           borderRadius: borderRadius,
           openPage: WalletDetailsPage(
             wallet: null,
-            initialSearchFilters: SearchFilters(
-              dateTimeRange: dateTimeRange,
-            ),
+            initialSearchFilters: SearchFilters(dateTimeRange: dateTimeRange),
           ),
           button: (openContainer) {
             return Tappable(
               borderRadius: borderRadius,
               color: appStateSettings["materialYou"]
                   ? dynamicPastel(
-                      context, Theme.of(context).colorScheme.secondaryContainer,
-                      amountDark: 0.5, amountLight: 0)
+                      context,
+                      Theme.of(context).colorScheme.secondaryContainer,
+                      amountDark: 0.5,
+                      amountLight: 0,
+                    )
                   : getColor(context, "canvasContainer"),
               onTap: () {
                 // setState(() {
@@ -1028,7 +1093,9 @@ class TransactionsEntriesSpendingSummary extends StatelessWidget {
               onLongPress: onLongPress,
               child: Padding(
                 padding: const EdgeInsetsDirectional.symmetric(
-                    vertical: 5, horizontal: 5),
+                  vertical: 5,
+                  horizontal: 5,
+                ),
                 child: Row(
                   children: [
                     Expanded(
@@ -1050,8 +1117,10 @@ class TransactionsEntriesSpendingSummary extends StatelessWidget {
                               textBuilder: (number) {
                                 return TextFont(
                                   text: convertToMoney(
-                                      Provider.of<AllWallets>(context), number,
-                                      finalNumber: expense.abs()),
+                                    Provider.of<AllWallets>(context),
+                                    number,
+                                    finalNumber: expense.abs(),
+                                  ),
                                   fontSize: 15,
                                   textColor: getColor(context, "expenseAmount"),
                                   autoSizeText: true,
@@ -1083,8 +1152,10 @@ class TransactionsEntriesSpendingSummary extends StatelessWidget {
                               textBuilder: (number) {
                                 return TextFont(
                                   text: convertToMoney(
-                                      Provider.of<AllWallets>(context), number,
-                                      finalNumber: income.abs()),
+                                    Provider.of<AllWallets>(context),
+                                    number,
+                                    finalNumber: income.abs(),
+                                  ),
                                   fontSize: 15,
                                   textColor: getColor(context, "incomeAmount"),
                                   autoSizeText: true,
@@ -1109,12 +1180,14 @@ class TransactionsEntriesSpendingSummary extends StatelessWidget {
                               initialCount: (0),
                               textBuilder: (number) {
                                 return TextFont(
-                                  text: "=" +
+                                  text:
+                                      "=" +
                                       " " +
                                       convertToMoney(
-                                          Provider.of<AllWallets>(context),
-                                          number,
-                                          finalNumber: netSpending.abs()),
+                                        Provider.of<AllWallets>(context),
+                                        number,
+                                        finalNumber: netSpending.abs(),
+                                      ),
                                   fontSize: 15,
                                   textColor: getColor(context, "black"),
                                   autoSizeText: true,

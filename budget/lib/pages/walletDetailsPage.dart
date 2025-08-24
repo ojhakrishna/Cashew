@@ -30,7 +30,6 @@ import 'package:budget/widgets/openContainerNavigation.dart';
 import 'package:budget/widgets/openPopup.dart';
 import 'package:budget/widgets/periodCyclePicker.dart';
 import 'package:budget/widgets/scrollbarWrap.dart';
-import 'package:budget/widgets/selectedTransactionsAppBar.dart';
 import 'package:budget/widgets/categoryEntry.dart';
 import 'package:budget/widgets/framework/pageFramework.dart';
 import 'package:budget/widgets/pieChart.dart';
@@ -1214,7 +1213,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
       onWillPop: () async {
         if ((globalSelectedID.value[listID] ?? []).length > 0) {
           globalSelectedID.value[listID] = [];
-          globalSelectedID.notifyListeners();
+          // globalSelectedID.notifyListeners(); // Removed: not allowed outside ChangeNotifier
           return false;
         } else {
           return true;
@@ -1234,7 +1233,7 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
             enableDoubleColumn(context) && widget.wallet == null ? false : true,
         expandedHeight:
             enableDoubleColumn(context) && widget.wallet == null ? 56 : null,
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         scrollController: _scrollController,
         key: pageState,
         listID: listID,
@@ -1545,9 +1544,8 @@ class WalletDetailsPageState extends State<WalletDetailsPage>
             ],
           );
         },
-        selectedTransactionsAppBar: SelectedTransactionsAppBar(
-          pageID: listID,
-        ),
+        selectedTransactionsAppBar: const SizedBox
+            .shrink(), // TODO: Replace with actual SelectedTransactionsAppBar widget if implemented
       ),
     );
   }
@@ -2582,7 +2580,7 @@ class _AllSpendingPastSpendingGraphState
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
                 child: FadeOutAndLockFeature(
                   hasInitiallyDismissed: allSpendingHistoryDismissedPremium,
                   actionAfter: () {
@@ -2656,11 +2654,8 @@ class _AllSpendingPastSpendingGraphState
                   foregroundDecoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Theme.of(context).colorScheme.background,
-                        Theme.of(context)
-                            .colorScheme
-                            .background
-                            .withOpacity(0.0),
+                        Theme.of(context).colorScheme.surface,
+                        Theme.of(context).colorScheme.surface.withOpacity(0.0),
                       ],
                       begin: AlignmentDirectional.topCenter,
                       end: AlignmentDirectional.bottomCenter,

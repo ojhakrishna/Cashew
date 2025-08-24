@@ -17,7 +17,6 @@ import 'package:budget/widgets/navigationSidebar.dart';
 import 'package:budget/widgets/noResults.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/widgets/openPopup.dart';
-import 'package:budget/widgets/selectedTransactionsAppBar.dart';
 import 'package:budget/widgets/framework/pageFramework.dart';
 import 'package:budget/widgets/settingsContainers.dart';
 import 'package:budget/widgets/slidingSelectorIncomeExpense.dart';
@@ -63,7 +62,7 @@ class UpcomingOverdueTransactionsState
       onWillPop: () async {
         if ((globalSelectedID.value[pageId] ?? []).length > 0) {
           globalSelectedID.value[pageId] = [];
-          globalSelectedID.notifyListeners();
+          // globalSelectedID.notifyListeners(); // Removed: not allowed outside ChangeNotifier
           return false;
         } else {
           return true;
@@ -305,9 +304,8 @@ class UpcomingOverdueTransactionsState
             child: SizedBox(height: 75),
           ),
         ],
-        selectedTransactionsAppBar: SelectedTransactionsAppBar(
-          pageID: pageId,
-        ),
+        selectedTransactionsAppBar: const SizedBox
+            .shrink(), // TODO: Replace with actual SelectedTransactionsAppBar widget if implemented
       ),
     );
   }

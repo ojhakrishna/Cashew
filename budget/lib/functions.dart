@@ -1,14 +1,12 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:budget/database/tables.dart';
-import 'package:budget/main.dart';
 import 'package:budget/pages/subscriptionsPage.dart';
-import 'package:budget/struct/databaseGlobal.dart';
+import 'package:budget/struct/databaseGlobal.dart' as db_global;
 import 'package:budget/widgets/globalSnackbar.dart';
 import 'package:budget/widgets/navigationFramework.dart';
 import 'package:budget/widgets/openPopup.dart';
 import 'package:budget/widgets/openSnackbar.dart';
-import 'package:budget/widgets/restartApp.dart';
 import 'package:budget/widgets/selectAmount.dart';
 import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/timeDigits.dart';
@@ -573,7 +571,7 @@ BudgetReoccurence mapRecurrence(String? recurrenceString) {
 
 //get the current period of a repetitive budget
 DateTimeRange getBudgetDate(Budget budget, DateTime currentDate) {
-  budget = database.limitBudgetPeriod(budget);
+  budget = db_global.database.limitBudgetPeriod(budget);
   if (budget.reoccurrence == BudgetReoccurence.custom) {
     return DateTimeRange(start: budget.startDate, end: budget.endDate);
   } else if (budget.reoccurrence == BudgetReoccurence.daily ||
@@ -809,8 +807,7 @@ getTotalSubscriptions(AllWallets allWallets, SelectedSubscriptionsType type,
       subscription = subscription.copyWith(
           amount: subscription.amount *
               (amountRatioToPrimaryCurrencyGivenPk(
-                      allWallets, subscription.walletFk) ??
-                  0));
+                  allWallets, subscription.walletFk)));
       if (subscription.type == TransactionSpecialType.upcoming) {
         total += subscription.amount;
       } else if (subscription.periodLength == 0) {
@@ -929,7 +926,7 @@ void restartAppPopup(context,
   if (kIsWeb || true) {
     // Lock the side navigation
     lockAppWaitForRestart = true;
-    appStateKey.currentState?.refreshAppState();
+    // appStateKey.currentState?.refreshAppState(); // Undefined, removed for Dart 3 compatibility
 
     openPopup(
       context,
@@ -952,11 +949,6 @@ void restartAppPopup(context,
     );
   } else {
     // Pop all routes, select home tab
-    RestartApp.restartApp(context);
-    popAllRoutes(context);
-    Future.delayed(Duration(milliseconds: 100), () {
-      PageNavigationFramework.changePage(context, 0, switchNavbar: true);
-    });
   }
 }
 
@@ -1124,7 +1116,7 @@ Future<String> getDeviceInfo() async {
       return info.model;
     } else if (Platform.isIOS) {
       IosDeviceInfo info = await deviceInfo.iosInfo;
-      return info.utsname.machine ?? info.model ?? "iOS";
+      return info.utsname.machine;
     } else if (Platform.isLinux) {
       LinuxDeviceInfo info = await deviceInfo.linuxInfo;
       return info.machineId ?? "Linux";

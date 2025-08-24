@@ -4,7 +4,8 @@ import 'package:budget/database/generatePreviewData.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/firebase_options.dart';
 import 'package:budget/functions.dart';
-import 'package:budget/main.dart';
+import 'package:budget/main.dart' as main_app
+    show appStateKey, pageNavigationFrameworkKey, sharedPreferences;
 import 'package:budget/pages/aboutPage.dart';
 import 'package:budget/pages/accountsPage.dart';
 import 'package:budget/struct/databaseGlobal.dart';
@@ -42,6 +43,18 @@ import 'package:shimmer/shimmer.dart';
 import 'package:universal_html/html.dart' as html;
 import 'dart:io';
 import 'package:budget/struct/randomConstants.dart';
+
+// --- Device Helper Functions ---
+// Helper to get the current device name for backup file naming
+String getCurrentDeviceName() {
+  // Use clientID as the device name, or fallback to 'unknown-device'
+  return clientID.isNotEmpty ? clientID : 'unknown-device';
+}
+
+// Helper to get the current device sync backup file name
+String getCurrentDeviceSyncBackupFileName({required String clientIDForSync}) {
+  return 'sync-' + clientIDForSync + '.db';
+}
 
 Future<bool> checkConnection() async {
   late bool isConnected;
@@ -216,7 +229,7 @@ Future<bool> testIfHasGmailAccess() async {
     final authHeaders = await googleUser!.authHeaders;
     final authenticateClient = GoogleAuthClient(authHeaders);
     gMail.GmailApi gmailApi = gMail.GmailApi(authenticateClient);
-    gMail.ListMessagesResponse results = await gmailApi.users.messages
+    await gmailApi.users.messages
         .list(googleUser!.id.toString(), maxResults: 1);
   } catch (e) {
     print(e.toString());
@@ -373,7 +386,7 @@ bool openDatabaseCorruptedPopup(BuildContext context) {
         popRoute(context);
         await openLoadingPopupTryCatch(() async {
           await forceDeleteDB();
-          await sharedPreferences.clear();
+          await main_app.sharedPreferences.clear();
         });
         restartAppPopup(context);
       },
@@ -381,7 +394,7 @@ bool openDatabaseCorruptedPopup(BuildContext context) {
     );
     // Lock the side navigation
     lockAppWaitForRestart = true;
-    appStateKey.currentState?.refreshAppState();
+    main_app.appStateKey.currentState?.refreshAppState();
     return true;
   }
   return false;
@@ -426,8 +439,8 @@ Future<void> createBackup(
         currentDBFileInfo.mediaStream, currentDBFileInfo.dbFileBytes.length);
 
     var driveFile = new drive.File();
-    final timestamp =
-        DateFormat("yyyy-MM-dd-hhmmss").format(DateTime.now().toUtc());
+    // final timestamp =
+    //     DateFormat("yyyy-MM-dd-hhmmss").format(DateTime.now().toUtc());
     // -$timestamp
     driveFile.name =
         "db-v$schemaVersionGlobal-${getCurrentDeviceName()}.sqlite";
@@ -651,9 +664,9 @@ class GoogleAccountLoginButtonState extends State<GoogleAccountLoginButton> {
 
   void openPage({VoidCallback? onNext}) {
     if (widget.navigationSidebarButton) {
-      pageNavigationFrameworkKey.currentState!
+      main_app.pageNavigationFrameworkKey.currentState!
           .changePage(8, switchNavbar: true);
-      appStateKey.currentState?.refreshAppState();
+      main_app.appStateKey.currentState?.refreshAppState();
     } else {
       if (onNext != null) onNext();
     }

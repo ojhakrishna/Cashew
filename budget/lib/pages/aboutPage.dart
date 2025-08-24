@@ -1,12 +1,12 @@
 import 'dart:math';
 import 'package:budget/functions.dart';
-import 'package:budget/main.dart';
+import 'package:budget/main.dart' as main_app;
 import 'package:budget/pages/accountsPage.dart';
 import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/pages/debugPage.dart';
 import 'package:budget/pages/detailedChangelogPage.dart';
 import 'package:budget/pages/onBoardingPage.dart';
-import 'package:budget/struct/databaseGlobal.dart';
+import 'package:budget/struct/databaseGlobal.dart' as db_global;
 import 'package:budget/struct/languageMap.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/button.dart';
@@ -61,7 +61,7 @@ class AboutPageState extends State<AboutPage> {
             Tappable(
               borderRadius: getPlatform() == PlatformOS.isIOS ? 10 : 15,
               onLongPress: () {
-                if (allowDebugFlags)
+                if (main_app.allowDebugFlags)
                   pushRoute(
                     context,
                     DebugPage(),
@@ -1004,8 +1004,11 @@ class AboutDeepLinking extends StatelessWidget {
 // Note that this is different than forceDeleteDB()
 Future clearDatabase(BuildContext context) async {
   openLoadingPopup(context);
-  await Future.wait([database.deleteEverything(), sharedPreferences.clear()]);
-  await database.close();
+  await Future.wait([
+    db_global.database.deleteEverything(),
+    main_app.sharedPreferences.clear()
+  ]);
+  await db_global.database.close();
   popRoute(context);
   restartAppPopup(context);
 }

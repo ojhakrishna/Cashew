@@ -227,8 +227,8 @@ class BottomNavBarState extends State<BottomNavBar> {
               ? dynamicPastel(context, Theme.of(context).colorScheme.primary,
                   amount: 0.6)
               : null,
-          labelTextStyle: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
               return TextStyle(
                 fontFamily: appStateSettings["font"],
                 fontFamilyFallback: ['Inter'],

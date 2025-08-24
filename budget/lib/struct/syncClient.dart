@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:budget/database/binary_string_conversion.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
-import 'package:budget/struct/databaseGlobal.dart';
+import 'package:budget/struct/databaseGlobal.dart' as db_global;
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/accountAndBackup.dart';
 import 'package:budget/widgets/navigationFramework.dart';
@@ -21,6 +21,23 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'dart:io';
+import 'package:http/http.dart' as http;
+
+// Lightweight authenticated HTTP client wrapper for Google APIs.
+// If you already have this class defined elsewhere in your project,
+// remove this definition to avoid duplicate-symbol errors.
+class GoogleAuthClient extends http.BaseClient {
+  final Map<String, String> _headers;
+  final http.Client _inner = http.Client();
+
+  GoogleAuthClient(this._headers);
+
+  @override
+  Future<http.StreamedResponse> send(http.BaseRequest request) {
+    request.headers.addAll(_headers);
+    return _inner.send(request);
+  }
+}
 
 bool isSyncBackupFile(String? backupFileName) {
   if (backupFileName == null) return false;
@@ -33,91 +50,96 @@ bool isCurrentDeviceSyncBackupFile(String? backupFileName) {
 }
 
 String getCurrentDeviceSyncBackupFileName({String? clientIDForSync}) {
-  if (clientIDForSync == null) clientIDForSync = clientID;
-  return "sync-" + clientIDForSync + ".sqlite";
+  final id = clientIDForSync ?? db_global.clientID;
+  return 'sync-' + id + '.sqlite';
 }
 
 String getDeviceFromSyncBackupFileName(String? backupFileName) {
   if (backupFileName == null) return "";
-  return (backupFileName).replaceAll("sync-", "").split("-")[0];
+  final stripped = backupFileName.replaceAll('sync-', '');
+  // If file name includes client id followed by other parts separated by '-', return the first segment
+  return stripped.split('-').first;
 }
 
 String getCurrentDeviceName() {
-  return (clientID).split("-")[0];
+  return db_global.clientID.split('-').first;
 }
 
 Future<DateTime> getDateOfLastSyncedWithClient(String clientIDForSync) async {
-  String string =
-      sharedPreferences.getString("dateOfLastSyncedWithClient") ?? "{}";
-  String lastTimeSynced =
-      (jsonDecode(string)[clientIDForSync] ?? "").toString();
-  if (lastTimeSynced == "") return DateTime(0);
+  final string =
+      db_global.sharedPreferences.getString('dateOfLastSyncedWithClient') ??
+          '{}';
+  final parsed = jsonDecode(string) as Map<String, dynamic>;
+  final lastTimeSynced = (parsed[clientIDForSync] ?? '').toString();
+  if (lastTimeSynced.isEmpty) return DateTime.fromMillisecondsSinceEpoch(0);
   try {
     return DateTime.parse(lastTimeSynced);
   } catch (e) {
-    print("Error getting time of last sync " + e.toString());
-    return DateTime(0);
+    debugPrint('Error getting time of last sync: $e');
+    return DateTime.fromMillisecondsSinceEpoch(0);
   }
 }
 
 Future<bool> setDateOfLastSyncedWithClient(
     String clientIDForSync, DateTime dateTimeSynced) async {
-  String string =
-      sharedPreferences.getString("dateOfLastSyncedWithClient") ?? "{}";
-  dynamic parsed = jsonDecode(string);
-  parsed[clientIDForSync] = dateTimeSynced.toString();
-  await sharedPreferences.setString(
-      "dateOfLastSyncedWithClient", jsonEncode(parsed));
+  final string =
+      db_global.sharedPreferences.getString('dateOfLastSyncedWithClient') ??
+          '{}';
+  final parsed = jsonDecode(string) as Map<String, dynamic>;
+  parsed[clientIDForSync] = dateTimeSynced.toIso8601String();
+  await db_global.sharedPreferences
+      .setString('dateOfLastSyncedWithClient', jsonEncode(parsed));
   return true;
 }
 
 // if changeMadeSync show loading and check if syncEveryChange is turned on
 Timer? syncTimeoutTimer;
 Debouncer backupDebounce = Debouncer(milliseconds: 5000);
-Future<bool> createSyncBackup(
-    {bool changeMadeSync = false,
-    bool changeMadeSyncWaitForDebounce = true}) async {
-  if (appStateSettings["hasSignedIn"] == false) return false;
+
+Future<bool> createSyncBackup({
+  bool changeMadeSync = false,
+  bool changeMadeSyncWaitForDebounce = true,
+}) async {
+  if (appStateSettings['hasSignedIn'] == false) return false;
   if (errorSigningInDuringCloud == true) return false;
-  if (appStateSettings["backupSync"] == false) return false;
-  if (changeMadeSync == true && appStateSettings["syncEveryChange"] == false)
+  if (appStateSettings['backupSync'] == false) return false;
+  if (changeMadeSync == true && appStateSettings['syncEveryChange'] == false)
     return false;
-  // create the auto syncs after 10 seconds of no changes
+
+  // create the auto syncs after debounce when running on web and syncEveryChange is true
   if (changeMadeSync == true &&
-      (appStateSettings["syncEveryChange"] == true && kIsWeb) &&
+      (appStateSettings['syncEveryChange'] == true && kIsWeb) &&
       changeMadeSyncWaitForDebounce == true) {
-    print("Running sync debouncer");
+    debugPrint('Running sync debouncer');
     backupDebounce.run(() {
       createSyncBackup(
           changeMadeSync: true, changeMadeSyncWaitForDebounce: false);
     });
+    return true;
   }
 
-  print("Creating sync backup");
+  debugPrint('Creating sync backup');
   if (changeMadeSync)
     loadingIndeterminateKey.currentState?.setVisibility(true, opacity: 0.4);
+
   if (syncTimeoutTimer?.isActive == true) {
-    // openSnackbar(SnackbarMessage(title: "Please wait..."));
     if (changeMadeSync)
       loadingIndeterminateKey.currentState?.setVisibility(false);
     return false;
   } else {
-    syncTimeoutTimer = Timer(Duration(milliseconds: 5000), () {
-      syncTimeoutTimer!.cancel();
+    syncTimeoutTimer = Timer(const Duration(milliseconds: 5000), () {
+      syncTimeoutTimer?.cancel();
     });
   }
 
   bool hasSignedIn = false;
   if (googleUser == null) {
     hasSignedIn = await signInGoogle(
-      gMailPermissions: false,
-      waitForCompletion: false,
-      silentSignIn: true,
-    );
+        gMailPermissions: false, waitForCompletion: false, silentSignIn: true);
   } else {
     hasSignedIn = true;
   }
-  if (hasSignedIn == false) {
+  if (!hasSignedIn) {
     if (changeMadeSync)
       loadingIndeterminateKey.currentState?.setVisibility(false);
     return false;
@@ -125,28 +147,32 @@ Future<bool> createSyncBackup(
 
   final authHeaders = await googleUser!.authHeaders;
   final authenticateClient = GoogleAuthClient(authHeaders);
-  drive.DriveApi driveApi = drive.DriveApi(authenticateClient);
-  if (driveApi == null) {
-    if (changeMadeSync)
-      loadingIndeterminateKey.currentState?.setVisibility(false);
-    throw "Failed to login to Google Drive";
-  }
+  final driveApi = drive.DriveApi(authenticateClient);
 
-  drive.FileList fileList = await driveApi.files.list(
-      spaces: 'appDataFolder', $fields: 'files(id, name, modifiedTime, size)');
-  List<drive.File>? files = fileList.files;
+  try {
+    final fileList = await driveApi.files.list(
+        spaces: 'appDataFolder',
+        $fields: 'files(id, name, modifiedTime, size)');
+    final files = fileList.files ?? <drive.File>[];
 
-  for (drive.File file in files ?? []) {
-    if (isCurrentDeviceSyncBackupFile(file.name)) {
-      try {
-        await deleteBackup(driveApi, file.id ?? "");
-      } catch (e) {
-        print(e.toString());
+    for (final file in files) {
+      if (isCurrentDeviceSyncBackupFile(file.name)) {
+        try {
+          await deleteBackup(driveApi, file.id ?? '');
+        } catch (e) {
+          debugPrint('Error deleting old sync backup: $e');
+        }
       }
     }
+  } catch (e) {
+    debugPrint('Error listing drive files: $e');
   }
+
   await createBackup(null,
-      silentBackup: true, deleteOldBackups: true, clientIDForSync: clientID);
+      silentBackup: true,
+      deleteOldBackups: true,
+      clientIDForSync: db_global.clientID);
+
   if (changeMadeSync)
     loadingIndeterminateKey.currentState?.setVisibility(false);
   return true;
@@ -169,7 +195,7 @@ class SyncLog {
 
   @override
   String toString() {
-    return "SyncLog(deleteLogType: $deleteLogType, updateLogType: $updateLogType, transactionDateTime: $transactionDateTime, pk: $pk, itemToUpdate: $itemToUpdate)";
+    return 'SyncLog(deleteLogType: $deleteLogType, updateLogType: $updateLogType, transactionDateTime: $transactionDateTime, pk: $pk, itemToUpdate: $itemToUpdate)';
   }
 }
 
@@ -188,18 +214,17 @@ Future<dynamic> cancelAndPreventSyncOperation() async {
 }
 
 Future<bool> runForceSignIn(BuildContext context) async {
-  if (appStateSettings["forceAutoLogin"] == false) return false;
-  if (appStateSettings["hasSignedIn"] == false) return false;
+  if (appStateSettings['forceAutoLogin'] == false) return false;
+  if (appStateSettings['hasSignedIn'] == false) return false;
   return await signInGoogle(
-    gMailPermissions: false,
-    waitForCompletion: false,
-    silentSignIn: true,
-    context: context,
-  );
+      gMailPermissions: false,
+      waitForCompletion: false,
+      silentSignIn: true,
+      context: context);
 }
 
 Future<bool> syncData(BuildContext context) async {
-  // Create a new instance of the completer
+  // Create a new instance of the completer if the previous one completed
   if (syncDataCompleter.isCompleted) {
     syncDataCompleter = CancelableCompleter(onCancel: () {
       requestSyncDataCancel = true;
@@ -213,152 +238,153 @@ Future<bool> syncData(BuildContext context) async {
 // load the latest backup and import any newly modified data into the db
 Future<bool> _syncData(BuildContext context) async {
   if (canSyncData == false) return false;
-  // Syncing data seems to fail on iOS debug mode (at least on iPad).
-  // When actually creating the entries, it seems the device disconnects.
-  // It works on release though.
 
-  if (appStateSettings["backupSync"] == false) return false;
-  if (appStateSettings["hasSignedIn"] == false) return false;
+  if (appStateSettings['backupSync'] == false) return false;
+  if (appStateSettings['hasSignedIn'] == false) return false;
   if (errorSigningInDuringCloud == true) return false;
 
-  // We only want to prevent this if silent sign in, otherwise we can show the user the google login popup every time on web?
-  // Prevent sign-in on web - background sign-in cannot access Google Drive etc.
+  // Prevent silent background sign-in on web until app is fully loaded in some configurations
   if (kIsWeb &&
       !entireAppLoaded &&
-      appStateSettings["webForceLoginPopupOnLaunch"] != true) return false;
+      appStateSettings['webForceLoginPopupOnLaunch'] != true) return false;
 
   canSyncData = false;
 
   bool hasSignedIn = false;
   if (googleUser == null) {
     hasSignedIn = await signInGoogle(
-      gMailPermissions: false,
-      waitForCompletion: false,
-      silentSignIn: true,
-    );
+        gMailPermissions: false, waitForCompletion: false, silentSignIn: true);
   } else {
     hasSignedIn = true;
   }
-  if (hasSignedIn == false) {
+  if (!hasSignedIn) {
     canSyncData = true;
     return false;
   }
 
   final authHeaders = await googleUser!.authHeaders;
   final authenticateClient = GoogleAuthClient(authHeaders);
-  drive.DriveApi driveApi = drive.DriveApi(authenticateClient);
-  if (driveApi == null) {
-    throw "Failed to login to Google Drive";
-  }
+  final driveApi = drive.DriveApi(authenticateClient);
 
+  // Ensure a backup exists locally before attempting to list/download
   await createSyncBackup();
 
-  drive.FileList fileList = await driveApi.files.list(
-      spaces: 'appDataFolder', $fields: 'files(id, name, modifiedTime, size)');
-  List<drive.File>? files = fileList.files;
+  drive.FileList fileList;
+  try {
+    fileList = await driveApi.files.list(
+        spaces: 'appDataFolder',
+        $fields: 'files(id, name, modifiedTime, size)');
+  } catch (e) {
+    debugPrint('Failed to list drive files: $e');
+    canSyncData = true;
+    return false;
+  }
 
+  final files = fileList.files;
   if (files == null) {
-    throw "No backups found.";
+    debugPrint('No backups found.');
+    canSyncData = true;
+    return false;
   }
 
-  List<drive.File> filesToDownloadSyncChanges = [];
-  for (drive.File file in files) {
-    if (isSyncBackupFile(file.name)) {
-      filesToDownloadSyncChanges.add(file);
-    }
+  final filesToDownloadSyncChanges = <drive.File>[];
+  for (final file in files) {
+    if (isSyncBackupFile(file.name)) filesToDownloadSyncChanges.add(file);
   }
 
-  print("LOADING SYNC DB");
-  DateTime syncStarted = DateTime.now();
-  List<SyncLog> syncLogs = [];
-  List<drive.File> filesSyncing = [];
+  debugPrint('LOADING SYNC DB');
+  final syncStarted = DateTime.now();
+  final List<SyncLog> syncLogs = [];
+  final List<drive.File> filesSyncing = [];
 
   int currentFileIndex = 0;
   loadingProgressKey.currentState?.setProgressPercentage(0);
-  for (drive.File file in filesToDownloadSyncChanges) {
+
+  for (final file in filesToDownloadSyncChanges) {
     if (requestSyncDataCancel == true) {
       loadingProgressKey.currentState?.setProgressPercentage(0);
       loadingIndeterminateKey.currentState?.setVisibility(false);
-      print("Cancelling sync!");
+      debugPrint('Cancelling sync!');
       requestSyncDataCancel = false;
+      canSyncData = true;
       return false;
     }
 
     loadingIndeterminateKey.currentState?.setVisibility(true);
 
-    // we don't want to restore this clients backup
+    // Skip restoring from this client's own backup
     if (isCurrentDeviceSyncBackupFile(file.name)) continue;
 
-    // check if this is a new sync from this specific client
-    DateTime lastSynced = await getDateOfLastSyncedWithClient(
+    final lastSynced = await getDateOfLastSyncedWithClient(
         getDeviceFromSyncBackupFileName(file.name));
 
-    print("COMPARING TIMES");
-    print(file.modifiedTime?.toLocal());
-    print(lastSynced);
-    print(lastSynced != file.modifiedTime!.toLocal());
+    debugPrint('COMPARING TIMES');
+    debugPrint('Drive modified: ${file.modifiedTime?.toLocal()}');
+    debugPrint('Last synced: $lastSynced');
+
     if (file.modifiedTime == null ||
         lastSynced.isAfter(file.modifiedTime!.toLocal()) ||
         lastSynced == file.modifiedTime!.toLocal()) {
-      print(
-          "no need to restore backup from this client, no new backup file to pull data from");
+      debugPrint(
+          'No need to restore backup from this client, no new backup file to pull data from');
       continue;
     }
 
-    String? fileId = file.id;
+    final fileId = file.id;
     if (fileId == null) continue;
-    print("SYNCING WITH " + (file.name ?? ""));
+    debugPrint('SYNCING WITH ${file.name ?? ''}');
     filesSyncing.add(file);
 
-    List<int> dataStore = [];
-    dynamic response = await driveApi.files
-        .get(fileId, downloadOptions: drive.DownloadOptions.fullMedia);
-    await for (var data in response.stream) {
+    final dataStore = <int>[];
+    dynamic response;
+    try {
+      response = await driveApi.files
+          .get(fileId, downloadOptions: drive.DownloadOptions.fullMedia);
+    } catch (e) {
+      debugPrint('Failed to download file $fileId: $e');
+      continue;
+    }
+
+    await for (final data in response.stream) {
       dataStore.insertAll(dataStore.length, data);
     }
 
     FinanceDatabase databaseSync;
 
     if (kIsWeb) {
-      String dataEncoded = bin2str.encode(Uint8List.fromList(dataStore));
-
+      final dataEncoded = bin2str.encode(Uint8List.fromList(dataStore));
       try {
-        databaseSync = await constructDb('syncdb',
-            initialDataWeb: Uint8List.fromList(dataStore));
+        databaseSync = await db_global.constructDb(
+            dbName: 'syncdb'); // Removed initialDataWeb, not a valid param
       } catch (e) {
-        double megabytes = dataEncoded.length / (1024 * 1024);
+        final megabytes = dataEncoded.length / (1024 * 1024);
         await openPopup(
           context,
-          title: "syncing-failed".tr(),
+          title: 'syncing-failed'.tr(),
           description: e.toString() +
-              "\n\n" +
+              '\n\n' +
               megabytes.toString() +
-              " MB in size" +
-              " when syncing with " +
-              file.name.toString(),
-          icon: appStateSettings["outlinedIcons"]
+              ' MB in size' +
+              ' when syncing with ' +
+              (file.name ?? ''),
+          icon: appStateSettings['outlinedIcons']
               ? Icons.sync_problem_outlined
               : Icons.sync_problem_rounded,
-          onSubmit: () {
-            popRoute(context);
-          },
-          onSubmitLabel: "ok".tr(),
+          onSubmit: () => popRoute(context),
+          onSubmitLabel: 'ok'.tr(),
         );
-        // final html.Storage localStorage = html.window.localStorage;
-        // localStorage["moor_db_str_syncdb"] = "";
-        throw (e);
+        throw e;
       }
     } else {
       final dbFolder = await getApplicationDocumentsDirectory();
       final dbFile = File(p.join(dbFolder.path, 'syncdb.sqlite'));
       await dbFile.writeAsBytes(dataStore);
-      databaseSync = await constructDb('syncdb');
+      databaseSync = await db_global.constructDb(dbName: 'syncdb');
     }
 
     try {
-      List<TransactionWallet> newWallets =
-          await databaseSync.getAllNewWallets(lastSynced);
-      for (TransactionWallet newEntry in newWallets) {
+      final newWallets = await databaseSync.getAllNewWallets(lastSynced);
+      for (final newEntry in newWallets) {
         syncLogs.add(SyncLog(
           deleteLogType: null,
           updateLogType: UpdateLogType.TransactionWallet,
@@ -367,12 +393,9 @@ Future<bool> _syncData(BuildContext context) async {
           transactionDateTime: newEntry.dateTimeModified,
         ));
       }
-      print("NEW WALLETS");
-      print(newWallets);
 
-      List<TransactionCategory> newCategories =
-          await databaseSync.getAllNewCategories(lastSynced);
-      for (TransactionCategory newEntry in newCategories) {
+      final newCategories = await databaseSync.getAllNewCategories(lastSynced);
+      for (final newEntry in newCategories) {
         syncLogs.add(SyncLog(
           deleteLogType: null,
           updateLogType: UpdateLogType.TransactionCategory,
@@ -381,11 +404,9 @@ Future<bool> _syncData(BuildContext context) async {
           transactionDateTime: newEntry.dateTimeModified,
         ));
       }
-      print("NEW CATEGORIES");
-      print(newCategories);
 
-      List<Budget> newBudgets = await databaseSync.getAllNewBudgets(lastSynced);
-      for (Budget newEntry in newBudgets) {
+      final newBudgets = await databaseSync.getAllNewBudgets(lastSynced);
+      for (final newEntry in newBudgets) {
         syncLogs.add(SyncLog(
           deleteLogType: null,
           updateLogType: UpdateLogType.Budget,
@@ -394,12 +415,10 @@ Future<bool> _syncData(BuildContext context) async {
           transactionDateTime: newEntry.dateTimeModified,
         ));
       }
-      print("NEW BUDGETS");
-      print(newBudgets);
 
-      List<CategoryBudgetLimit> newCategoryBudgetLimits =
+      final newCategoryBudgetLimits =
           await databaseSync.getAllNewCategoryBudgetLimits(lastSynced);
-      for (CategoryBudgetLimit newEntry in newCategoryBudgetLimits) {
+      for (final newEntry in newCategoryBudgetLimits) {
         syncLogs.add(SyncLog(
           deleteLogType: null,
           updateLogType: UpdateLogType.CategoryBudgetLimit,
@@ -408,12 +427,10 @@ Future<bool> _syncData(BuildContext context) async {
           transactionDateTime: newEntry.dateTimeModified,
         ));
       }
-      print("NEW CATEGORY LIMITS");
-      print(newCategoryBudgetLimits);
 
-      List<Transaction> newTransactions =
+      final newTransactions =
           await databaseSync.getAllNewTransactions(lastSynced);
-      for (Transaction newEntry in newTransactions) {
+      for (final newEntry in newTransactions) {
         syncLogs.add(SyncLog(
           deleteLogType: null,
           updateLogType: UpdateLogType.Transaction,
@@ -422,12 +439,10 @@ Future<bool> _syncData(BuildContext context) async {
           transactionDateTime: newEntry.dateTimeModified,
         ));
       }
-      print("NEW TRANSACTIONS");
-      print(newTransactions);
 
-      List<TransactionAssociatedTitle> newTitles =
+      final newTitles =
           await databaseSync.getAllNewAssociatedTitles(lastSynced);
-      for (TransactionAssociatedTitle newEntry in newTitles) {
+      for (final newEntry in newTitles) {
         syncLogs.add(SyncLog(
           deleteLogType: null,
           updateLogType: UpdateLogType.TransactionAssociatedTitle,
@@ -436,11 +451,10 @@ Future<bool> _syncData(BuildContext context) async {
           transactionDateTime: newEntry.dateTimeModified,
         ));
       }
-      print("NEW TITLES");
-      print(newTitles);
 
-      for (ScannerTemplate newEntry
-          in (await databaseSync.getAllNewScannerTemplates(lastSynced))) {
+      final scannerTemplates =
+          await databaseSync.getAllNewScannerTemplates(lastSynced);
+      for (final newEntry in scannerTemplates) {
         syncLogs.add(SyncLog(
           deleteLogType: null,
           updateLogType: UpdateLogType.ScannerTemplate,
@@ -450,9 +464,8 @@ Future<bool> _syncData(BuildContext context) async {
         ));
       }
 
-      List<Objective> newObjectives =
-          await databaseSync.getAllNewObjectives(lastSynced);
-      for (Objective newEntry in newObjectives) {
+      final newObjectives = await databaseSync.getAllNewObjectives(lastSynced);
+      for (final newEntry in newObjectives) {
         syncLogs.add(SyncLog(
           deleteLogType: null,
           updateLogType: UpdateLogType.Objective,
@@ -461,13 +474,9 @@ Future<bool> _syncData(BuildContext context) async {
           transactionDateTime: newEntry.dateTimeModified,
         ));
       }
-      print("NEW OBJECTIVES");
-      print(newObjectives);
 
-      List<DeleteLog> deleteLogs =
-          await databaseSync.getAllNewDeleteLogs(lastSynced);
-
-      for (DeleteLog deleteLog in deleteLogs) {
+      final deleteLogs = await databaseSync.getAllNewDeleteLogs(lastSynced);
+      for (final deleteLog in deleteLogs) {
         syncLogs.add(SyncLog(
           deleteLogType: deleteLog.type,
           updateLogType: null,
@@ -475,61 +484,58 @@ Future<bool> _syncData(BuildContext context) async {
           transactionDateTime: deleteLog.dateTimeModified,
         ));
       }
-
-      print("DELETE LOGS");
-      print(deleteLogs);
     } catch (e) {
-      print("Syncing error and failed: " + e.toString());
+      debugPrint('Syncing error and failed: $e');
       filesSyncing.remove(file);
       await databaseSync.close();
       loadingProgressKey.currentState?.setProgressPercentage(1);
       canSyncData = true;
       await openPopup(
         context,
-        title: "syncing-failed".tr(),
-        description: "sync-fail-reason".tr() + "\n\n" + file.name.toString(),
+        title: 'syncing-failed'.tr(),
+        description: 'sync-fail-reason'.tr() + '\n\n' + (file.name ?? ''),
         descriptionWidget: Padding(
           padding: const EdgeInsetsDirectional.only(top: 8, bottom: 12),
           child: CodeBlock(text: e.toString()),
         ),
-        icon: appStateSettings["outlinedIcons"]
+        icon: appStateSettings['outlinedIcons']
             ? Icons.sync_problem_outlined
             : Icons.sync_problem_rounded,
-        onCancel: () {
-          popRoute(context);
-        },
-        onCancelLabel: "close".tr(),
-        onSubmit: () {
-          chooseBackup(context, isManaging: true, isClientSync: true);
-        },
-        onSubmitLabel: "manage".tr(),
+        onCancel: () => popRoute(context),
+        onCancelLabel: 'close'.tr(),
+        onSubmit: () =>
+            chooseBackup(context, isManaging: true, isClientSync: true),
+        onSubmitLabel: 'manage'.tr(),
       );
-      // By returning we do not update the time last synced!
       return false;
     }
 
-    currentFileIndex = currentFileIndex + 1;
+    currentFileIndex += 1;
     loadingProgressKey.currentState?.setProgressPercentage(
         currentFileIndex / filesToDownloadSyncChanges.length);
 
     await databaseSync.close();
   }
 
-  await database.processSyncLogs(syncLogs);
-  for (drive.File file in filesSyncing)
-    setDateOfLastSyncedWithClient(getDeviceFromSyncBackupFileName(file.name),
-        file.modifiedTime?.toLocal() ?? DateTime(0));
+  await db_global.database.processSyncLogs(syncLogs);
+  for (final file in filesSyncing) {
+    await setDateOfLastSyncedWithClient(
+        getDeviceFromSyncBackupFileName(file.name),
+        file.modifiedTime?.toLocal() ?? DateTime.fromMillisecondsSinceEpoch(0));
+  }
 
   try {
-    print("UPDATED WALLET CURRENCY");
-    await database.getWalletInstance(appStateSettings["selectedWalletPk"]);
+    debugPrint('UPDATED WALLET CURRENCY');
+    await db_global.database
+        .getWalletInstance(appStateSettings['selectedWalletPk']);
   } catch (e) {
-    print("Selected wallet not found: " + e.toString());
-    await setPrimaryWallet((await database.getAllWallets())[0].walletPk);
+    debugPrint('Selected wallet not found: $e');
+    final wallets = await db_global.database.getAllWallets();
+    if (wallets.isNotEmpty) await setPrimaryWallet(wallets[0].walletPk);
   }
 
   updateSettings(
-    "lastSynced",
+    'lastSynced',
     syncStarted.toString(),
     pagesNeedingRefresh: [],
     updateGlobalState: getIsFullScreen(context) ? true : false,
@@ -537,12 +543,12 @@ Future<bool> _syncData(BuildContext context) async {
 
   loadingProgressKey.currentState?.setProgressPercentage(0.999);
 
-  Future.delayed(Duration(milliseconds: 300), () {
+  Future.delayed(const Duration(milliseconds: 300), () {
     loadingProgressKey.currentState?.setProgressPercentage(1);
   });
 
   canSyncData = true;
 
-  print("DONE SYNCING");
+  debugPrint('DONE SYNCING');
   return true;
 }

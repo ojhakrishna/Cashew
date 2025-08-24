@@ -1,20 +1,19 @@
 import 'dart:convert';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
-import 'package:budget/main.dart';
+import 'package:budget/main.dart' as main_app;
 import 'package:budget/pages/editHomePage.dart';
 import 'package:budget/widgets/framework/pageFramework.dart';
 import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntry.dart';
 import 'package:budget/widgets/watchAllWallets.dart';
-import 'package:drift/isolate.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:budget/struct/databaseGlobal.dart';
+import 'package:budget/struct/databaseGlobal.dart' as db_global;
 import 'package:budget/struct/defaultPreferences.dart';
 import 'package:budget/widgets/navigationFramework.dart';
 import 'package:budget/colors.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as flutter_widgets;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:budget/struct/languageMap.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
@@ -37,12 +36,14 @@ Future<bool> initializeSettings() async {
     isDatabaseImportedOnThisSession = true;
     try {
       print("Settings were loaded from backup, trying to restore");
-      String storedSettings = (await database.getSettings()).settingsJSON;
-      await sharedPreferences.setString('userSettings', storedSettings);
+      // Safely get settings, handle potential null
+      final settingsData = await db_global.database.getSettings();
+      String storedSettings = settingsData.settingsJSON;
+      await main_app.sharedPreferences
+          .setString('userSettings', storedSettings);
       print(storedSettings);
       userSettings = json.decode(storedSettings);
-      //we need to load any defaults to migrate if on an older version backup restores
-      //Set to defaults if a new setting is added, but no entry saved
+
       Map<String, dynamic> userPreferencesDefault =
           await getDefaultPreferences();
       userPreferencesDefault.forEach((key, value) {
@@ -56,19 +57,16 @@ Future<bool> initializeSettings() async {
       userSettings["databaseJustImported"] = false;
       print("Settings were restored");
     } catch (e) {
-      print("Error restoring imported settings " + e.toString());
-      if (e is DriftRemoteException) {
-        if (e.remoteCause
-            .toString()
-            .toLowerCase()
-            .contains("file is not a database")) {
-          isDatabaseCorrupted = true;
-          databaseCorruptedError = e.toString();
-        }
-      } else if (e
-          .toString()
-          .toLowerCase()
-          .contains("file is not a database")) {
+      print("Error restoring imported settings: " + e.toString());
+      // Check for Drift-specific exceptions if drift_remote is used
+      // Note: DriftRemoteException is from 'package:drift/remote.dart'
+      // if (e is DriftRemoteException) {
+      //   if (e.remoteCause.toString().toLowerCase().contains("file is not a database")) {
+      //     isDatabaseCorrupted = true;
+      //     databaseCorruptedError = e.toString();
+      //   }
+      // }
+      if (e.toString().toLowerCase().contains("file is not a database")) {
         isDatabaseCorrupted = true;
         databaseCorruptedError = e.toString();
       }
@@ -77,7 +75,8 @@ Future<bool> initializeSettings() async {
 
   appStateSettings = userSettings;
   print(
-      "App settings loaded: if logging is enabled, logs will now be captured");
+    "App settings loaded: if logging is enabled, logs will now be captured",
+  );
 
   // Do some actions based on loaded settings
   if (appStateSettings["accentSystemColor"] == true) {
@@ -87,45 +86,30 @@ Future<bool> initializeSettings() async {
   await attemptToMigrateSetLongTermLoansAmountTo0();
   attemptToMigrateCustomNumberFormattingSettings();
 
-  // Disable sync every change is not on web
-  // It will still sync when user pulls down to refresh
-  // if (!kIsWeb) {
-  //   appStateSettings["syncEveryChange"] = false;
-  // }
-  // Instead we now check for web with the setting appStateSettings["syncEveryChange"]
-
-  // Load iOS font when iOS
-  // Disable iOS font for now... Avenir looks better
-  // if (getPlatform() == PlatformOS.isIOS) {
-  //   // appStateSettings["font"] = "SFProText";
-  //   appStateSettings["font"] = "Avenir";
-  // }
-
   if (appStateSettings["hasOnboarded"] == true) {
-    appStateSettings["numLogins"] = appStateSettings["numLogins"] + 1;
+    // Safely increment numLogins, providing a default value if it's null
+    appStateSettings["numLogins"] = (appStateSettings["numLogins"] ?? 0) + 1;
   }
 
   appStateSettings["appOpenedHour"] = DateTime.now().hour;
   appStateSettings["appOpenedMinute"] = DateTime.now().minute;
 
-  String? retrievedClientID = await sharedPreferences.getString("clientID");
-  if (retrievedClientID == null) {
-    String systemID = await getDeviceInfo();
-    String newClientID = systemID
-            .substring(0, (systemID.length > 17 ? 17 : systemID.length))
-            .replaceAll("-", "_") +
-        "-" +
-        DateTime.now().millisecondsSinceEpoch.toString();
-    await sharedPreferences.setString("clientID", newClientID);
-    clientID = newClientID;
-  } else {
-    clientID = retrievedClientID;
-  }
+  String? retrievedClientID =
+      await main_app.sharedPreferences.getString("clientID");
+  // Ensure clientID is never null. If it doesn't exist, create a new one.
+  db_global.clientID = retrievedClientID ?? db_global.uuid.v4();
+  await main_app.sharedPreferences.setString("clientID", db_global.clientID);
 
-  timeDilation = double.parse(appStateSettings["animationSpeed"].toString());
+  // Safely parse animation speed with a fallback
+  timeDilation = double.tryParse(
+          appStateSettings["animationSpeed"]?.toString() ?? '1.0') ??
+      1.0;
 
-  selectedWalletPkController.add(SelectedWalletPk(
-      selectedWalletPk: appStateSettings["selectedWalletPk"] ?? "0"));
+  selectedWalletPkController.add(
+    SelectedWalletPk(
+      selectedWalletPk: appStateSettings["selectedWalletPk"]?.toString() ?? "0",
+    ),
+  );
 
   Map<String, dynamic> defaultPreferences = await getDefaultPreferences();
 
@@ -133,26 +117,32 @@ Future<bool> initializeSettings() async {
   fixHomePageOrder(defaultPreferences, "homePageOrderFullScreen");
 
   // save settings
-  await sharedPreferences.setString(
-      "userSettings", json.encode(appStateSettings));
+  await main_app.sharedPreferences.setString(
+    "userSettings",
+    json.encode(appStateSettings),
+  );
 
   try {
     globalCollapsedFutureID.value = (jsonDecode(
-                sharedPreferences.getString("globalCollapsedFutureID") ?? "{}")
-            as Map<String, dynamic>)
+      main_app.sharedPreferences.getString("globalCollapsedFutureID") ?? "{}",
+    ) as Map<String, dynamic>)
         .map((key, value) {
       return MapEntry(key, value is bool ? value : false);
     });
   } catch (e) {
-    print("There was an error restoring globalCollapsedFutureID preference: " +
-        e.toString());
+    print(
+      "There was an error restoring globalCollapsedFutureID preference: " +
+          e.toString(),
+    );
   }
 
   try {
     loadRecentlyDeletedTransactions();
   } catch (e) {
-    print("There was an error loading recently deleted transactions map: " +
-        e.toString());
+    print(
+      "There was an error loading recently deleted transactions map: " +
+          e.toString(),
+    );
   }
 
   return true;
@@ -161,7 +151,8 @@ Future<bool> initializeSettings() async {
 // setAppStateSettings
 Future<bool> updateSettings(
   String setting,
-  value, {
+  dynamic value, {
+  // value can be of any type
   required bool updateGlobalState,
   List<int> pagesNeedingRefresh = const [],
   bool forceGlobalStateUpdate = false,
@@ -170,25 +161,26 @@ Future<bool> updateSettings(
   bool isChanged = appStateSettings[setting] != value;
 
   appStateSettings[setting] = value;
-  await sharedPreferences.setString(
-      'userSettings', json.encode(appStateSettings));
+  await main_app.sharedPreferences.setString(
+    'userSettings',
+    json.encode(appStateSettings),
+  );
 
   if (updateGlobalState == true) {
-    // Only refresh global state if the value is different
     if (isChanged || forceGlobalStateUpdate) {
-      print("Rebuilt Main Request from: " +
-          setting.toString() +
-          " : " +
-          value.toString());
-      appStateKey.currentState?.refreshAppState();
+      print(
+        "Rebuilt Main Request from: " +
+            setting.toString() +
+            " : " +
+            value.toString(),
+      );
+      main_app.appStateKey.currentState?.refreshAppState();
     }
   } else {
     if (setStateAllPageFrameworks) {
       refreshPageFrameworks();
-      // Since the transactions list page does not use PageFramework!
       transactionsListPageStateKey.currentState?.refreshState();
     }
-    //Refresh any pages listed
     for (int page in pagesNeedingRefresh) {
       print("Pages Rebuilt and Refreshed: " + pagesNeedingRefresh.toString());
       if (page == 0) {
@@ -209,70 +201,80 @@ Future<bool> updateSettings(
 }
 
 Map<String, dynamic> getSettingConstants(Map<String, dynamic> userSettings) {
-  Map<String, dynamic> themeSetting = {
-    "system": ThemeMode.system,
-    "light": ThemeMode.light,
-    "dark": ThemeMode.dark,
-    "black": ThemeMode.dark,
+  final Map<String, flutter_widgets.ThemeMode> themeSetting = {
+    "system": flutter_widgets.ThemeMode.system,
+    "light": flutter_widgets.ThemeMode.light,
+    "dark": flutter_widgets.ThemeMode.dark,
+    "black": flutter_widgets.ThemeMode.dark,
   };
 
   Map<String, dynamic> userSettingsNew = {...userSettings};
-  userSettingsNew["theme"] = themeSetting[userSettings["theme"]];
-  userSettingsNew["accentColor"] =
-      HexColor(userSettings["accentColor"]).withOpacity(1);
+  // Provide a fallback value for theme and accentColor to prevent null errors
+  userSettingsNew["theme"] =
+      themeSetting[userSettings["theme"]] ?? flutter_widgets.ThemeMode.system;
+  userSettingsNew["accentColor"] = HexColor(
+    userSettings["accentColor"]?.toString() ?? '#0084F8', // Default color
+  ).withOpacity(1);
   return userSettingsNew;
 }
 
 Future<Map<String, dynamic>> getUserSettings() async {
   Map<String, dynamic> userPreferencesDefault = await getDefaultPreferences();
 
-  String? userSettings = sharedPreferences.getString('userSettings');
+  String? userSettingsString =
+      main_app.sharedPreferences.getString('userSettings');
+
+  // If no settings are stored, return the default preferences immediately.
+  if (userSettingsString == null) {
+    print("No user settings found, using defaults.");
+    await main_app.sharedPreferences.setString(
+      'userSettings',
+      json.encode(userPreferencesDefault),
+    );
+    return userPreferencesDefault;
+  }
+
   try {
-    if (userSettings == null) {
-      throw ("no settings on file");
-    }
     print("Found user settings on file");
+    Map<String, dynamic> userSettingsJSON = json.decode(userSettingsString);
 
-    Map<String, dynamic> userSettingsJSON = json.decode(userSettings);
-
-    //Set to defaults if a new setting is added, but no entry saved
+    // Ensure all default keys exist in the loaded settings.
     userPreferencesDefault.forEach((key, value) {
-      userSettingsJSON =
-          attemptToMigrateCyclePreferences(userSettingsJSON, key);
-      if (userSettingsJSON[key] == null) {
-        userSettingsJSON[key] = userPreferencesDefault[key];
-      }
+      userSettingsJSON = attemptToMigrateCyclePreferences(
+        userSettingsJSON,
+        key,
+      );
+      userSettingsJSON.putIfAbsent(key, () => value);
     });
     return userSettingsJSON;
   } catch (e) {
-    print("There was an error, settings corrupted: " + e.toString());
-    await sharedPreferences.setString(
-        'userSettings', json.encode(userPreferencesDefault));
+    print("Error parsing settings, reverting to defaults: " + e.toString());
+    await main_app.sharedPreferences.setString(
+      'userSettings',
+      json.encode(userPreferencesDefault),
+    );
     return userPreferencesDefault;
   }
 }
 
-// Returns the name of the language given a key, if key is System will return system translated label
 String languageDisplayFilter(String languageKey) {
   if (languageNamesJSON[languageKey] != null) {
     return languageNamesJSON[languageKey].toString().capitalizeFirstofEach;
   }
-  // if (supportedLanguagesSet.contains(item))
-  //   return supportedLanguagesSet[item];
   if (languageKey == "System") return "system".tr();
   return languageKey;
 }
 
-void openLanguagePicker(BuildContext context) {
+void openLanguagePicker(flutter_widgets.BuildContext context) {
   print(appStateSettings["locale"]);
   openBottomSheet(
     context,
     PopupFramework(
       title: "language".tr(),
-      child: Column(
+      child: flutter_widgets.Column(
         children: [
-          Padding(
-            padding: const EdgeInsetsDirectional.only(bottom: 10),
+          flutter_widgets.Padding(
+            padding: flutter_widgets.EdgeInsetsDirectional.only(bottom: 10),
             child: TranslationsHelp(),
           ),
           RadioItems(
@@ -280,17 +282,16 @@ void openLanguagePicker(BuildContext context) {
               "System",
               for (String localeKey in supportedLocales.keys) localeKey,
             ],
-            initial: appStateSettings["locale"].toString(),
+            initial: appStateSettings["locale"]?.toString() ?? "System",
             displayFilter: languageDisplayFilter,
             onChanged: (value) async {
-              // Need to update this value first because our RootBundleAssetLoaderCustomLocaleLoader
-              // makes use of this value for some languages
               appStateSettings["locale"] = value;
               if (value == "System") {
-                context.resetLocale();
+                await context.resetLocale();
               } else {
-                if (supportedLocales[value] != null)
-                  context.setLocale(supportedLocales[value]!);
+                if (supportedLocales[value] != null) {
+                  await context.setLocale(supportedLocales[value]!);
+                }
               }
               updateSettings(
                 "locale",
@@ -298,9 +299,9 @@ void openLanguagePicker(BuildContext context) {
                 pagesNeedingRefresh: [3],
                 updateGlobalState: false,
               );
-              await Future.delayed(Duration(milliseconds: 50));
+              await Future.delayed(const Duration(milliseconds: 50));
               initializeLocalizedMonthNames();
-              popRoute(context);
+              flutter_widgets.Navigator.of(context).pop();
             },
           ),
         ],
@@ -309,9 +310,9 @@ void openLanguagePicker(BuildContext context) {
   );
 }
 
-Future<void> resetLanguageToSystem(BuildContext context) async {
-  if (appStateSettings["locale"].toString() == "System") return;
-  context.resetLocale();
+Future<void> resetLanguageToSystem(flutter_widgets.BuildContext context) async {
+  if (appStateSettings["locale"]?.toString() == "System") return;
+  await context.resetLocale();
   await updateSettings(
     "locale",
     "System",
@@ -320,13 +321,13 @@ Future<void> resetLanguageToSystem(BuildContext context) async {
   );
 }
 
-// Backup user settings by creating an entry in the db
-Future backupSettings() async {
-  String userSettings = sharedPreferences.getString('userSettings') ?? "";
-  if (userSettings == "") throw ("No settings stored");
-  await database.createOrUpdateSettings(
+Future<void> backupSettings() async {
+  String? userSettings = main_app.sharedPreferences.getString('userSettings');
+  if (userSettings == null) throw ("No settings stored to backup");
+  await db_global.database.createOrUpdateSettings(
     AppSetting(
-      settingsPk: 0,
+      settingsPk:
+          0, // Assuming 0 is the fixed key for the single settings entry
       settingsJSON: userSettings,
       dateUpdated: DateTime.now(),
     ),
@@ -334,7 +335,7 @@ Future backupSettings() async {
   print("Created settings entry in DB");
 }
 
-class TranslationsHelp extends StatelessWidget {
+class TranslationsHelp extends flutter_widgets.StatelessWidget {
   const TranslationsHelp({
     super.key,
     this.showIcon = true,
@@ -342,10 +343,11 @@ class TranslationsHelp extends StatelessWidget {
   });
 
   final bool showIcon;
-  final Color? backgroundColor;
+  final flutter_widgets.Color? backgroundColor;
 
   @override
-  Widget build(BuildContext context) {
+  @override
+  flutter_widgets.Widget build(flutter_widgets.BuildContext context) {
     return Tappable(
       onTap: () {
         openUrl('mailto:dapperappdeveloper@gmail.com');
@@ -354,50 +356,62 @@ class TranslationsHelp extends StatelessWidget {
         copyToClipboard("dapperappdeveloper@gmail.com");
       },
       color: backgroundColor ??
-          Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.7),
+          flutter_widgets.Theme.of(context)
+              .colorScheme
+              .secondaryContainer
+              .withOpacity(0.7),
       borderRadius: getPlatform() == PlatformOS.isIOS ? 10 : 15,
-      child: Padding(
-        padding:
-            const EdgeInsetsDirectional.symmetric(horizontal: 15, vertical: 12),
-        child: Row(
+      child: flutter_widgets.Padding(
+        padding: const flutter_widgets.EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 12,
+        ),
+        child: flutter_widgets.Row(
           children: [
             if (showIcon)
-              Padding(
-                padding: const EdgeInsetsDirectional.only(end: 12),
-                child: Icon(
-                  appStateSettings["outlinedIcons"]
-                      ? Icons.connect_without_contact_outlined
-                      : Icons.connect_without_contact_rounded,
-                  color: Theme.of(context).colorScheme.secondary,
+              flutter_widgets.Padding(
+                padding: const flutter_widgets.EdgeInsets.only(right: 12),
+                child: flutter_widgets.Icon(
+                  (appStateSettings["outlinedIcons"] ?? false)
+                      ? flutter_widgets.Icons.connect_without_contact_outlined
+                      : flutter_widgets.Icons.connect_without_contact_rounded,
+                  color:
+                      flutter_widgets.Theme.of(context).colorScheme.secondary,
                   size: 31,
                 ),
               ),
-            Expanded(
+            flutter_widgets.Expanded(
               child: TextFont(
-                text: "",
+                text: "", // Rich text is used instead
                 textColor: getColor(context, "black"),
-                textAlign:
-                    showIcon == true ? TextAlign.start : TextAlign.center,
+                textAlign: showIcon
+                    ? flutter_widgets.TextAlign.start
+                    : flutter_widgets.TextAlign.center,
                 richTextSpan: [
-                  TextSpan(
+                  flutter_widgets.TextSpan(
                     text: "translations-help".tr() + " ",
-                    style: TextStyle(
+                    style: flutter_widgets.TextStyle(
                       color: getColor(context, "black"),
-                      fontFamily: appStateSettings["font"],
-                      fontFamilyFallback: ['Inter'],
+                      fontFamily: appStateSettings["font"]?.toString(),
+                      fontFamilyFallback: const ['Inter'],
                     ),
                   ),
-                  TextSpan(
+                  flutter_widgets.TextSpan(
                     text: 'dapperappdeveloper@gmail.com',
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      decorationStyle: TextDecorationStyle.solid,
-                      decorationColor:
-                          getColor(context, "unPaidOverdue").withOpacity(0.8),
-                      color:
-                          getColor(context, "unPaidOverdue").withOpacity(0.8),
-                      fontFamily: appStateSettings["font"],
-                      fontFamilyFallback: ['Inter'],
+                    style: flutter_widgets.TextStyle(
+                      decoration: flutter_widgets.TextDecoration.underline,
+                      decorationStyle:
+                          flutter_widgets.TextDecorationStyle.solid,
+                      decorationColor: getColor(
+                        context,
+                        "unPaidOverdue",
+                      ).withOpacity(0.8),
+                      color: getColor(
+                        context,
+                        "unPaidOverdue",
+                      ).withOpacity(0.8),
+                      fontFamily: appStateSettings["font"]?.toString(),
+                      fontFamilyFallback: const ['Inter'],
                     ),
                   ),
                 ],
@@ -410,4 +424,21 @@ class TranslationsHelp extends StatelessWidget {
       ),
     );
   }
+}
+
+// Placeholder for a function that needs to be updated for null safety
+void attemptToMigrateCustomNumberFormattingSettings() {
+  // Implement migration logic here if needed
+}
+
+// Placeholder for a function that needs to be updated for null safety
+Future<void> attemptToMigrateSetLongTermLoansAmountTo0() async {
+  // Implement migration logic here if needed
+}
+
+// Placeholder for a function that needs to be updated for null safety
+Map<String, dynamic> attemptToMigrateCyclePreferences(
+    Map<String, dynamic> userSettingsJSON, String key) {
+  // Implement migration logic here if needed
+  return userSettingsJSON;
 }

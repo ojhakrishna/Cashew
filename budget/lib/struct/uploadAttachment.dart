@@ -1,105 +1,117 @@
 import 'dart:io';
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:budget/struct/settings.dart';
-import 'package:budget/widgets/accountAndBackup.dart';
+import 'package:budget/widgets/accountAndBackup.dart'
+    show googleUser, signInGoogle, signOutGoogle, GoogleAuthClient;
 import 'package:budget/widgets/globalSnackbar.dart';
 import 'package:budget/widgets/openPopup.dart';
 import 'package:budget/widgets/openSnackbar.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'dart:async';
-import 'package:image_picker/image_picker.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
 
 Future<String?> getPhotoAndUpload({required ImageSource source}) async {
-  dynamic result = await openLoadingPopupTryCatch(() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? photo = await picker.pickImage(source: source);
-    if (photo == null) {
-      if (source == ImageSource.camera) throw ("no-photo-taken".tr());
-      if (source == ImageSource.gallery) throw ("no-file-selected".tr());
-      throw ("error-getting-photo");
-    }
+  dynamic result = await openLoadingPopupTryCatch(
+    () async {
+      final ImagePicker picker = ImagePicker();
+      final XFile? photo = await picker.pickImage(source: source);
+      if (photo == null) {
+        if (source == ImageSource.camera) throw ("no-photo-taken".tr());
+        if (source == ImageSource.gallery) throw ("no-file-selected".tr());
+        throw ("error-getting-photo".tr());
+      }
 
-    var fileBytes;
-    late Stream<List<int>> mediaStream;
-    fileBytes = await photo.readAsBytes();
-    mediaStream = Stream.value(List<int>.from(fileBytes));
+      final Uint8List fileBytes = await photo.readAsBytes();
+      final Stream<List<int>> mediaStream = photo.openRead();
 
-    try {
-      return await uploadFileToDrive(
-          fileBytes: fileBytes, fileName: photo.name, mediaStream: mediaStream);
-    } catch (e) {
-      print(
-          "Error uploading file, trying again and requesting new permissions " +
-              e.toString());
-      await signOutGoogle();
-      await signInGoogle(drivePermissionsAttachments: true);
-      return await uploadFileToDrive(
-          fileBytes: fileBytes, fileName: photo.name, mediaStream: mediaStream);
-    }
-  }, onError: (e) {
-    openSnackbar(
-      SnackbarMessage(
-        title: "error-attaching-file".tr(),
-        description: e.toString(),
-        icon: appStateSettings["outlinedIcons"]
-            ? Icons.error_outlined
-            : Icons.error_rounded,
-      ),
-    );
-  });
+      try {
+        return await uploadFileToDrive(
+          fileBytes: fileBytes,
+          fileName: photo.name,
+          mediaStream: mediaStream,
+        );
+      } catch (e) {
+        print(
+          "Error uploading file, trying again and requesting new permissions: $e",
+        );
+        await signOutGoogle();
+        await signInGoogle(drivePermissionsAttachments: true);
+        return await uploadFileToDrive(
+          fileBytes: fileBytes,
+          fileName: photo.name,
+          mediaStream: mediaStream,
+        );
+      }
+    },
+    onError: (e) {
+      openSnackbar(
+        SnackbarMessage(
+          title: "error-attaching-file".tr(),
+          description: e.toString(),
+          icon: (appStateSettings["outlinedIcons"] ?? false)
+              ? Icons.error_outlined
+              : Icons.error_rounded,
+        ),
+      );
+    },
+  );
   if (result is String) return result;
   return null;
 }
 
 Future<String?> getFileAndUpload() async {
-  dynamic result = await openLoadingPopupTryCatch(() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result == null) throw ("no-file-selected".tr());
+  dynamic result = await openLoadingPopupTryCatch(
+    () async {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result == null || result.files.single.path == null) {
+        throw ("no-file-selected".tr());
+      }
 
-    Uint8List fileBytes;
+      final file = result.files.single;
+      final Uint8List fileBytes;
 
-    if (kIsWeb) {
-      fileBytes = result.files.single.bytes!;
-    } else {
-      File file = File(result.files.single.path ?? "");
-      fileBytes = await file.readAsBytes();
-    }
+      if (kIsWeb) {
+        fileBytes = file.bytes!;
+      } else {
+        fileBytes = await File(file.path!).readAsBytes();
+      }
 
-    late Stream<List<int>> mediaStream;
-    mediaStream = Stream.value(fileBytes);
+      final Stream<List<int>> mediaStream = Stream.value(fileBytes);
 
-    try {
-      return await uploadFileToDrive(
-        fileBytes: fileBytes,
-        fileName: result.files.single.name,
-        mediaStream: mediaStream,
+      try {
+        return await uploadFileToDrive(
+          fileBytes: fileBytes,
+          fileName: file.name,
+          mediaStream: mediaStream,
+        );
+      } catch (e) {
+        print(
+          "Error uploading file, trying again and requesting new permissions: $e",
+        );
+        await signOutGoogle();
+        await signInGoogle(drivePermissionsAttachments: true);
+        return await uploadFileToDrive(
+          fileBytes: fileBytes,
+          fileName: file.name,
+          mediaStream: mediaStream,
+        );
+      }
+    },
+    onError: (e) {
+      openSnackbar(
+        SnackbarMessage(
+          title: "error-attaching-file".tr(),
+          description: e.toString(),
+          icon: (appStateSettings["outlinedIcons"] ?? false)
+              ? Icons.error_outlined
+              : Icons.error_rounded,
+        ),
       );
-    } catch (e) {
-      print(
-          "Error uploading file, trying again and requesting new permissions " +
-              e.toString());
-      await signOutGoogle();
-      await signInGoogle(drivePermissionsAttachments: true);
-      return await uploadFileToDrive(
-        fileBytes: fileBytes,
-        fileName: result.files.single.name,
-        mediaStream: mediaStream,
-      );
-    }
-  }, onError: (e) {
-    openSnackbar(
-      SnackbarMessage(
-        title: "error-attaching-file".tr(),
-        description: e.toString(),
-        icon: appStateSettings["outlinedIcons"]
-            ? Icons.error_outlined
-            : Icons.error_rounded,
-      ),
-    );
-  });
+    },
+  );
   if (result is String) return result;
   return null;
 }
@@ -111,57 +123,52 @@ Future<String?> uploadFileToDrive({
 }) async {
   if (googleUser == null) {
     await signInGoogle(drivePermissionsAttachments: true);
+    if (googleUser == null) {
+      throw ("google-sign-in-required".tr());
+    }
   }
 
   final authHeaders = await googleUser!.authHeaders;
   final authenticateClient = GoogleAuthClient(authHeaders);
   final driveApi = drive.DriveApi(authenticateClient);
 
-  String folderName = "Cashew";
-  drive.FileList list = await driveApi.files.list(
-      q: "mimeType='application/vnd.google-apps.folder' and name='$folderName'");
+  const String folderName = "Cashew";
   String? folderId;
-  for (var file in list.files!) {
-    if (file.name == folderName) {
-      folderId = file.id;
-      break;
-    }
+
+  final fileList = await driveApi.files.list(
+    q: "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed = false",
+    $fields: "files(id, name)",
+  );
+
+  if (fileList.files != null && fileList.files!.isNotEmpty) {
+    folderId = fileList.files!.first.id;
   }
 
   if (folderId == null) {
-    // If the folder doesn't exist, create it
-    drive.File folder = drive.File();
-    folder.name = folderName;
-    folder.mimeType = "application/vnd.google-apps.folder";
-    drive.File createdFolder = await driveApi.files.create(folder);
+    final folder = drive.File()
+      ..name = folderName
+      ..mimeType = "application/vnd.google-apps.folder";
+    final createdFolder = await driveApi.files.create(folder);
     folderId = createdFolder.id;
   }
 
-  if (folderId == null) throw ("Folder could not be created in Google Drive");
+  if (folderId == null) {
+    throw ("could-not-create-drive-folder".tr());
+  }
 
-  drive.Media media = new drive.Media(mediaStream, fileBytes.length);
+  final media = drive.Media(mediaStream, fileBytes.length);
+  final timestamp = DateFormat("yyyy-MM-dd-HHmmss").format(DateTime.now());
 
-  drive.File driveFile = new drive.File();
-  String timestamp = DateFormat("yyyy-MM-dd-hhmmss").format(DateTime.now());
-  driveFile.name = timestamp + fileName;
-  driveFile.modifiedTime = DateTime.now().toUtc();
-  driveFile.parents = [folderId];
+  final driveFile = drive.File()
+    ..name = '$timestamp-$fileName'
+    ..modifiedTime = DateTime.now().toUtc()
+    ..parents = [folderId];
 
-  drive.File driveFileCreated =
-      await driveApi.files.create(driveFile, uploadMedia: media);
+  final createdFile = await driveApi.files.create(
+    driveFile,
+    uploadMedia: media,
+    $fields: "id, webViewLink",
+  );
 
-  // Only if we want attachments to be publicly available
-  // drive.Permission permission = drive.Permission();
-  // permission.role = "reader";
-  // await driveApi.permissions.create(
-  //   permission,
-  //   driveFileCreated.id!,
-  //   sendNotificationEmail: false,
-  // );
-
-  // Retrieve the updated metadata for the file with permissions
-  drive.File fileOnDrive = await driveApi.files.get(driveFileCreated.id!,
-      $fields: "id, name, webViewLink, permissions") as drive.File;
-
-  return fileOnDrive.webViewLink;
+  return createdFile.webViewLink;
 }

@@ -2,18 +2,18 @@ import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addBudgetPage.dart';
-import 'package:budget/pages/editCategoriesPage.dart';
+// import 'package:budget/pages/editCategoriesPage.dart'; // Unused import removed
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
-import 'package:budget/struct/shareBudget.dart';
-import 'package:budget/widgets/animatedExpanded.dart';
+// import 'package:budget/struct/shareBudget.dart'; // Unused import removed
+// import 'package:budget/widgets/animatedExpanded.dart'; // Unused import removed
 import 'package:budget/widgets/button.dart';
 import 'package:budget/widgets/dropdownSelect.dart';
 import 'package:budget/widgets/fab.dart';
 import 'package:budget/widgets/fadeIn.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/globalSnackbar.dart';
-import 'package:budget/widgets/navigationFramework.dart';
+// import 'package:budget/widgets/navigationFramework.dart'; // Unused import removed
 import 'package:budget/widgets/noResults.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
 import 'package:budget/widgets/openPopup.dart';
@@ -62,9 +62,7 @@ bool hideIfSearching(String? searchTerm, bool isFocused, BuildContext context) {
 }
 
 class EditBudgetPage extends StatefulWidget {
-  EditBudgetPage({
-    Key? key,
-  }) : super(key: key);
+  EditBudgetPage({Key? key}) : super(key: key);
 
   @override
   _EditBudgetPageState createState() => _EditBudgetPageState();
@@ -181,13 +179,12 @@ class _EditBudgetPageState extends State<EditBudgetPage> {
           // ),
           StreamBuilder<List<Budget>>(
             stream: database.watchAllBudgets(
-                searchFor: searchValue == "" ? null : searchValue),
+              searchFor: searchValue == "" ? null : searchValue,
+            ),
             builder: (context, snapshot) {
               if (snapshot.hasData && (snapshot.data ?? []).length <= 0) {
                 return SliverToBoxAdapter(
-                  child: NoResults(
-                    message: "no-budgets-found".tr(),
-                  ),
+                  child: NoResults(message: "no-budgets-found".tr()),
                 );
               }
               if (snapshot.hasData && (snapshot.data ?? []).length > 0) {
@@ -207,15 +204,19 @@ class _EditBudgetPageState extends State<EditBudgetPage> {
                   },
                   itemBuilder: (context, index) {
                     Budget budget = snapshot.data![index];
-                    DateTimeRange budgetRange =
-                        getBudgetDate(budget, DateTime.now());
+                    DateTimeRange budgetRange = getBudgetDate(
+                      budget,
+                      DateTime.now(),
+                    );
                     Color accentColor = dynamicPastel(
-                        context,
-                        HexColor(budget.colour,
-                            defaultColor:
-                                Theme.of(context).colorScheme.primary),
-                        amountLight: 0.55,
-                        amountDark: 0.35);
+                      context,
+                      HexColor(
+                        budget.colour,
+                        defaultColor: Theme.of(context).colorScheme.primary,
+                      ),
+                      amountLight: 0.55,
+                      amountDark: 0.35,
+                    );
                     return Stack(
                       key: ValueKey(index),
                       children: [
@@ -267,12 +268,12 @@ class _EditBudgetPageState extends State<EditBudgetPage> {
                                 children: [
                                   TextFont(
                                     text: convertToMoney(
-                                        Provider.of<AllWallets>(context),
-                                        budget.amount,
-                                        currencyKey:
-                                            Provider.of<AllWallets>(context)
-                                                .indexedByPk[budget.walletFk]
-                                                ?.currency),
+                                      Provider.of<AllWallets>(context),
+                                      budget.amount,
+                                      currencyKey: Provider.of<AllWallets>(
+                                        context,
+                                      ).indexedByPk[budget.walletFk]?.currency,
+                                    ),
                                     fontWeight: FontWeight.bold,
                                     fontSize: 18,
                                   ),
@@ -327,7 +328,8 @@ class _EditBudgetPageState extends State<EditBudgetPage> {
                                   : FutureBuilder<int?>(
                                       future: database
                                           .getTotalCountOfTransactionsInBudget(
-                                              budget.budgetPk),
+                                        budget.budgetPk,
+                                      ),
                                       builder: (context, snapshot) {
                                         if (snapshot.hasData &&
                                             snapshot.data != null) {
@@ -343,9 +345,10 @@ class _EditBudgetPageState extends State<EditBudgetPage> {
                                                         .tr()
                                                         .toLowerCase()),
                                             fontSize: 14,
-                                            textColor:
-                                                getColor(context, "black")
-                                                    .withOpacity(0.65),
+                                            textColor: getColor(
+                                              context,
+                                              "black",
+                                            ).withOpacity(0.65),
                                           );
                                         } else {
                                           return TextFont(
@@ -353,9 +356,10 @@ class _EditBudgetPageState extends State<EditBudgetPage> {
                                             text:
                                                 "/" + " " + "transactions".tr(),
                                             fontSize: 14,
-                                            textColor:
-                                                getColor(context, "black")
-                                                    .withOpacity(0.65),
+                                            textColor: getColor(
+                                              context,
+                                              "black",
+                                            ).withOpacity(0.65),
                                           );
                                         }
                                       },
@@ -408,7 +412,9 @@ class _EditBudgetPageState extends State<EditBudgetPage> {
                         budget.sharedKey != null
                             ? Padding(
                                 padding: const EdgeInsetsDirectional.only(
-                                    top: 15, end: 20),
+                                  top: 15,
+                                  end: 20,
+                                ),
                                 child: Align(
                                   alignment: AlignmentDirectional.topEnd,
                                   child: Icon(
@@ -417,12 +423,15 @@ class _EditBudgetPageState extends State<EditBudgetPage> {
                                         : Icons.people_alt_rounded,
                                     size: 18,
                                     color: budget.colour == null
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .secondary
+                                        ? Theme.of(
+                                            context,
+                                          ).colorScheme.secondary
                                         : dynamicPastel(
-                                            context, HexColor(budget.colour),
-                                            inverse: true, amount: 0.5),
+                                            context,
+                                            HexColor(budget.colour),
+                                            inverse: true,
+                                            amount: 0.5,
+                                          ),
                                   ),
                                 ),
                               )
@@ -439,23 +448,25 @@ class _EditBudgetPageState extends State<EditBudgetPage> {
 
                     if (_intNew > _intPrevious) {
                       await database.moveBudget(
-                          oldBudget.budgetPk, _intNew - 1, oldBudget.order);
+                        oldBudget.budgetPk,
+                        _intNew - 1,
+                        oldBudget.order,
+                      );
                     } else {
                       await database.moveBudget(
-                          oldBudget.budgetPk, _intNew, oldBudget.order);
+                        oldBudget.budgetPk,
+                        _intNew,
+                        oldBudget.order,
+                      );
                     }
                     return true;
                   },
                 );
               }
-              return SliverToBoxAdapter(
-                child: Container(),
-              );
+              return SliverToBoxAdapter(child: Container());
             },
           ),
-          SliverToBoxAdapter(
-            child: SizedBox(height: 75),
-          ),
+          SliverToBoxAdapter(child: SizedBox(height: 75)),
         ],
       ),
     );
@@ -477,8 +488,9 @@ Future<DeletePopupAction?> deleteBudgetPopup(
     if (budget.sharedKey != null) {
       result = await deleteSharedBudgetPopup(context, budget);
     } else if (budget.addedTransactionsOnly) {
-      int? numTransactions =
-          await database.getTotalCountOfTransactionsInBudget(budget.budgetPk);
+      int? numTransactions = await database.getTotalCountOfTransactionsInBudget(
+        budget.budgetPk,
+      );
       if (numTransactions != null && numTransactions > 0) {
         result = await openPopup(
           context,
@@ -560,8 +572,10 @@ Future<dynamic> deleteSharedBudgetPopup(context, Budget budget) {
 }
 
 // either "none", null, or a Budget type
-Future<dynamic> selectAddableBudgetPopup(BuildContext context,
-    {String? removeWalletPk}) async {
+Future<dynamic> selectAddableBudgetPopup(
+  BuildContext context, {
+  String? removeWalletPk,
+}) async {
   dynamic budget = await openBottomSheet(
     context,
     PopupFramework(
@@ -630,11 +644,12 @@ Future<dynamic> selectAddableBudgetPopup(BuildContext context,
 }
 
 class NoResultsCreate extends StatelessWidget {
-  const NoResultsCreate(
-      {required this.message,
-      required this.buttonLabel,
-      required this.route,
-      super.key});
+  const NoResultsCreate({
+    required this.message,
+    required this.buttonLabel,
+    required this.route,
+    super.key,
+  });
   final String message;
   final String buttonLabel;
   final Widget route;
@@ -665,10 +680,7 @@ class NoResultsCreate extends StatelessWidget {
           child: Button(
             label: buttonLabel.tr(),
             onTap: () {
-              pushRoute(
-                context,
-                route,
-              );
+              pushRoute(context, route);
             },
           ),
         ),
@@ -734,11 +746,18 @@ class _TotalSpentToggleState extends State<TotalSpentToggle> {
               onChanged: (option) async {
                 bool result = option == "total-spent";
                 if (widget.isForGoalTotal) {
-                  await updateSettings(appSettingKey, result,
-                      updateGlobalState: true);
+                  await updateSettings(
+                    appSettingKey,
+                    result,
+                    updateGlobalState: true,
+                  );
                 } else {
-                  await updateSettings(appSettingKey, result,
-                      pagesNeedingRefresh: [0, 2], updateGlobalState: false);
+                  await updateSettings(
+                    appSettingKey,
+                    result,
+                    pagesNeedingRefresh: [0, 2],
+                    updateGlobalState: false,
+                  );
                 }
 
                 // Read the new settings value by setting state

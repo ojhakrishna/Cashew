@@ -15,11 +15,9 @@ import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntryTypeButton.dart';
 import 'package:budget/widgets/transactionEntry/transactionLabel.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:budget/colors.dart';
 import 'package:budget/widgets/openBottomSheet.dart';
@@ -39,10 +37,7 @@ int maxSelectableTransactionsListedOnPage = 1000;
 Map<String, List<String>> globalTransactionsListedOnPageID = {};
 
 class RecentlyAddedTransactionInfo {
-  RecentlyAddedTransactionInfo(
-    this.transactionPk,
-    this.shouldAnimate,
-  );
+  RecentlyAddedTransactionInfo(this.transactionPk, this.shouldAnimate);
 
   String? transactionPk;
   bool shouldAnimate = false;
@@ -62,7 +57,8 @@ class RecentlyAddedTransactionInfo {
 
 ValueNotifier<RecentlyAddedTransactionInfo> recentlyAddedTransactionInfo =
     ValueNotifier<RecentlyAddedTransactionInfo>(
-        RecentlyAddedTransactionInfo(null, false));
+  RecentlyAddedTransactionInfo(null, false),
+);
 
 class TransactionEntryHitBox extends RenderProxyBox {
   String? transactionKey;
@@ -72,9 +68,11 @@ class TransactionEntryHitBox extends RenderProxyBox {
 class TransactionEntryBox extends SingleChildRenderObjectWidget {
   final String transactionKey;
 
-  TransactionEntryBox(
-      {required Widget child, required this.transactionKey, Key? key})
-      : super(child: child, key: key);
+  TransactionEntryBox({
+    required Widget child,
+    required this.transactionKey,
+    Key? key,
+  }) : super(child: child, key: key);
 
   @override
   TransactionEntryHitBox createRenderObject(BuildContext context) {
@@ -83,7 +81,9 @@ class TransactionEntryBox extends SingleChildRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext context, TransactionEntryHitBox renderObject) {
+    BuildContext context,
+    TransactionEntryHitBox renderObject,
+  ) {
     renderObject..transactionKey = transactionKey;
   }
 }
@@ -141,7 +141,10 @@ class TransactionEntry extends StatelessWidget {
   final double fabSize = 50;
 
   void selectTransaction(
-      Transaction transaction, bool selected, bool isSwiping) {
+    Transaction transaction,
+    bool selected,
+    bool isSwiping,
+  ) {
     if (allowSelect == false) return;
     if (!selected) {
       globalSelectedID.value[listID ?? "0"]!.add(transaction.transactionPk);
@@ -272,15 +275,17 @@ class TransactionEntry extends StatelessWidget {
 
     // getColor(context, "unPaidUpcoming");
     Color iconColor = dynamicPastel(
-        context, Theme.of(context).colorScheme.primary,
-        amount: 0.3);
+      context,
+      Theme.of(context).colorScheme.primary,
+      amount: 0.3,
+    );
 
-    String? walletCurrency = Provider.of<AllWallets>(context)
-        .indexedByPk[appStateSettings["selectedWalletPk"]]
-        ?.currency;
-    String? transactionCurrency = Provider.of<AllWallets>(context)
-        .indexedByPk[transaction.walletFk]
-        ?.currency;
+    String? walletCurrency = Provider.of<AllWallets>(
+      context,
+    ).indexedByPk[appStateSettings["selectedWalletPk"]]?.currency;
+    String? transactionCurrency = Provider.of<AllWallets>(
+      context,
+    ).indexedByPk[transaction.walletFk]?.currency;
     // is the currency a customCurrency or does it actually exist in our table
     // and a custom exchange rate has not been set
     bool showOtherCurrency =
@@ -292,10 +297,11 @@ class TransactionEntry extends StatelessWidget {
             appStateSettings["customCurrencyAmounts"][transactionCurrency] ==
                 null);
 
-    Widget transactionContents(
-        {required VoidCallback openContainer,
-        required bool selected,
-        required bool? areTransactionsBeingSelected}) {
+    Widget transactionContents({
+      required VoidCallback openContainer,
+      required bool selected,
+      required bool? areTransactionsBeingSelected,
+    }) {
       Widget transactionSelectionCheck = enableSelectionCheckmark
           ? TransactionSelectionCheck(
               areTransactionsBeingSelected: areTransactionsBeingSelected,
@@ -337,15 +343,16 @@ class TransactionEntry extends StatelessWidget {
               : actionButton,
         );
         return Stack(
-            clipBehavior: Clip.none,
-            alignment: AlignmentDirectional.bottomStart,
-            children: [
-              actionButton,
-              PositionedDirectional(
-                bottom: -2,
-                start: -2,
-                child: IgnorePointer(
-                  child: Builder(builder: (context) {
+          clipBehavior: Clip.none,
+          alignment: AlignmentDirectional.bottomStart,
+          children: [
+            actionButton,
+            PositionedDirectional(
+              bottom: -2,
+              start: -2,
+              child: IgnorePointer(
+                child: Builder(
+                  builder: (context) {
                     int? numberRepeats =
                         transaction.createdAnotherFutureTransaction == true
                             ? null
@@ -356,25 +363,32 @@ class TransactionEntry extends StatelessWidget {
                                 dateCreated: transaction.dateCreated,
                                 endDate: transaction.endDate,
                               );
-                    if (numberRepeats == null) return SizedBox.shrink();
                     return Container(
                       transform: Matrix4.translationValues(
-                          (padding.start - padding.end) / 2, 0, 0),
+                        (padding.start - padding.end) / 2,
+                        0,
+                        0,
+                      ),
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          color: Theme.of(context).colorScheme.secondary),
+                        borderRadius: BorderRadius.circular(100),
+                        color: Theme.of(context).colorScheme.secondary,
+                      ),
                       padding: EdgeInsetsDirectional.symmetric(
-                          vertical: 2, horizontal: 4),
+                        vertical: 2,
+                        horizontal: 4,
+                      ),
                       child: TextFont(
                         textColor: Theme.of(context).colorScheme.onSecondary,
                         text: " ×" + numberRepeats.toString() + " ",
                         fontSize: 10,
                       ),
                     );
-                  }),
+                  },
                 ),
               ),
-            ]);
+            ),
+          ],
+        );
       }
 
       double fontSize = getIsFullScreen(context) == false ? 15.5 : 16.5;
@@ -466,7 +480,10 @@ class TransactionEntry extends StatelessWidget {
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsetsDirectional.only(
-                                        start: 3, bottom: 2, top: 2),
+                                      start: 3,
+                                      bottom: 2,
+                                      top: 2,
+                                    ),
                                     child: Container(
                                       child: Column(
                                         mainAxisAlignment:
@@ -483,9 +500,7 @@ class TransactionEntry extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 7,
-                                ),
+                                SizedBox(width: 7),
                                 if (getIsFullScreen(context))
                                   transactionActionLabelButton,
                                 amount,
@@ -493,8 +508,9 @@ class TransactionEntry extends StatelessWidget {
                             ),
                           ),
                           Padding(
-                            padding:
-                                const EdgeInsetsDirectional.only(start: 5 + 3),
+                            padding: const EdgeInsetsDirectional.only(
+                              start: 5 + 3,
+                            ),
                             child: Column(
                               children: [
                                 if (showNote)
@@ -504,7 +520,9 @@ class TransactionEntry extends StatelessWidget {
                                         child: Padding(
                                           padding:
                                               const EdgeInsetsDirectional.only(
-                                                  bottom: 4, top: 3),
+                                            bottom: 4,
+                                            top: 3,
+                                          ),
                                           child: note,
                                         ),
                                       ),
@@ -513,11 +531,11 @@ class TransactionEntry extends StatelessWidget {
                                 tags,
                               ],
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             )
@@ -552,9 +570,7 @@ class TransactionEntry extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: 7,
-                  ),
+                  SizedBox(width: 7),
                   if (getIsFullScreen(context)) transactionActionLabelButton,
                   noteIcon,
                   amount,
@@ -580,8 +596,11 @@ class TransactionEntry extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsetsDirectional.symmetric(
-          horizontal: getHorizontalPaddingConstrained(context,
-              enabled: useHorizontalPaddingConstrained)),
+        horizontal: getHorizontalPaddingConstrained(
+          context,
+          enabled: useHorizontalPaddingConstrained,
+        ),
+      ),
       child: TransactionEntryBox(
         transactionKey: transaction.transactionPk,
         child: CollapseFutureTransactions(
@@ -590,43 +609,49 @@ class TransactionEntry extends StatelessWidget {
           listID: listID,
           child: ValueListenableBuilder(
             valueListenable: enableSelectionCheckmark
-                ? globalSelectedID.select((controller) =>
-                    (controller.value[listID ?? "0"] ?? []).length)
+                ? globalSelectedID.select(
+                    (controller) =>
+                        (controller.value[listID ?? "0"] ?? []).length,
+                  )
                 : globalSelectedID.select(
                     (controller) =>
                         (transactionBefore != null &&
-                                controller.value[listID ?? "0"]!
-                                    .contains(transactionBefore?.transactionPk))
+                                controller.value[listID ?? "0"]!.contains(
+                                  transactionBefore?.transactionPk,
+                                ))
                             .toString() +
-                        (controller.value[listID ?? "0"]!
-                                .contains(transaction.transactionPk))
-                            .toString() +
+                        (controller.value[listID ?? "0"]!.contains(
+                          transaction.transactionPk,
+                        )).toString() +
                         (transactionAfter != null &&
-                                controller.value[listID ?? "0"]!
-                                    .contains(transactionAfter?.transactionPk))
+                                controller.value[listID ?? "0"]!.contains(
+                                  transactionAfter?.transactionPk,
+                                ))
                             .toString(),
                   ),
             builder: (context, _, __) {
               bool? areTransactionsBeingSelected =
                   globalSelectedID.value[listID ?? "0"]?.isNotEmpty;
-              bool selected = globalSelectedID.value[listID ?? "0"]!
-                  .contains(transaction.transactionPk);
+              bool selected = globalSelectedID.value[listID ?? "0"]!.contains(
+                transaction.transactionPk,
+              );
               bool isTransactionBeforeSelected = transactionBefore != null &&
-                  globalSelectedID.value[listID ?? "0"]!
-                      .contains(transactionBefore?.transactionPk);
+                  globalSelectedID.value[listID ?? "0"]!.contains(
+                    transactionBefore?.transactionPk,
+                  );
               bool isTransactionAfterSelected = transactionAfter != null &&
-                  globalSelectedID.value[listID ?? "0"]!
-                      .contains(transactionAfter?.transactionPk);
+                  globalSelectedID.value[listID ?? "0"]!.contains(
+                    transactionAfter?.transactionPk,
+                  );
               double borderRadius = getPlatform() == PlatformOS.isIOS ? 7 : 12;
               return ValueListenableBuilder(
                 valueListenable: recentlyAddedTransactionInfo,
                 builder: (context, _, __) {
                   Color selectedColor = appStateSettings["materialYou"]
                       ? categoryTintColor == null
-                          ? Theme.of(context)
-                              .colorScheme
-                              .secondaryContainer
-                              .withOpacity(0.8)
+                          ? Theme.of(
+                              context,
+                            ).colorScheme.secondaryContainer.withOpacity(0.8)
                           : categoryTintColor!.withOpacity(0.2)
                       : getColor(context, "black").withOpacity(0.1);
                   bool checkVisibilityForAnimation =
@@ -644,7 +669,9 @@ class TransactionEntry extends StatelessWidget {
                         (enableSelectionCheckmark
                             ? const EdgeInsetsDirectional.only(start: 5, end: 5)
                             : const EdgeInsetsDirectional.only(
-                                start: 13, end: 13)),
+                                start: 13,
+                                end: 13,
+                              )),
                     child: OpenContainerNavigation(
                       borderRadius: 0,
                       customBorderRadius: BorderRadiusDirectional.vertical(
@@ -656,7 +683,7 @@ class TransactionEntry extends StatelessWidget {
                         ),
                       ),
                       closedColor: containerColor == null
-                          ? Theme.of(context).colorScheme.background
+                          ? Theme.of(context).colorScheme.surface
                           : containerColor,
                       button: (openContainer) {
                         return FlashingContainer(
@@ -781,8 +808,9 @@ class CollapseFutureTransactions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: globalCollapsedFutureID
-          .select((controller) => controller.value[listID ?? "0"]),
+      valueListenable: globalCollapsedFutureID.select(
+        (controller) => controller.value[listID ?? "0"],
+      ),
       builder: (context, _, __) {
         bool isTransactionsCollapsed =
             (globalCollapsedFutureID.value[listID ?? "0"] ?? false) &&
@@ -804,7 +832,9 @@ void toggleFutureTransactionsSection(String? listID) {
       !(globalCollapsedFutureID.value[listID ?? "0"] ?? false);
   globalCollapsedFutureID.notifyListeners();
   sharedPreferences.setString(
-      "globalCollapsedFutureID", jsonEncode(globalCollapsedFutureID.value));
+    "globalCollapsedFutureID",
+    jsonEncode(globalCollapsedFutureID.value),
+  );
 }
 
 void flashTransaction(String transactionPk, {int flashCount = 5}) {
@@ -959,10 +989,9 @@ class TransactionSelectionCheck extends StatelessWidget {
                               border: Border.all(
                                 color: selected
                                     ? Colors.transparent
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .primary
-                                        .withOpacity(0.8),
+                                    : Theme.of(
+                                        context,
+                                      ).colorScheme.primary.withOpacity(0.8),
                                 width: 2,
                               ),
                             ),

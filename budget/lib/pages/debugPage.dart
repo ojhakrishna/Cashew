@@ -1,10 +1,10 @@
 import 'package:budget/colors.dart';
 import 'package:budget/database/tables.dart';
 import 'package:budget/functions.dart';
-import 'package:budget/main.dart';
+import 'package:budget/main.dart' as main_app;
 import 'package:budget/pages/aboutPage.dart';
 import 'package:budget/pages/addTransactionPage.dart';
-import 'package:budget/struct/databaseGlobal.dart';
+import 'package:budget/struct/databaseGlobal.dart' as db_global;
 import 'package:budget/struct/logging.dart';
 import 'package:budget/struct/settings.dart';
 import 'package:budget/widgets/button.dart';
@@ -522,7 +522,8 @@ class DebugPage extends StatelessWidget {
               Button(
                 label: "Redo migration (from db 37 above)",
                 onTap: () async {
-                  await database.customStatement('PRAGMA user_version = 37');
+                  await db_global.database
+                      .customStatement('PRAGMA user_version = 37');
                   if (kIsWeb) {
                     final html.Storage localStorage = html.window.localStorage;
                     localStorage["moor_db_version_db"] = "37";
@@ -534,7 +535,8 @@ class DebugPage extends StatelessWidget {
               Button(
                 label: "Fix transaction polarity",
                 onTap: () async {
-                  int result = await database.fixTransactionPolarity();
+                  int result =
+                      await db_global.database.fixTransactionPolarity();
                   openSnackbar(
                     SnackbarMessage(
                       title: "Done",
@@ -549,7 +551,7 @@ class DebugPage extends StatelessWidget {
               Button(
                 label: "Capitalize first letter in all transactions",
                 onTap: () async {
-                  int result = await database.capitalizeFirst();
+                  int result = await db_global.database.capitalizeFirst();
                   openSnackbar(
                     SnackbarMessage(
                       title: "Done",
@@ -565,7 +567,7 @@ class DebugPage extends StatelessWidget {
                 label: "Vacuum/Clean DB",
                 onTap: () async {
                   try {
-                    await database.customStatement('VACUUM');
+                    await db_global.database.customStatement('VACUUM');
                     openSnackbar(
                       SnackbarMessage(
                         title: "Done",
@@ -586,8 +588,8 @@ class DebugPage extends StatelessWidget {
               Button(
                   label: "Force full sync",
                   onTap: () async {
-                    sharedPreferences.setString(
-                        "dateOfLastSyncedWithClient", "{}");
+                    main_app.sharedPreferences
+                        .setString("dateOfLastSyncedWithClient", "{}");
                     runAllCloudFunctions(context);
                   }),
               SizedBox(height: 20),
@@ -596,7 +598,7 @@ class DebugPage extends StatelessWidget {
                 label:
                     "Clean database delete logs (WARNING: Make sure you sync with all other devices first!)",
                 onTap: () async {
-                  int result = await database.deleteAllDeleteLogs();
+                  int result = await db_global.database.deleteAllDeleteLogs();
                   openSnackbar(
                     SnackbarMessage(
                       title: "Done",
@@ -616,7 +618,7 @@ class DebugPage extends StatelessWidget {
                         title: "Delete logs",
                         slivers: [
                           StreamBuilder<List<DeleteLog>>(
-                            stream: database.watchAllDeleteLogs(),
+                            stream: db_global.database.watchAllDeleteLogs(),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return SliverPadding(
@@ -693,9 +695,9 @@ class DebugPage extends StatelessWidget {
                   label: "Create random transactions",
                   onTap: () async {
                     List<TransactionCategory> categories =
-                        await database.getAllCategories();
+                        await db_global.database.getAllCategories();
                     for (int i = 0; i < 10; i++) {
-                      await database.createOrUpdateTransaction(
+                      await db_global.database.createOrUpdateTransaction(
                         insert: true,
                         Transaction(
                           transactionPk: "-1",
@@ -798,10 +800,9 @@ class DebugPage extends StatelessWidget {
         ColorBox(
             color: Theme.of(context).colorScheme.onSurface, name: "onSurface"),
         ColorBox(
-            color: Theme.of(context).colorScheme.background,
-            name: "background"),
+            color: Theme.of(context).colorScheme.surface, name: "background"),
         ColorBox(
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
             name: "onBackground"),
         Container(
           margin: EdgeInsetsDirectional.all(10),
@@ -929,7 +930,7 @@ class DangerousDebugFlag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (allowDangerousDebugFlags) {
+    if (main_app.allowDangerousDebugFlags) {
       return Container(
         color: Colors.red.withOpacity(0.3),
         child: child,
