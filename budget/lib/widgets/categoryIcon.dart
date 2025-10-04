@@ -10,7 +10,7 @@ import 'package:budget/widgets/textWidgets.dart';
 import 'package:flutter/material.dart';
 
 class CategoryIcon extends StatelessWidget {
-  CategoryIcon({
+  const CategoryIcon({
     Key? key,
     this.categoryPk,
     required this.size,
@@ -62,7 +62,7 @@ class CategoryIcon extends StatelessWidget {
           alignment: AlignmentDirectional.center,
           children: [
             AnimatedContainer(
-              duration: Duration(milliseconds: 250),
+              duration: const Duration(milliseconds: 250),
               margin: margin ??
                   EdgeInsetsDirectional.only(
                       start: 8, end: 8, top: 8, bottom: label ? 2 : 8),
@@ -118,7 +118,7 @@ class CategoryIcon extends StatelessWidget {
                     ? null
                     : () {
                         if (onLongPress != null) onLongPress!();
-                        if (canEditByLongPress)
+                        if (canEditByLongPress) {
                           pushRoute(
                             context,
                             AddCategoryPage(
@@ -127,6 +127,7 @@ class CategoryIcon extends StatelessWidget {
                                   RoutesToPopAfterDelete.One,
                             ),
                           );
+                        }
                       },
                 borderRadius: borderRadius - 3,
                 child: Center(
@@ -170,12 +171,12 @@ class CategoryIcon extends StatelessWidget {
                     emojiScale: emojiScale,
                     correctionPaddingBottom: correctionEmojiPaddingBottom,
                   )
-                : SizedBox.shrink(),
+                : const SizedBox.shrink(),
           ],
         ),
         label
             ? Container(
-                margin: EdgeInsetsDirectional.only(top: 3),
+                margin: const EdgeInsetsDirectional.only(top: 3),
                 width: 60,
                 child: Center(
                   child: TextFont(
@@ -193,12 +194,12 @@ class CategoryIcon extends StatelessWidget {
     );
     if (enableTooltip == true && category?.name != null) {
       return Tooltip(
-        waitDuration: Duration(milliseconds: 100),
+        waitDuration: const Duration(milliseconds: 100),
         message: category?.name ?? "",
-        child: child,
         // A hover will still trigger the tooltip,
         // but a long press won't since category icons can be long pressed to reorder/edited
         triggerMode: TooltipTriggerMode.manual,
+        child: child,
       );
     } else {
       return child;
@@ -241,7 +242,7 @@ class _CacheCategoryIconState extends State<CacheCategoryIcon> {
   void initState() {
     super.initState();
     image = Image.asset(
-      "assets/categories/" + widget.iconName,
+      "assets/categories/${widget.iconName}",
       width: widget.size,
     );
   }
@@ -252,7 +253,7 @@ class _CacheCategoryIconState extends State<CacheCategoryIcon> {
         widget.size != oldWidget.size) {
       setState(() {
         image = Image.asset(
-          "assets/categories/" + widget.iconName,
+          "assets/categories/${widget.iconName}",
           width: widget.size,
         );
       });
@@ -287,7 +288,7 @@ class EmojiIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
-      data: MediaQueryData(textScaleFactor: 1),
+      data: const MediaQueryData(textScaler: TextScaler.linear(1)),
       child: IgnorePointer(
         child: Padding(
           padding: EdgeInsetsDirectional.only(

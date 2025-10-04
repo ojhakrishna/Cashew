@@ -41,7 +41,7 @@ class _HomePagePieChartState extends State<HomePagePieChart>
 
   @override
   Widget build(BuildContext context) {
-    final PageController _pageController = PageController(
+    final PageController pageController = PageController(
         initialPage: appStateSettings["pieChartTotal"] != "incoming" ? 0 : 1);
     TransactionCategory? selectedCategory;
 
@@ -82,11 +82,11 @@ class _HomePagePieChartState extends State<HomePagePieChart>
                               updateGlobalState: false,
                             );
                           },
-                          animationDuration: Duration(milliseconds: 500),
+                          animationDuration: const Duration(milliseconds: 500),
                           animateFirstPage: true,
                           pageSnapping: true,
                           clipBehavior: Clip.none,
-                          controller: _pageController,
+                          controller: pageController,
                           children: [
                             PieChartHomeAndCategorySummary(
                                 isIncome: false,
@@ -101,7 +101,7 @@ class _HomePagePieChartState extends State<HomePagePieChart>
                           end: 0,
                           bottom: -10,
                           child: PageIndicator(
-                            controller: _pageController,
+                            controller: pageController,
                             itemCount: 2,
                           ),
                         ),
@@ -109,11 +109,11 @@ class _HomePagePieChartState extends State<HomePagePieChart>
                           top: 0,
                           end: 0,
                           child: IncomeOutcomeArrowPageIndicator(
-                            controller: _pageController,
+                            controller: pageController,
                             onTap: (isIncome) {
-                              _pageController.animateToPage(
+                              pageController.animateToPage(
                                 isIncome ? 0 : 1,
-                                duration: Duration(milliseconds: 600),
+                                duration: const Duration(milliseconds: 600),
                                 curve: Curves.easeInOutCubicEmphasized,
                               );
                             },
@@ -124,7 +124,7 @@ class _HomePagePieChartState extends State<HomePagePieChart>
                   );
                 }
                 return Padding(
-                  padding: EdgeInsetsDirectional.only(bottom: 5),
+                  padding: const EdgeInsetsDirectional.only(bottom: 5),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -158,7 +158,8 @@ class IncomeOutcomeArrowPageIndicator extends StatelessWidget {
   final PageController controller;
   final Function(bool isIncome) onTap;
 
-  IncomeOutcomeArrowPageIndicator({
+  const IncomeOutcomeArrowPageIndicator({
+    super.key,
     required this.controller,
     required this.onTap,
   });
@@ -244,10 +245,11 @@ class _PieChartHomeAndCategorySummaryState
     setState(() {
       showAllSubcategories = !showAllSubcategories;
     });
-    Future.delayed(Duration(milliseconds: 10), () {
-      if (expandCategorySelection)
+    Future.delayed(const Duration(milliseconds: 10), () {
+      if (expandCategorySelection) {
         pieChartDisplayStateKey.currentState
             ?.setTouchedCategoryPk(selectedCategory?.categoryPk);
+      }
     });
 
     updateSettings("showAllSubcategories", showAllSubcategories,
@@ -263,8 +265,10 @@ class _PieChartHomeAndCategorySummaryState
             appStateSettings["pieChartAllWallets"] == true) {
           List<String>? walletPks =
               (snapshot.data ?? []).map((item) => item.walletPk).toList();
-          if (walletPks.length <= 0 ||
-              appStateSettings["pieChartAllWallets"] == true) walletPks = null;
+          if (walletPks.isEmpty ||
+              appStateSettings["pieChartAllWallets"] == true) {
+            walletPks = null;
+          }
           return StreamBuilder<List<CategoryWithTotal>>(
             stream:
                 database.watchTotalSpentInEachCategoryInTimeRangeFromCategories(
@@ -306,7 +310,7 @@ class _PieChartHomeAndCategorySummaryState
                     if (selectedCategory?.categoryPk ==
                             category.category.categoryPk ||
                         selectedCategory?.mainCategoryPk ==
-                            category.category.categoryPk)
+                            category.category.categoryPk) {
                       categoryEntries.add(
                         CategoryEntry(
                           percentageOffset: totalSpentPercent,
@@ -383,8 +387,10 @@ class _PieChartHomeAndCategorySummaryState
                           allSelected: true,
                         ),
                       );
-                    if (s.totalSpent != 0)
+                    }
+                    if (s.totalSpent != 0) {
                       totalSpentPercent += category.total.abs() / s.totalSpent;
+                    }
                   },
                 );
 
@@ -394,13 +400,13 @@ class _PieChartHomeAndCategorySummaryState
                       clipBehavior: Clip.none,
                       children: [
                         Padding(
-                          padding: EdgeInsetsDirectional.only(
+                          padding: const EdgeInsetsDirectional.only(
                               start: 10, end: 10, bottom: 15, top: 30),
                           child: LayoutBuilder(
                             builder: (_, boxConstraints) {
                               bool showTopCategoriesLegend =
                                   boxConstraints.maxWidth > 320 &&
-                                      snapshot.data!.length > 0;
+                                      snapshot.data!.isNotEmpty;
                               return Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
@@ -410,8 +416,9 @@ class _PieChartHomeAndCategorySummaryState
                                     Flexible(
                                       flex: 1,
                                       child: Padding(
-                                        padding: EdgeInsetsDirectional.only(
-                                            start: 12),
+                                        padding:
+                                            const EdgeInsetsDirectional.only(
+                                                start: 12),
                                         child: TopCategoriesSpentLegend(
                                           categoriesWithTotal: snapshot.data!
                                               .take(
@@ -457,7 +464,7 @@ class _PieChartHomeAndCategorySummaryState
                                                 "lightDarkAccentHeavyLight"),
                                           ),
                                         ),
-                                        if (snapshot.data!.length <= 0)
+                                        if (snapshot.data!.isEmpty)
                                           Padding(
                                             padding:
                                                 const EdgeInsetsDirectional.all(
@@ -495,7 +502,7 @@ class _PieChartHomeAndCategorySummaryState
                                                     fontSize: 17,
                                                   ),
                                                 ),
-                                                SizedBox(height: 15),
+                                                const SizedBox(height: 15),
                                                 LowKeyButton(
                                                   onTap: openPieChartSettings,
                                                   text: "select-period"
@@ -535,31 +542,31 @@ class _PieChartHomeAndCategorySummaryState
                     widget.animatedSizeCategoryContainer
                         ? AnimatedSizeSwitcher(
                             child: expandCategorySelection == false
-                                ? Container(key: ValueKey(1), height: 10)
+                                ? Container(key: const ValueKey(1), height: 10)
                                 : Column(
-                                    children: categoryEntries,
                                     key: ValueKey(
                                         selectedCategory?.categoryPk ?? ""),
+                                    children: categoryEntries,
                                   ),
                           )
                         : AnimatedSwitcher(
-                            duration: Duration(milliseconds: 300),
+                            duration: const Duration(milliseconds: 300),
                             child: expandCategorySelection == false
-                                ? Container(key: ValueKey(1), height: 10)
+                                ? Container(key: const ValueKey(1), height: 10)
                                 : Column(
-                                    children: categoryEntries,
                                     key: ValueKey(
                                         selectedCategory?.categoryPk ?? ""),
+                                    children: categoryEntries,
                                   ),
                           ),
                   ],
                 );
               }
-              return SizedBox(height: 255);
+              return const SizedBox(height: 255);
             },
           );
         }
-        return SizedBox(height: 255);
+        return const SizedBox(height: 255);
       },
     );
   }
@@ -589,7 +596,7 @@ class TopCategoriesSpentLegend extends StatelessWidget {
                     color: HexColor(categoryWithTotal.category.colour),
                   ),
                 ),
-                SizedBox(width: 5),
+                const SizedBox(width: 5),
                 Flexible(
                   child: TextFont(
                     text: categoryWithTotal.category.name,

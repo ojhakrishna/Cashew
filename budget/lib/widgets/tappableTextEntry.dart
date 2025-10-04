@@ -93,7 +93,7 @@ class TappableTextEntry extends StatelessWidget {
               padding: padding,
               child: AnimatedContainer(
                 curve: Curves.easeInOut,
-                duration: Duration(milliseconds: 250),
+                duration: const Duration(milliseconds: 250),
                 padding: internalPadding,
                 decoration: BoxDecoration(
                   border: Border(

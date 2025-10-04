@@ -89,7 +89,7 @@ class SlidingSelectorIncomeExpense extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontFamily: appStateSettings["font"],
-                                  fontFamilyFallback: ['Inter'],
+                                  fontFamilyFallback: const ['Inter'],
                                 ),
                               ),
                             ),
@@ -105,7 +105,7 @@ class SlidingSelectorIncomeExpense extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontFamily: appStateSettings["font"],
-                                  fontFamilyFallback: ['Inter'],
+                                  fontFamilyFallback: const ['Inter'],
                                 ),
                               ),
                             ),
@@ -121,7 +121,7 @@ class SlidingSelectorIncomeExpense extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontFamily: appStateSettings["font"],
-                                  fontFamilyFallback: ['Inter'],
+                                  fontFamilyFallback: const ['Inter'],
                                 ),
                               ),
                             ),
@@ -140,7 +140,7 @@ class SlidingSelectorIncomeExpense extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontFamily: appStateSettings["font"],
-                                    fontFamilyFallback: ['Inter'],
+                                    fontFamilyFallback: const ['Inter'],
                                   ),
                                 ),
                               ),

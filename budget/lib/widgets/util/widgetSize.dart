@@ -42,7 +42,7 @@ class _WidgetSizeState extends State<WidgetSize> {
     if (context == null) return;
 
     try {
-      Size newSize = context.size ?? Size(0, 0);
+      Size newSize = context.size ?? const Size(0, 0);
       if (oldSize == newSize) return;
 
       oldSize = newSize;
@@ -88,7 +88,7 @@ class _WidgetSizeBuilderState extends State<WidgetSizeBuilder> {
     var context = widgetKey.currentContext;
     if (context == null) return;
     try {
-      Size newSize = context.size ?? Size(0, 0);
+      Size newSize = context.size ?? const Size(0, 0);
       if (oldSize == newSize) return;
 
       oldSize = newSize;

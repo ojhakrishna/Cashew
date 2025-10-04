@@ -21,8 +21,9 @@ class AndroidOnly extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) {
-    if (getPlatform(ignoreEmulation: true) != PlatformOS.isAndroid)
-      return SizedBox.shrink();
+    if (getPlatform(ignoreEmulation: true) != PlatformOS.isAndroid) {
+      return const SizedBox.shrink();
+    }
     return child;
   }
 }
@@ -35,14 +36,14 @@ class CheckWidgetLaunch extends StatefulWidget {
 }
 
 Throttler widgetActionThrottler =
-    Throttler(duration: Duration(milliseconds: 350));
+    Throttler(duration: const Duration(milliseconds: 350));
 
 class _CheckWidgetLaunchState extends State<CheckWidgetLaunch> {
   @override
   void initState() {
     super.initState();
     HomeWidget.setAppGroupId('WIDGET_GROUP_ID');
-    Future.delayed(Duration(milliseconds: 50), () {
+    Future.delayed(const Duration(milliseconds: 50), () {
       _checkForWidgetLaunch();
     });
     HomeWidget.widgetClicked.listen(_launchedFromWidget);
@@ -61,7 +62,7 @@ class _CheckWidgetLaunchState extends State<CheckWidgetLaunch> {
     String widgetPayload = (uri ?? "").toString();
     if (widgetPayload == "addTransactionWidget") {
       // Add a delay so the keyboard can focus
-      Future.delayed(Duration(milliseconds: 50), () {
+      Future.delayed(const Duration(milliseconds: 50), () {
         pushRoute(
           context,
           AddTransactionPage(
@@ -75,7 +76,9 @@ class _CheckWidgetLaunchState extends State<CheckWidgetLaunch> {
       // the route when this is called so the first time routing does not persist (i.e. we end with one route)
       if (Provider.of<AllWallets>(context, listen: false)
               .indexedByPk[appStateSettings["selectedWalletPk"]] ==
-          null) popAllRoutes(context);
+          null) {
+        popAllRoutes(context);
+      }
 
       openBottomSheet(
         context,
@@ -90,7 +93,7 @@ class _CheckWidgetLaunchState extends State<CheckWidgetLaunch> {
     } else if (widgetPayload == "netWorthLaunchWidget") {
       pushRoute(
         context,
-        WalletDetailsPage(
+        const WalletDetailsPage(
           wallet: null,
         ),
       );
@@ -99,7 +102,7 @@ class _CheckWidgetLaunchState extends State<CheckWidgetLaunch> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.shrink();
+    return const SizedBox.shrink();
   }
 }
 
@@ -112,7 +115,7 @@ class RenderHomePageWidgets extends StatefulWidget {
 
 Future updateWidgetColorsAndText(BuildContext context) async {
   if (getPlatform(ignoreEmulation: true) != PlatformOS.isAndroid) return;
-  await Future.delayed(Duration(milliseconds: 500), () async {
+  await Future.delayed(const Duration(milliseconds: 500), () async {
     double widgetBackgroundOpacity =
         (double.tryParse((appStateSettings["widgetOpacity"] ?? 1).toString()) ??
                 1)
@@ -180,8 +183,10 @@ class RenderHomePageWidgetsState extends State<RenderHomePageWidgets> {
       builder: (context, snapshot) {
         List<String>? walletPks =
             (snapshot.data ?? []).map((item) => item.walletPk).toList();
-        if (walletPks.length <= 0 ||
-            appStateSettings["netWorthAllWallets"] == true) walletPks = null;
+        if (walletPks.isEmpty ||
+            appStateSettings["netWorthAllWallets"] == true) {
+          walletPks = null;
+        }
         return Container(
           child: StreamBuilder<TotalWithCount?>(
             stream: database.watchTotalWithCountOfWallet(
@@ -194,11 +199,8 @@ class RenderHomePageWidgetsState extends State<RenderHomePageWidgets> {
             builder: (context, snapshot) {
               Future.delayed(Duration.zero, () async {
                 int totalCount = snapshot.data?.count ?? 0;
-                String netWorthTransactionsNumber = totalCount.toString() +
-                    " " +
-                    (totalCount == 1
-                        ? "transaction".tr().toLowerCase()
-                        : "transactions".tr().toLowerCase());
+                String netWorthTransactionsNumber =
+                    "$totalCount ${totalCount == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()}";
                 double totalSpent = snapshot.data?.total ?? 0;
                 String netWorthAmount = convertToMoney(
                   Provider.of<AllWallets>(context, listen: false),

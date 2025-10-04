@@ -32,7 +32,7 @@ class GlobalLoadingProgressState extends State<GlobalLoadingProgress> {
           : AlignmentDirectional.topCenter,
       child: AnimatedOpacity(
         opacity: progressPercentage <= 0 || progressPercentage >= 1 ? 0 : 1,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         child: Stack(
           children: [
             Container(
@@ -48,7 +48,7 @@ class GlobalLoadingProgressState extends State<GlobalLoadingProgress> {
             AnimatedContainer(
               constraints:
                   BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
-              duration: Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
               height: loadingBarHeight,
               width: MediaQuery.sizeOf(context).width * progressPercentage,
@@ -56,7 +56,7 @@ class GlobalLoadingProgressState extends State<GlobalLoadingProgress> {
                 color: dynamicPastel(
                     context, Theme.of(context).colorScheme.primary,
                     amount: 0.5),
-                borderRadius: BorderRadiusDirectional.only(
+                borderRadius: const BorderRadiusDirectional.only(
                   bottomEnd: Radius.circular(5),
                   topEnd: Radius.circular(5),
                 ),
@@ -111,17 +111,17 @@ class GlobalLoadingIndeterminateState
               ? AlignmentDirectional.bottomStart
               : AlignmentDirectional.topCenter,
           child: AnimatedContainer(
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
             height: !visible ? 0 : 3,
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadiusDirectional.only(
+              borderRadius: const BorderRadiusDirectional.only(
                 bottomEnd: Radius.circular(5),
                 topEnd: Radius.circular(5),
               ),
             ),
-            child: ClipRRect(
+            child: const ClipRRect(
               borderRadius: BorderRadiusDirectional.only(
                 bottomEnd: Radius.circular(5),
                 topEnd: Radius.circular(5),

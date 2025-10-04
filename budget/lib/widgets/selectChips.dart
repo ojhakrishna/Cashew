@@ -68,8 +68,8 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
   @override
   void initState() {
     if (widget.wrapped == false) {
-      Future.delayed(Duration(milliseconds: 0), () {
-        int? scrollToIndex = null;
+      Future.delayed(const Duration(milliseconds: 0), () {
+        int? scrollToIndex;
         int currentIndex = 0;
         for (T item in widget.items) {
           if (widget.getSelected(item)) {
@@ -87,7 +87,7 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
         if (scrollToIndex != null && scrollToIndex != 0) {
           itemScrollController.scrollTo(
             index: scrollToIndex,
-            duration: Duration(milliseconds: 500),
+            duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOutCubicEmphasized,
             alignment: widget.extraWidgetBeforeSticky &&
                     widget.extraWidgetBefore != null
@@ -96,11 +96,12 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
           );
         }
       });
-      Future.delayed(Duration(milliseconds: 1000), () {
-        if (mounted)
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        if (mounted) {
           setState(() {
             isDoneAnimation = true;
           });
+        }
       });
     }
     super.initState();
@@ -111,7 +112,7 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
     List<Widget> children = [
       if (widget.extraWidgetBefore != null &&
           widget.extraWidgetBeforeSticky == false)
-        widget.extraWidgetBefore ?? SizedBox.shrink(),
+        widget.extraWidgetBefore ?? const SizedBox.shrink(),
       ...List<Widget>.generate(
         widget.items.length,
         (int index) {
@@ -155,11 +156,11 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
                             ),
                       labelPadding: avatar == null
                           ? null
-                          : EdgeInsetsDirectional.only(
+                          : const EdgeInsetsDirectional.only(
                               start: 5, end: 10, top: 1, bottom: 1),
                       padding: avatar == null
                           ? null
-                          : EdgeInsetsDirectional.only(
+                          : const EdgeInsetsDirectional.only(
                               start: 10, top: 7, bottom: 7),
                       showCheckmark: widget.allowMultipleSelected == true &&
                           avatar == null,
@@ -205,7 +206,7 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
         },
       ).toList(),
       if (widget.extraWidgetAfter != null)
-        widget.extraWidgetAfter ?? SizedBox.shrink(),
+        widget.extraWidgetAfter ?? const SizedBox.shrink(),
     ];
 
     EdgeInsetsDirectional scrollPadding = widget.padding ??
@@ -221,7 +222,7 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
       padding: const EdgeInsetsDirectional.only(bottom: 8),
       child: Stack(
         children: [
-          children.length > 0
+          children.isNotEmpty
               ? IgnorePointer(
                   child: Visibility(
                     maintainSize: true,
@@ -243,7 +244,7 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
                     ),
                   ),
                 )
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           ConstrainedBox(
             constraints: BoxConstraints(
                 maxHeight: widget.wrapped ? double.infinity : heightOfScroll),
@@ -256,7 +257,8 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
                     child: Padding(
                       padding: EdgeInsetsDirectional.only(
                           start: (widget.extraHorizontalPadding ?? 0) + 18),
-                      child: widget.extraWidgetBefore ?? SizedBox.shrink(),
+                      child:
+                          widget.extraWidgetBefore ?? const SizedBox.shrink(),
                     ),
                   ),
                 Expanded(
@@ -287,6 +289,8 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
                               height: heightOfScroll,
                               child: widget.scrollablePositionedList == false
                                   ? SingleChildScrollView(
+                                      padding: scrollPadding,
+                                      scrollDirection: Axis.horizontal,
                                       child: Row(
                                         children: children,
                                         mainAxisAlignment:
@@ -294,8 +298,6 @@ class _SelectChipsState<T> extends State<SelectChips<T>> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                       ),
-                                      padding: scrollPadding,
-                                      scrollDirection: Axis.horizontal,
                                     )
                                   : ScrollablePositionedList.builder(
                                       itemCount: children.length,
@@ -345,7 +347,7 @@ class SelectChipsAddButtonExtraWidget extends StatelessWidget {
       icon: iconData,
       onTap: onTap ?? () {},
       width: 40,
-      margin: EdgeInsetsDirectional.symmetric(horizontal: 5, vertical: 0),
+      margin: const EdgeInsetsDirectional.symmetric(horizontal: 5, vertical: 0),
       openPage: openPage,
       borderRadius: 8,
     );

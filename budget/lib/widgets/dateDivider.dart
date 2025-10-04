@@ -5,7 +5,7 @@ import 'package:flutter/src/widgets/basic.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
 class DateDivider extends StatelessWidget {
-  DateDivider({
+  const DateDivider({
     Key? key,
     required this.date,
     this.info,

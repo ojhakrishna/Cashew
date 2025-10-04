@@ -50,7 +50,7 @@ class AboutPageState extends State<AboutPage> {
       spacing: 10,
       runSpacing: 10,
       children: [
-        Image(
+        const Image(
           image: AssetImage("assets/icon/icon-small.png"),
           height: 70,
         ),
@@ -61,11 +61,12 @@ class AboutPageState extends State<AboutPage> {
             Tappable(
               borderRadius: getPlatform() == PlatformOS.isIOS ? 10 : 15,
               onLongPress: () {
-                if (allowDebugFlags)
+                if (allowDebugFlags) {
                   pushRoute(
                     context,
-                    DebugPage(),
+                    const DebugPage(),
                   );
+                }
               },
               child: Padding(
                 padding: const EdgeInsetsDirectional.symmetric(
@@ -184,13 +185,13 @@ class AboutPageState extends State<AboutPage> {
           ),
         ),
       ),
-      SizedBox(height: 10),
+      const SizedBox(height: 10),
       Padding(
         padding:
             const EdgeInsetsDirectional.symmetric(horizontal: 15, vertical: 7),
         child: Center(
           child: TextFont(
-            text: "made-in-canada".tr() + " " + "🍁",
+            text: "${"made-in-canada".tr()} 🍁",
             fontSize: 14,
             textAlign: TextAlign.center,
             maxLines: 5,
@@ -219,48 +220,53 @@ class AboutPageState extends State<AboutPage> {
         title: "Flutter",
         link: "https://flutter.dev/",
         padding: fullScreenLayout
-            ? EdgeInsetsDirectional.symmetric(horizontal: 7.5, vertical: 5)
+            ? const EdgeInsetsDirectional.symmetric(
+                horizontal: 7.5, vertical: 5)
             : null,
       ),
       AboutInfoBox(
         title: "Google Cloud APIs",
         link: "https://cloud.google.com/",
         padding: fullScreenLayout
-            ? EdgeInsetsDirectional.symmetric(horizontal: 7.5, vertical: 5)
+            ? const EdgeInsetsDirectional.symmetric(
+                horizontal: 7.5, vertical: 5)
             : null,
       ),
       AboutInfoBox(
         title: "Drift SQL Database",
         link: "https://drift.simonbinder.eu/",
         padding: fullScreenLayout
-            ? EdgeInsetsDirectional.symmetric(horizontal: 7.5, vertical: 5)
+            ? const EdgeInsetsDirectional.symmetric(
+                horizontal: 7.5, vertical: 5)
             : null,
       ),
       AboutInfoBox(
         title: "FL Charts",
         link: "https://github.com/imaNNeoFighT/fl_chart",
         padding: fullScreenLayout
-            ? EdgeInsetsDirectional.symmetric(horizontal: 7.5, vertical: 5)
+            ? const EdgeInsetsDirectional.symmetric(
+                horizontal: 7.5, vertical: 5)
             : null,
       ),
       AboutInfoBox(
         title: "exchange-rates-api".tr(),
         link: "https://github.com/fawazahmed0/exchange-api",
         padding: fullScreenLayout
-            ? EdgeInsetsDirectional.symmetric(horizontal: 7.5, vertical: 5)
+            ? const EdgeInsetsDirectional.symmetric(
+                horizontal: 7.5, vertical: 5)
             : null,
       ),
     ];
 
     List<Widget> translators = [
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Italian",
         list: [
           "Thomas B.",
           "Mattia A.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Polish",
         list: [
           "Michał S.",
@@ -268,19 +274,19 @@ class AboutPageState extends State<AboutPage> {
           "Kaczusia",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Serbian",
         list: [
           "Jovan P.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Swahili",
         list: [
           "Anthony K.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "German",
         list: [
           "Fabian S.",
@@ -289,7 +295,7 @@ class AboutPageState extends State<AboutPage> {
           "Bettina S.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Arabic",
         list: [
           "Dorra Y.",
@@ -298,7 +304,7 @@ class AboutPageState extends State<AboutPage> {
           "Mahmoud E.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Portuguese",
         list: [
           "Alexander G.",
@@ -309,25 +315,25 @@ class AboutPageState extends State<AboutPage> {
           "Xavier B.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Bulgarian",
         list: [
           "Денислав C.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Chinese (Simplified)",
         list: [
           "Clyde",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Chinese (Traditional)",
         list: [
           "qazlll456",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Hindi",
         list: [
           "Dikshant S.",
@@ -335,13 +341,13 @@ class AboutPageState extends State<AboutPage> {
           "Darshan L.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Vietnamese",
         list: [
           "Ng. Anh",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "French",
         list: [
           "Antoine C.",
@@ -349,13 +355,13 @@ class AboutPageState extends State<AboutPage> {
           "Samuel S.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Indonesian",
         list: [
           "Gusairi P.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Ukrainian",
         list: [
           "Chris M.",
@@ -363,7 +369,7 @@ class AboutPageState extends State<AboutPage> {
           "Mariia",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Russian",
         list: [
           "Ilya A.",
@@ -372,14 +378,14 @@ class AboutPageState extends State<AboutPage> {
           "Innokentii B.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Romanian",
         list: [
           "Valentin G.",
           "Tarciziu",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Spanish",
         list: [
           "Pablo S.",
@@ -387,112 +393,112 @@ class AboutPageState extends State<AboutPage> {
           "Ramon M.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Swedish",
         list: [
           "Anna M.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Danish",
         list: [
           "Mittheo",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Turkish",
         list: [
           "Serdar A.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Slovak",
         list: [
           "Igor V.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Macedonian",
         list: [
           "Andrej A.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Czech",
         list: [
           "Kamil T.",
           "Hana B.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Hebrew",
         list: [
           "Happy Bear",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Afrikaans",
         list: [
           "Andrè B.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Filipino",
         list: [
           "Waren G.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Tamil",
         list: [
           "Mohamed A.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Japanese",
         list: [
           "Tetta N.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Hungarian",
         list: [
           "Döbröntei S.",
           "Myra S.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Thai",
         list: [
           "Jateniphat U.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Gujarati",
         list: [
           "Darshan L.",
           "Harsh S.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Finnish",
         list: [
           "Mirko J.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Dutch",
         list: [
           "Niels S.",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Malay",
         list: [
           "アリフ",
         ],
       ),
-      TranslationInfoBox(
+      const TranslationInfoBox(
         title: "Sinhala",
         list: [
           "Bhagya S.",
@@ -516,7 +522,7 @@ class AboutPageState extends State<AboutPage> {
         SliverPadding(
           padding: fullScreenLayout
               ? EdgeInsets.zero
-              : EdgeInsetsDirectional.symmetric(horizontal: 7.5),
+              : const EdgeInsetsDirectional.symmetric(horizontal: 7.5),
           sliver: SliverMasonryGrid(
             gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: fullScreenLayout ? 4 : 2,
@@ -531,7 +537,7 @@ class AboutPageState extends State<AboutPage> {
             ),
           ),
         ),
-        SliverToBoxAdapter(child: SizedBox(height: 20)),
+        const SliverToBoxAdapter(child: SizedBox(height: 20)),
       ],
       listWidgets: fullScreenLayout
           ? [
@@ -544,12 +550,12 @@ class AboutPageState extends State<AboutPage> {
                         child: Column(
                           children: [
                             cashewInformation,
-                            SizedBox(height: 15),
+                            const SizedBox(height: 15),
                             AboutLinks(containerColor: containerColor),
-                            HorizontalBreak(
+                            const HorizontalBreak(
                                 padding: EdgeInsetsDirectional.symmetric(
                                     horizontal: 10, vertical: 20)),
-                            AboutDeepLinking(),
+                            const AboutDeepLinking(),
                           ],
                         ),
                       ),
@@ -558,7 +564,7 @@ class AboutPageState extends State<AboutPage> {
                           children: [
                             for (Widget teamMember in developmentTeam)
                               Row(children: [Expanded(child: teamMember)]),
-                            HorizontalBreak(
+                            const HorizontalBreak(
                                 padding: EdgeInsetsDirectional.symmetric(
                                     horizontal: 10, vertical: 20)),
                             for (Widget graphicAcknowledge in graphics)
@@ -572,14 +578,14 @@ class AboutPageState extends State<AboutPage> {
                   );
                 },
               ),
-              HorizontalBreak(
+              const HorizontalBreak(
                   padding: EdgeInsetsDirectional.symmetric(
                       horizontal: 10, vertical: 20)),
               Padding(
-                padding: EdgeInsetsDirectional.symmetric(horizontal: 7.5),
+                padding: const EdgeInsetsDirectional.symmetric(horizontal: 7.5),
                 child: SpreadExpandFlex(majorTools: majorTools, maxPerRow: 3),
               ),
-              HorizontalBreak(
+              const HorizontalBreak(
                 padding: EdgeInsetsDirectional.only(
                     start: 10, end: 10, top: 25, bottom: 10),
               ),
@@ -590,13 +596,13 @@ class AboutPageState extends State<AboutPage> {
                     horizontal: 15, vertical: 7),
                 child: cashewInformation,
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               AboutLinks(containerColor: containerColor),
-              SizedBox(height: 10),
-              HorizontalBreak(),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
+              const HorizontalBreak(),
+              const SizedBox(height: 10),
               ...developmentTeam,
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               if (getPlatform(ignoreEmulation: true) == PlatformOS.isAndroid ||
                   kIsWeb)
                 Padding(
@@ -605,7 +611,7 @@ class AboutPageState extends State<AboutPage> {
                   child: HorizontalBreakAbove(
                       child: Column(
                     children: [
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsetsDirectional.symmetric(
                             horizontal: 15, vertical: 7),
@@ -619,13 +625,13 @@ class AboutPageState extends State<AboutPage> {
                           ),
                         ),
                       ),
-                      AboutDeepLinking(),
-                      SizedBox(height: 10),
+                      const AboutDeepLinking(),
+                      const SizedBox(height: 10),
                     ],
                   )),
                 ),
-              HorizontalBreak(),
-              SizedBox(height: 10),
+              const HorizontalBreak(),
+              const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsetsDirectional.symmetric(
                     horizontal: 15, vertical: 7),
@@ -640,7 +646,7 @@ class AboutPageState extends State<AboutPage> {
                 ),
               ),
               ...graphics,
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Padding(
                 padding: const EdgeInsetsDirectional.symmetric(
                     horizontal: 15, vertical: 7),
@@ -686,7 +692,8 @@ class SpreadExpandFlex extends StatelessWidget {
   final List<Widget> majorTools;
   final int maxPerRow;
 
-  SpreadExpandFlex({required this.majorTools, this.maxPerRow = 3});
+  const SpreadExpandFlex(
+      {super.key, required this.majorTools, this.maxPerRow = 3});
 
   @override
   Widget build(BuildContext context) {
@@ -699,8 +706,8 @@ class SpreadExpandFlex extends StatelessWidget {
       // If the current row is full or it's the last widget, add the row to the rows list
       if ((i + 1) % maxPerRow == 0 || i == majorTools.length - 1) {
         rows.add(Row(
-          children: currentRow,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: currentRow,
         ));
         currentRow = [];
       }
@@ -725,7 +732,7 @@ void showChangelogForce(BuildContext context) {
         label: "view-detailed-changelog".tr(),
         onTap: () {
           popRoute(context);
-          pushRoute(context, DetailedChangelogPage());
+          pushRoute(context, const DetailedChangelogPage());
         },
       ),
     ),
@@ -735,7 +742,7 @@ void showChangelogForce(BuildContext context) {
 void openOnBoarding(BuildContext context) {
   pushRoute(
     context,
-    OnBoardingPage(
+    const OnBoardingPage(
       popNavigationWhenDone: true,
       showPreviewDemoButton: false,
     ),
@@ -747,8 +754,8 @@ void openLicensesPage(BuildContext context) {
       context: context,
       applicationVersion: getVersionString(),
       applicationLegalese:
-          "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE." +
-              "\n\n" +
+          "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+                  "\n\n" +
               "exchange-rate-notice-description".tr());
 }
 
@@ -788,16 +795,16 @@ void deleteAllDataFlow(BuildContext context) {
                     child: SyncCloudBackupButton(
                       onTap: () async {
                         popRoute(context);
-                        pushRoute(context, AccountsPage());
+                        pushRoute(context, const AccountsPage());
                       },
                     ),
                   ),
-                  SizedBox(width: 18),
+                  const SizedBox(width: 18),
                   Expanded(
                     child: BackupsCloudBackupButton(
                       onTap: () async {
                         popRoute(context);
-                        pushRoute(context, AccountsPage());
+                        pushRoute(context, const AccountsPage());
                       },
                     ),
                   ),
@@ -874,7 +881,7 @@ class AboutLinks extends StatelessWidget {
               context: context,
               isExternalLink: false,
               onTap: () =>
-                  openBottomSheet(context, RatingPopup(), fullSnap: true),
+                  openBottomSheet(context, const RatingPopup(), fullSnap: true),
               icon: appStateSettings["outlinedIcons"]
                   ? Icons.rate_review_outlined
                   : Icons.rate_review_rounded,
@@ -1026,7 +1033,8 @@ class TranslationInfoBox extends StatelessWidget {
       title: title,
       list: list,
       listTextColor: getColor(context, "black").withOpacity(0.5),
-      padding: EdgeInsetsDirectional.symmetric(horizontal: 7.5, vertical: 5),
+      padding:
+          const EdgeInsetsDirectional.symmetric(horizontal: 7.5, vertical: 5),
     );
   }
 }
@@ -1055,7 +1063,7 @@ class AboutInfoBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: padding ??
-          EdgeInsetsDirectional.symmetric(horizontal: 15, vertical: 5),
+          const EdgeInsetsDirectional.symmetric(horizontal: 15, vertical: 5),
       child: Tappable(
         onTap: () async {
           if (link != null) openUrl(link ?? "");
@@ -1082,7 +1090,7 @@ class AboutInfoBox extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 5,
               ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               if (link != null && showLink)
                 TextFont(
                   text: link ?? "",

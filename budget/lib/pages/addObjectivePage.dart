@@ -43,7 +43,7 @@ import 'package:budget/widgets/selectDateRange.dart';
 import 'package:budget/widgets/tappableTextEntry.dart';
 
 class AddObjectivePage extends StatefulWidget {
-  AddObjectivePage({
+  const AddObjectivePage({
     Key? key,
     this.objective,
     required this.routesToPopAfterDelete,
@@ -73,14 +73,14 @@ class _AddObjectivePageState extends State<AddObjectivePage>
   String? selectedEmoji;
   double selectedAmount = 0;
   DateTime selectedStartDate = DateTime.now();
-  DateTime? selectedEndDate = null;
+  DateTime? selectedEndDate;
   late bool selectedIncome = widget.selectedIncome ?? true;
   bool selectedPin = true;
   String selectedWalletPk = appStateSettings["selectedWalletPk"];
   bool isDifferenceOnlyLoan = false;
 
-  FocusNode _titleFocusNode = FocusNode();
-  late TabController _incomeTabController =
+  final FocusNode _titleFocusNode = FocusNode();
+  late final TabController _incomeTabController =
       TabController(length: 2, vsync: this);
 
   late ObjectiveType objectiveType =
@@ -172,7 +172,7 @@ class _AddObjectivePageState extends State<AddObjectivePage>
           },
           nextLabel: "set-amount".tr(),
           enableWalletPicker: true,
-          padding: EdgeInsetsDirectional.symmetric(horizontal: 18),
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 18),
           setSelectedWalletPk: (walletPk) {
             setState(() {
               selectedWalletPk = walletPk;
@@ -370,22 +370,19 @@ class _AddObjectivePageState extends State<AddObjectivePage>
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   determineBottomButton() {
     if (selectedTitle != null) {
-      if (canAddObjective != true)
-        this.setState(() {
+      if (canAddObjective != true) {
+        setState(() {
           canAddObjective = true;
         });
+      }
     } else {
-      if (canAddObjective != false)
-        this.setState(() {
+      if (canAddObjective != false) {
+        setState(() {
           canAddObjective = false;
         });
+      }
     }
   }
 
@@ -472,7 +469,7 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                   label: "set-name".tr(),
                   onTap: () async {
                     FocusScope.of(context).unfocus();
-                    Future.delayed(Duration(milliseconds: 100), () {
+                    Future.delayed(const Duration(milliseconds: 100), () {
                       _titleFocusNode.requestFocus();
                     });
                   },
@@ -509,7 +506,7 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                 children: [
                   Expanded(
                     child: AnimatedOpacity(
-                      duration: Duration(milliseconds: 500),
+                      duration: const Duration(milliseconds: 500),
                       opacity: isDifferenceOnlyLoan ? 0.5 : 1,
                       child: IncomeExpenseTabSelector(
                         hasBorderRadius: true,
@@ -594,8 +591,7 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                         child: SelectCategoryImage(
                           setSelectedImage: setSelectedImage,
                           setSelectedEmoji: setSelectedEmoji,
-                          selectedImage:
-                              "assets/categories/" + selectedImage.toString(),
+                          selectedImage: "assets/categories/$selectedImage",
                           setSelectedTitle: (String? titleRecommendation) {},
                         ),
                       ),
@@ -635,7 +631,7 @@ class _AddObjectivePageState extends State<AddObjectivePage>
             ),
           ),
           SliverToBoxAdapter(
-            child: Container(
+            child: SizedBox(
               height: 65,
               child: SelectColor(
                 horizontalList: true,
@@ -651,7 +647,7 @@ class _AddObjectivePageState extends State<AddObjectivePage>
               ),
             ),
           ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: SizedBox(
               height: 25,
             ),
@@ -687,7 +683,7 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                                 settingsString: null,
                               )
                             : isDifferenceOnlyLoan
-                                ? SizedBox.shrink()
+                                ? const SizedBox.shrink()
                                 : Wrap(
                                     alignment: WrapAlignment.center,
                                     crossAxisAlignment: WrapCrossAlignment.end,
@@ -705,7 +701,7 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                                                 ? selectedIncome
                                                     ? "lent".tr()
                                                     : "borrowed".tr()
-                                                : "goal".tr() + " ",
+                                                : "${"goal".tr()} ",
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -746,11 +742,12 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                                         fontSize: 32,
                                         fontWeight: FontWeight.bold,
                                         internalPadding:
-                                            EdgeInsetsDirectional.symmetric(
+                                            const EdgeInsetsDirectional
+                                                .symmetric(
                                                 vertical: 2, horizontal: 4),
-                                        padding:
-                                            EdgeInsetsDirectional.symmetric(
-                                                vertical: 10, horizontal: 5),
+                                        padding: const EdgeInsetsDirectional
+                                            .symmetric(
+                                            vertical: 10, horizontal: 5),
                                       ),
                                     ],
                                   ),
@@ -758,7 +755,8 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                           HorizontalBreakAbove(
                             child: Center(
                               child: SelectDateRange(
-                                padding: EdgeInsetsDirectional.only(bottom: 8),
+                                padding:
+                                    const EdgeInsetsDirectional.only(bottom: 8),
                                 initialStartDate: selectedStartDate,
                                 initialEndDate: selectedEndDate,
                                 onSelectedStartDate: setSelectedStartDate,
@@ -843,10 +841,11 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
                                     internalPadding:
-                                        EdgeInsetsDirectional.symmetric(
+                                        const EdgeInsetsDirectional.symmetric(
                                             vertical: 2, horizontal: 4),
-                                    padding: EdgeInsetsDirectional.symmetric(
-                                        vertical: 10, horizontal: 5),
+                                    padding:
+                                        const EdgeInsetsDirectional.symmetric(
+                                            vertical: 10, horizontal: 5),
                                   ),
                                   Padding(
                                     padding: const EdgeInsetsDirectional.only(
@@ -855,8 +854,9 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                                       stream: database.getObjective(
                                           widget.objective?.objectivePk ?? "0"),
                                       builder: (context, snapshot) {
-                                        if (snapshot.data == null)
-                                          return SizedBox.shrink();
+                                        if (snapshot.data == null) {
+                                          return const SizedBox.shrink();
+                                        }
                                         Objective objective =
                                             snapshot.data!.copyWith(
                                           income: selectedIncome,
@@ -880,30 +880,21 @@ class _AddObjectivePageState extends State<AddObjectivePage>
                                                           ?.currency,
                                                     );
                                             return TextFont(
-                                              text: (selectedIncome
-                                                      ? "lent".tr()
-                                                      : "borrowed".tr()) +
-                                                  " " +
-                                                  "total".tr() +
-                                                  ": " +
-                                                  convertToMoney(
-                                                    Provider.of<AllWallets>(
-                                                        context),
+                                              text:
+                                                  "${selectedIncome ? "lent".tr() : "borrowed".tr()} ${"total".tr()}: ${convertToMoney(
+                                                Provider.of<AllWallets>(
+                                                    context),
+                                                selectedAmountConverted,
+                                              )} + ${convertToMoney(
+                                                Provider.of<AllWallets>(
+                                                    context),
+                                                objectiveAmount,
+                                              )} = ${convertToMoney(
+                                                Provider.of<AllWallets>(
+                                                    context),
+                                                objectiveAmount +
                                                     selectedAmountConverted,
-                                                  ) +
-                                                  " + " +
-                                                  convertToMoney(
-                                                    Provider.of<AllWallets>(
-                                                        context),
-                                                    objectiveAmount,
-                                                  ) +
-                                                  " = " +
-                                                  convertToMoney(
-                                                    Provider.of<AllWallets>(
-                                                        context),
-                                                    objectiveAmount +
-                                                        selectedAmountConverted,
-                                                  ),
+                                              )}",
                                               fontSize: 14.5,
                                               textAlign: TextAlign.center,
                                               textColor: getColor(
@@ -926,7 +917,7 @@ class _AddObjectivePageState extends State<AddObjectivePage>
               ),
             ),
 
-          SliverToBoxAdapter(child: SizedBox(height: 65)),
+          const SliverToBoxAdapter(child: SizedBox(height: 65)),
           // SliverToBoxAdapter(
           //   child: KeyboardHeightAreaAnimated(),
           // ),
@@ -952,7 +943,7 @@ class SelectObjectiveTypePopup extends StatelessWidget {
                 child: OutlinedButtonStacked(
                   alignStart: true,
                   alignBeside: true,
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       horizontal: 20, vertical: 20),
                   text: "savings-goal".tr(),
                   iconData: appStateSettings["outlinedIcons"]
@@ -984,14 +975,14 @@ class SelectObjectiveTypePopup extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 13),
+          const SizedBox(height: 13),
           Row(
             children: [
               Expanded(
                 child: OutlinedButtonStacked(
                   alignStart: true,
                   alignBeside: true,
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       horizontal: 20, vertical: 20),
                   text: "expense-goal".tr(),
                   iconData: appStateSettings["outlinedIcons"]
@@ -1054,8 +1045,8 @@ class InstallmentObjectivePopup extends StatefulWidget {
 
 class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
   bool isNegative = false;
-  TimeOfDay? selectedTime = null;
-  DateTime? selectedDateTime = null;
+  TimeOfDay? selectedTime;
+  DateTime? selectedDateTime;
   String selectedTitle = "";
   String selectedWalletPk = appStateSettings["selectedWalletPk"];
   TransactionCategory? selectedCategory;
@@ -1066,8 +1057,8 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
   String selectedRecurrenceDisplay = "month";
   BudgetReoccurence selectedRecurrenceEnum = BudgetReoccurence.monthly;
 
-  int? numberOfInstallmentPayments = null;
-  double? amountPerInstallmentPayment = null;
+  int? numberOfInstallmentPayments;
+  double? amountPerInstallmentPayment;
 
   @override
   void initState() {
@@ -1088,7 +1079,7 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
         child: SelectAmount(
           enableWalletPicker: true,
           hideWalletPickerIfOneCurrency: true,
-          padding: EdgeInsetsDirectional.symmetric(horizontal: 18),
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 18),
           onlyShowCurrencyIcon: true,
           amountPassed: (amountPerInstallmentPayment ?? 0).toString(),
           setSelectedAmount: (amount, _) {
@@ -1151,10 +1142,10 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
           },
           initialValue: selectedTitle,
           labelText: "title-placeholder".tr(),
-          padding: EdgeInsetsDirectional.only(bottom: 13),
+          padding: const EdgeInsetsDirectional.only(bottom: 13),
         ),
         DateButton(
-          internalPadding: EdgeInsetsDirectional.only(end: 5),
+          internalPadding: const EdgeInsetsDirectional.only(end: 5),
           initialSelectedDate: selectedDateTime ?? DateTime.now(),
           initialSelectedTime: TimeOfDay(
               hour: selectedDateTime?.hour ?? TimeOfDay.now().hour,
@@ -1172,14 +1163,8 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
 
     return PopupFramework(
       title: "installment".tr(),
-      subtitle: widget.objective.name +
-          " (" +
-          convertToMoney(
-              Provider.of<AllWallets>(context),
-              objectiveAmountToPrimaryCurrency(
-                      Provider.of<AllWallets>(context), widget.objective) *
-                  ((widget.objective.income) ? 1 : -1)) +
-          ")",
+      subtitle:
+          "${widget.objective.name} (${convertToMoney(Provider.of<AllWallets>(context), objectiveAmountToPrimaryCurrency(Provider.of<AllWallets>(context), widget.objective) * ((widget.objective.income) ? 1 : -1))})",
       underTitleSpace: false,
       hasPadding: false,
       child: Column(
@@ -1236,9 +1221,10 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
                               },
                               fontSize: 23,
                               fontWeight: FontWeight.bold,
-                              internalPadding: EdgeInsetsDirectional.symmetric(
-                                  vertical: 4, horizontal: 4),
-                              padding: EdgeInsetsDirectional.symmetric(
+                              internalPadding:
+                                  const EdgeInsetsDirectional.symmetric(
+                                      vertical: 4, horizontal: 4),
+                              padding: const EdgeInsetsDirectional.symmetric(
                                   vertical: 0, horizontal: 3),
                             ),
                             Padding(
@@ -1266,9 +1252,10 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
                               },
                               fontSize: 23,
                               fontWeight: FontWeight.bold,
-                              internalPadding: EdgeInsetsDirectional.symmetric(
-                                  vertical: 4, horizontal: 4),
-                              padding: EdgeInsetsDirectional.symmetric(
+                              internalPadding:
+                                  const EdgeInsetsDirectional.symmetric(
+                                      vertical: 4, horizontal: 4),
+                              padding: const EdgeInsetsDirectional.symmetric(
                                   vertical: 0, horizontal: 3),
                             ),
                           ],
@@ -1327,9 +1314,10 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
                           },
                           fontSize: 23,
                           fontWeight: FontWeight.bold,
-                          internalPadding: EdgeInsetsDirectional.symmetric(
-                              vertical: 4, horizontal: 4),
-                          padding: EdgeInsetsDirectional.symmetric(
+                          internalPadding:
+                              const EdgeInsetsDirectional.symmetric(
+                                  vertical: 4, horizontal: 4),
+                          padding: const EdgeInsetsDirectional.symmetric(
                               vertical: 0, horizontal: 3),
                         ),
                         TappableTextEntry(
@@ -1358,9 +1346,10 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
                           },
                           fontSize: 23,
                           fontWeight: FontWeight.bold,
-                          internalPadding: EdgeInsetsDirectional.symmetric(
-                              vertical: 4, horizontal: 4),
-                          padding: EdgeInsetsDirectional.symmetric(
+                          internalPadding:
+                              const EdgeInsetsDirectional.symmetric(
+                                  vertical: 4, horizontal: 4),
+                          padding: const EdgeInsetsDirectional.symmetric(
                               vertical: 0, horizontal: 3),
                         ),
                       ],
@@ -1368,18 +1357,19 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               HorizontalBreak(
                 color: Theme.of(context)
                     .colorScheme
                     .secondaryContainer
                     .withOpacity(0.5),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               if (selectedCategory != null)
                 SelectCategory(
                   horizontalList: true,
-                  listPadding: EdgeInsetsDirectional.symmetric(horizontal: 10),
+                  listPadding:
+                      const EdgeInsetsDirectional.symmetric(horizontal: 10),
                   addButton: false,
                   setSelectedCategory: (category) {
                     // Clear the subcategory
@@ -1396,7 +1386,7 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
                   popRoute: false,
                   selectedCategory: selectedCategory,
                 ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               if (selectedCategory != null)
                 SelectSubcategoryChips(
                   setSelectedSubCategory: (category) {
@@ -1413,12 +1403,12 @@ class _InstallmentObjectivePopupState extends State<InstallmentObjectivePopup> {
                   selectedCategoryPk: selectedCategory!.categoryPk,
                   selectedSubCategoryPk: selectedSubCategory?.categoryPk,
                 ),
-              SizedBox(height: 9),
+              const SizedBox(height: 9),
               Padding(
                 padding: const EdgeInsetsDirectional.symmetric(horizontal: 18),
                 child: editTransferDetails,
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Padding(
                 padding: const EdgeInsetsDirectional.symmetric(horizontal: 18),
                 child: Button(

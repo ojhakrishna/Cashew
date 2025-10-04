@@ -20,7 +20,7 @@ Future<TimeOfDay?> showCustomTimePicker(
     builder: (BuildContext context, Widget? child) {
       child = Apply24HourFormatSetting(
           materialLocalizations: MaterialLocalizations.of(context),
-          child: child ?? SizedBox.shrink());
+          child: child ?? const SizedBox.shrink());
 
       if (appStateSettings["materialYou"]) {
         return Theme(
@@ -38,7 +38,7 @@ Future<TimeOfDay?> showCustomTimePicker(
                 ? Theme.of(context).colorScheme.secondaryContainer
                 : null,
             textTheme: TextTheme(
-              displayLarge: TextStyle(
+              displayLarge: const TextStyle(
                 fontSize: 65,
                 fontWeight: FontWeight.w300,
               ),
@@ -59,7 +59,7 @@ Future<TimeOfDay?> showCustomTimePicker(
                 colorScheme: ColorScheme.light(
                     primary: Theme.of(context).colorScheme.primary),
                 buttonTheme:
-                    ButtonThemeData(textTheme: ButtonTextTheme.primary),
+                    const ButtonThemeData(textTheme: ButtonTextTheme.primary),
               )
             : ThemeData.dark().copyWith(
                 // ignore: deprecated_member_use
@@ -68,7 +68,7 @@ Future<TimeOfDay?> showCustomTimePicker(
                 colorScheme: ColorScheme.dark(
                     primary: Theme.of(context).colorScheme.secondary),
                 buttonTheme:
-                    ButtonThemeData(textTheme: ButtonTextTheme.primary),
+                    const ButtonThemeData(textTheme: ButtonTextTheme.primary),
               ),
         child: child,
       );
@@ -97,13 +97,13 @@ class Apply24HourFormatSetting extends StatelessWidget {
       // See: https://github.com/flutter/flutter/issues/54839 which is slightly incorrect in its implementation
       // We apply the translations to the actual time picker when opened
       // Only issue: AM and PM is not correctly translated... so we fix that with a custom delegate
-      locale: Locale("en", "US"),
+      locale: const Locale("en", "US"),
       delegates: [delegate],
       child: MediaQuery(
-        child: child,
         data: MediaQuery.of(context).copyWith(
           alwaysUse24HourFormat: isSetting24HourFormat(),
         ),
+        child: child,
       ),
     );
   }

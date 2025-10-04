@@ -113,9 +113,9 @@ class MoreActionsPageState extends State<MoreActionsPage> {
             ],
           ),
         ],
-        listWidgets: [
+        listWidgets: const [
           Padding(
-            padding: const EdgeInsetsDirectional.only(bottom: 8.0),
+            padding: EdgeInsetsDirectional.only(bottom: 8.0),
             child: PremiumBanner(),
           ),
           MorePages()
@@ -162,7 +162,7 @@ class MorePages extends StatelessWidget {
               children: [
                 Expanded(
                   child: SettingsContainerOpenPage(
-                    openPage: WalletDetailsPage(wallet: null),
+                    openPage: const WalletDetailsPage(wallet: null),
                     title: navBarIconsData["allSpending"]!.labelLong.tr(),
                     icon: navBarIconsData["allSpending"]!.iconData,
                     description: appStateSettings["showExtraInfoText"] == false
@@ -192,7 +192,7 @@ class MorePages extends StatelessWidget {
               // ),
               Expanded(
                 child: SettingsContainerOpenPage(
-                  openPage: AboutPage(),
+                  openPage: const AboutPage(),
                   title: "about-app".tr(namedArgs: {"app": globalAppName}),
                   icon: navBarIconsData["about"]!.iconData,
                   isOutlined: true,
@@ -200,11 +200,12 @@ class MorePages extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       vertical: 5, horizontal: 4),
                   child: SettingsContainer(
                     onTap: () {
-                      openBottomSheet(context, RatingPopup(), fullSnap: true);
+                      openBottomSheet(context, const RatingPopup(),
+                          fullSnap: true);
                     },
                     title: "feedback".tr(),
                     icon: appStateSettings["outlinedIcons"]
@@ -223,7 +224,7 @@ class MorePages extends StatelessWidget {
                       hasSideNavigation == false
                   ? Expanded(
                       child: SettingsContainerOpenPage(
-                        openPage: BillSplitter(),
+                        openPage: const BillSplitter(),
                         title: "bill-splitter".tr(),
                         icon: appStateSettings["outlinedIcons"]
                             ? Icons.summarize_outlined
@@ -234,13 +235,13 @@ class MorePages extends StatelessWidget {
                   : notificationsGlobalEnabled
                       ? Expanded(
                           child: SettingsContainerOpenPage(
-                            openPage: NotificationsPage(),
+                            openPage: const NotificationsPage(),
                             title: navBarIconsData["notifications"]!.label.tr(),
                             icon: navBarIconsData["notifications"]!.iconData,
                             isOutlined: true,
                           ),
                         )
-                      : SizedBox.shrink(),
+                      : const SizedBox.shrink(),
               if (hasSideNavigation == false)
                 Expanded(
                     child: GoogleAccountLoginButton(
@@ -254,7 +255,7 @@ class MorePages extends StatelessWidget {
               children: [
                 Expanded(
                   child: SettingsContainerOpenPage(
-                    openPage: SubscriptionsPage(),
+                    openPage: const SubscriptionsPage(),
                     title: navBarIconsData["subscriptions"]!.label.tr(),
                     icon: navBarIconsData["subscriptions"]!.iconData,
                     isOutlined: true,
@@ -262,8 +263,8 @@ class MorePages extends StatelessWidget {
                 ),
                 Expanded(
                   child: SettingsContainerOpenPage(
-                    openPage:
-                        UpcomingOverdueTransactions(overdueTransactions: null),
+                    openPage: const UpcomingOverdueTransactions(
+                        overdueTransactions: null),
                     title: navBarIconsData["scheduled"]!.label.tr(),
                     icon: navBarIconsData["scheduled"]!.iconData,
                     isOutlined: true,
@@ -277,7 +278,7 @@ class MorePages extends StatelessWidget {
               children: [
                 Expanded(
                   child: SettingsContainerOpenPage(
-                    openPage: ObjectivesListPage(
+                    openPage: const ObjectivesListPage(
                       backButton: true,
                     ),
                     title: navBarIconsData["goals"]!.label.tr(),
@@ -287,7 +288,7 @@ class MorePages extends StatelessWidget {
                 ),
                 Expanded(
                   child: SettingsContainerOpenPage(
-                    openPage: CreditDebtTransactions(isCredit: null),
+                    openPage: const CreditDebtTransactions(isCredit: null),
                     title: navBarIconsData["loans"]!.label.tr(),
                     icon: navBarIconsData["loans"]!.iconData,
                     isOutlined: true,
@@ -320,7 +321,7 @@ class MorePages extends StatelessWidget {
                                 "budgets" &&
                             appStateSettings["customNavBarShortcut2"] !=
                                 "budgets"
-                        ? BudgetsListPage(enableBackButton: true)
+                        ? const BudgetsListPage(enableBackButton: true)
                         : EditBudgetPage(),
                     title: navBarIconsData["budgetDetails"]!.label.tr(),
                     icon: navBarIconsData["budgetDetails"]!.iconData,
@@ -350,7 +351,7 @@ class MorePages extends StatelessWidget {
                 )
               ],
             ),
-          if (hasSideNavigation) SettingsPageContent(),
+          if (hasSideNavigation) const SettingsPageContent(),
         ],
       ),
     );
@@ -418,7 +419,7 @@ class SettingsPageFrameworkState extends State<SettingsPageFramework> {
     return PageFramework(
       title: "settings".tr(),
       dragDownToDismiss: true,
-      listWidgets: [SettingsPageContent()],
+      listWidgets: const [SettingsPageContent()],
     );
   }
 }
@@ -464,7 +465,7 @@ class SettingsPageContent extends StatelessWidget {
                                   enableBorderRadius: true,
                                 ),
                               )
-                            : SizedBox.shrink(),
+                            : const SizedBox.shrink(),
                         SelectColor(
                           selectableColorsList: selectableAccentColors(context),
                           includeThemeColor: false,
@@ -493,7 +494,7 @@ class SettingsPageContent extends StatelessWidget {
           },
         ),
         getPlatform() == PlatformOS.isIOS
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : SettingsContainerSwitch(
                 title: "material-you".tr(),
                 description: "material-you-description".tr(),
@@ -505,13 +506,13 @@ class SettingsPageContent extends StatelessWidget {
                     ? Icons.brush_outlined
                     : Icons.brush_rounded,
               ),
-        ThemeSettingsDropdown(),
+        const ThemeSettingsDropdown(),
 
         // EnterName(),
         SettingsHeader(title: "preferences".tr()),
 
         SettingsContainerOpenPage(
-          openPage: EditHomePage(),
+          openPage: const EditHomePage(),
           title: "edit-home-page".tr(),
           icon: appStateSettings["outlinedIcons"]
               ? Icons.home_outlined
@@ -520,15 +521,15 @@ class SettingsPageContent extends StatelessWidget {
 
         notificationsGlobalEnabled && getIsFullScreen(context) == false
             ? SettingsContainerOpenPage(
-                openPage: NotificationsPage(),
+                openPage: const NotificationsPage(),
                 title: "notifications".tr(),
                 icon: appStateSettings["outlinedIcons"]
                     ? Icons.notifications_outlined
                     : Icons.notifications_rounded,
               )
-            : SizedBox.shrink(),
+            : const SizedBox.shrink(),
 
-        BiometricsSettingToggle(),
+        const BiometricsSettingToggle(),
 
         SettingsContainer(
           title: "language".tr(),
@@ -554,7 +555,7 @@ class SettingsPageContent extends StatelessWidget {
         ),
 
         SettingsContainerOpenPage(
-          openPage: MoreOptionsPagePreferences(),
+          openPage: const MoreOptionsPagePreferences(),
           title: "more-options".tr(),
           description: "more-options-description".tr(),
           icon: appStateSettings["outlinedIcons"]
@@ -571,27 +572,27 @@ class SettingsPageContent extends StatelessWidget {
 
         appStateSettings["emailScanning"]
             ? SettingsContainerOpenPage(
-                openPage: AutoTransactionsPageEmail(),
+                openPage: const AutoTransactionsPageEmail(),
                 title: "auto-email-transactions".tr(),
                 icon: appStateSettings["outlinedIcons"]
                     ? Icons.mark_email_unread_outlined
                     : Icons.mark_email_unread_rounded,
               )
-            : SizedBox.shrink(),
+            : const SizedBox.shrink(),
 
         appStateSettings["notificationScanningDebug"] &&
                 getPlatform(ignoreEmulation: true) == PlatformOS.isAndroid
             ? SettingsContainerOpenPage(
                 title: "Notification Transactions",
-                openPage: AutoTransactionsPageNotifications(),
+                openPage: const AutoTransactionsPageNotifications(),
                 icon: appStateSettings["outlinedIcons"]
                     ? Icons.edit_notifications_outlined
                     : Icons.edit_notifications_rounded,
               )
-            : SizedBox.shrink(),
+            : const SizedBox.shrink(),
 
         SettingsContainerOpenPage(
-          openPage: BillSplitter(),
+          openPage: const BillSplitter(),
           title: "bill-splitter".tr(),
           icon: appStateSettings["outlinedIcons"]
               ? Icons.summarize_outlined
@@ -599,7 +600,7 @@ class SettingsPageContent extends StatelessWidget {
         ),
 
         SettingsContainerOpenPage(
-          openPage: ActivityPage(),
+          openPage: const ActivityPage(),
           title: "transaction-activity-log".tr(),
           icon: appStateSettings["outlinedIcons"]
               ? Icons.ballot_outlined
@@ -608,15 +609,15 @@ class SettingsPageContent extends StatelessWidget {
 
         SettingsHeader(title: "import-and-export".tr()),
 
-        ExportCSV(),
+        const ExportCSV(),
 
-        ImportCSV(),
+        const ImportCSV(),
 
         SettingsHeader(title: "backups".tr()),
 
-        ExportDB(),
+        const ExportDB(),
 
-        ImportDB(),
+        const ImportDB(),
 
         GoogleAccountLoginButton(
           isOutlinedButton: false,
@@ -692,31 +693,31 @@ class MoreOptionsPagePreferences extends StatelessWidget {
       horizontalPaddingConstrained: true,
       listWidgets: [
         SettingsHeader(title: "style".tr()),
-        HeaderHeightSetting(),
-        OutlinedIconsSetting(),
-        FontPickerSetting(),
-        AppAnimationSetting(),
-        CountingNumberAnimationSetting(),
-        IncreaseTextContrastSetting(),
+        const HeaderHeightSetting(),
+        const OutlinedIconsSetting(),
+        const FontPickerSetting(),
+        const AppAnimationSetting(),
+        const CountingNumberAnimationSetting(),
+        const IncreaseTextContrastSetting(),
         SettingsHeader(title: "transactions".tr()),
-        TransactionsSettings(),
+        const TransactionsSettings(),
         SettingsHeader(title: "accounts".tr()),
-        WalletsSettings(),
-        PrimaryCurrencySetting(),
+        const WalletsSettings(),
+        const PrimaryCurrencySetting(),
         SettingsHeader(title: "budgets".tr()),
-        BudgetSettings(),
+        const BudgetSettings(),
         SettingsHeader(title: "goals".tr()),
-        ObjectiveSettings(),
+        const ObjectiveSettings(),
         SettingsHeader(title: "titles".tr()),
-        TitlesSettings(),
+        const TitlesSettings(),
         SettingsHeader(title: "widgets".tr()),
-        WidgetSettings(),
+        const WidgetSettings(),
         SettingsHeader(title: "formatting".tr()),
-        NumberFormattingSetting(),
-        PercentagePrecisionSetting(),
-        Time24HourFormatSetting(),
-        FirstDayOfWeekSetting(updateHomePage: true),
-        NumberPadFormatSetting(),
+        const NumberFormattingSetting(),
+        const PercentagePrecisionSetting(),
+        const Time24HourFormatSetting(),
+        const FirstDayOfWeekSetting(updateHomePage: true),
+        const NumberPadFormatSetting(),
       ],
     );
   }
@@ -727,8 +728,9 @@ class WidgetSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (getPlatform(ignoreEmulation: true) != PlatformOS.isAndroid)
-      return SizedBox.shrink();
+    if (getPlatform(ignoreEmulation: true) != PlatformOS.isAndroid) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -751,7 +753,7 @@ class WidgetSettings extends StatelessWidget {
               ? Icons.contrast_outlined
               : Icons.contrast_rounded,
           initial: appStateSettings["widgetTheme"].toString(),
-          items: ["app", "light", "dark"],
+          items: const ["app", "light", "dark"],
           onChanged: (value) async {
             if (value == "app") value = "system";
             await updateSettings("widgetTheme", value,
@@ -769,11 +771,11 @@ class WidgetSettings extends StatelessWidget {
               : Icons.blur_on_rounded,
           descriptionWidget: Container(
             height: 28,
-            padding: EdgeInsetsDirectional.only(end: 10),
+            padding: const EdgeInsetsDirectional.only(end: 10),
             child: SliderTheme(
               data: SliderThemeData(
                 trackShape: CustomTrackShape(),
-                thumbShape: RoundSliderThumbShape(enabledThumbRadius: 9),
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9),
               ),
               child: SliderSelector(
                 min: 0,
@@ -891,7 +893,7 @@ class _BiometricsSettingToggleState extends State<BiometricsSettingToggle> {
                         ? Icons.lock_open_outlined
                         : Icons.lock_open_rounded,
               )
-            : SizedBox.shrink(),
+            : const SizedBox.shrink(),
       ],
     );
   }
@@ -912,7 +914,7 @@ class HeaderHeightSetting extends StatelessWidget {
             ? Icons.subtitles_outlined
             : Icons.subtitles_rounded,
         initial: appStateSettings["forceSmallHeader"].toString(),
-        items: ["true", "false"],
+        items: const ["true", "false"],
         onChanged: (value) async {
           bool boolValue = false;
           if (value == "true") {
@@ -944,7 +946,7 @@ class OutlinedIconsSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SettingsContainerDropdown(
-      items: ["rounded", "outlined"],
+      items: const ["rounded", "outlined"],
       onChanged: (value) async {
         if (value == "rounded") {
           await updateSettings("outlinedIcons", false,
@@ -985,7 +987,7 @@ class CountingNumberAnimationSetting extends StatelessWidget {
       initial: appStateSettings["numberCountUpAnimation"] == true
           ? "count-up"
           : "disabled",
-      items: ["count-up", "disabled"],
+      items: const ["count-up", "disabled"],
       onChanged: (value) async {
         await updateSettings(
           "numberCountUpAnimation",
@@ -1019,7 +1021,7 @@ class AppAnimationSetting extends StatelessWidget {
                       AppAnimations.disabled.index
                   ? "disabled"
                   : "all",
-      items: ["all", "minimal"], // "disabled" is not yet supported
+      items: const ["all", "minimal"], // "disabled" is not yet supported
       onChanged: (value) async {
         await updateSettings(
           "appAnimations",
@@ -1105,7 +1107,7 @@ void openFontPicker(BuildContext context) {
       title: "font".tr(),
       child: RadioItems(
         itemsAreFonts: true,
-        items: [
+        items: const [
           // These values match that of pubspec font family
           "Avenir",
           "DMSans",
@@ -1120,7 +1122,7 @@ void openFontPicker(BuildContext context) {
         displayFilter: fontNameDisplayFilter,
         onChanged: (value) async {
           updateSettings("font", value, updateGlobalState: true);
-          await Future.delayed(Duration(milliseconds: 50));
+          await Future.delayed(const Duration(milliseconds: 50));
           popRoute(context);
         },
       ),
@@ -1179,7 +1181,7 @@ class NumberFormattingSetting extends StatelessWidget {
         await openBottomSheet(
           context,
           fullSnap: true,
-          SetNumberFormatPopup(),
+          const SetNumberFormatPopup(),
         );
         String newSetting = appStateSettings["customNumberFormat"].toString() +
             appStateSettings["numberFormatDelimiter"].toString() +
@@ -1207,7 +1209,7 @@ class Time24HourFormatSetting extends StatelessWidget {
           ? Icons.history_toggle_off_outlined
           : Icons.history_toggle_off_rounded,
       initial: appStateSettings["use24HourFormat"].toString(),
-      items: ["system", "12-hour", "24-hour"],
+      items: const ["system", "12-hour", "24-hour"],
       onChanged: (value) async {
         await updateSettings("use24HourFormat", value, updateGlobalState: true);
       },
@@ -1250,10 +1252,10 @@ class _SetNumberFormatPopupState extends State<SetNumberFormatPopup> {
                 ? Icons.one_k_outlined
                 : Icons.one_k_rounded,
           ),
-          HorizontalBreak(),
-          SizedBox(height: 10),
+          const HorizontalBreak(),
+          const SizedBox(height: 10),
           AnimatedOpacity(
-            duration: Duration(milliseconds: 500),
+            duration: const Duration(milliseconds: 500),
             opacity: customNumberFormat == false ? 1 : 0.5,
             child: Row(
               children: [
@@ -1262,7 +1264,7 @@ class _SetNumberFormatPopupState extends State<SetNumberFormatPopup> {
                     filled: customNumberFormat == false,
                     alignStart: true,
                     alignBeside: true,
-                    padding: EdgeInsetsDirectional.symmetric(
+                    padding: const EdgeInsetsDirectional.symmetric(
                         horizontal: 20, vertical: 20),
                     text: "default".tr(),
                     afterWidget: Padding(
@@ -1300,9 +1302,9 @@ class _SetNumberFormatPopupState extends State<SetNumberFormatPopup> {
               ],
             ),
           ),
-          SizedBox(height: 13),
+          const SizedBox(height: 13),
           AnimatedOpacity(
-            duration: Duration(milliseconds: 500),
+            duration: const Duration(milliseconds: 500),
             opacity: customNumberFormat == true ? 1 : 0.5,
             child: Row(
               children: [
@@ -1311,7 +1313,7 @@ class _SetNumberFormatPopupState extends State<SetNumberFormatPopup> {
                     filled: customNumberFormat == true,
                     alignStart: true,
                     alignBeside: true,
-                    padding: EdgeInsetsDirectional.symmetric(
+                    padding: const EdgeInsetsDirectional.symmetric(
                         horizontal: 20, vertical: 20),
                     text: "custom".tr(),
                     afterWidget: CustomNumberFormatPopup(onChangeAnyOption: () {
@@ -1336,7 +1338,7 @@ class _SetNumberFormatPopupState extends State<SetNumberFormatPopup> {
               ],
             ),
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           Tappable(
             borderRadius: 10,
             color: Colors.transparent,
@@ -1390,7 +1392,7 @@ class _CustomNumberFormatPopupState extends State<CustomNumberFormatPopup> {
     );
     return Column(
       children: [
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         AnimatedSizeSwitcher(
           child: TextFont(
             key: ValueKey(formattedNumber),
@@ -1400,7 +1402,7 @@ class _CustomNumberFormatPopupState extends State<CustomNumberFormatPopup> {
             text: formattedNumber,
           ),
         ),
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1413,8 +1415,9 @@ class _CustomNumberFormatPopupState extends State<CustomNumberFormatPopup> {
                     ? Symbols.decimal_decrease_sharp
                     : Symbols.decimal_decrease_rounded,
                 onTap: () {
-                  if (widget.onChangeAnyOption != null)
+                  if (widget.onChangeAnyOption != null) {
                     widget.onChangeAnyOption!();
+                  }
                   openBottomSheet(
                     context,
                     popupWithKeyboard: true,
@@ -1444,22 +1447,20 @@ class _CustomNumberFormatPopupState extends State<CustomNumberFormatPopup> {
                 },
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: SettingsContainer(
                 isOutlined: true,
                 isOutlinedColumn: true,
-                title: "symbol".tr() +
-                    "\n" +
-                    (numberFormatCurrencyFirst
-                        ? "before".tr().capitalizeFirst
-                        : "after".tr().capitalizeFirst),
+                title:
+                    "${"symbol".tr()}\n${numberFormatCurrencyFirst ? "before".tr().capitalizeFirst : "after".tr().capitalizeFirst}",
                 icon: appStateSettings["outlinedIcons"]
                     ? Icons.monetization_on_outlined
                     : Icons.monetization_on_rounded,
                 onTap: () {
-                  if (widget.onChangeAnyOption != null)
+                  if (widget.onChangeAnyOption != null) {
                     widget.onChangeAnyOption!();
+                  }
                   setState(() {
                     numberFormatCurrencyFirst = !numberFormatCurrencyFirst;
                   });
@@ -1469,7 +1470,7 @@ class _CustomNumberFormatPopupState extends State<CustomNumberFormatPopup> {
                 },
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: SettingsContainer(
                 isOutlined: true,
@@ -1479,8 +1480,9 @@ class _CustomNumberFormatPopupState extends State<CustomNumberFormatPopup> {
                     ? Symbols.decimal_increase_sharp
                     : Symbols.decimal_increase_rounded,
                 onTap: () {
-                  if (widget.onChangeAnyOption != null)
+                  if (widget.onChangeAnyOption != null) {
                     widget.onChangeAnyOption!();
+                  }
                   openBottomSheet(
                     context,
                     popupWithKeyboard: true,
@@ -1527,7 +1529,7 @@ class NumberPadFormatSetting extends StatelessWidget {
       onTap: () {
         openBottomSheet(
           context,
-          NumberPadFormatSettingPopup(),
+          const NumberPadFormatSettingPopup(),
         );
       },
       icon: appStateSettings["outlinedIcons"]
@@ -1559,12 +1561,12 @@ class _NumberPadFormatSettingPopupState
               setState(() {});
             },
           ),
-          NumberPadHapticFeedbackSetting(
+          const NumberPadHapticFeedbackSetting(
             enableBorderRadius: true,
           ),
-          HorizontalBreak(),
-          SizedBox(height: 10),
-          NumberPadFormatPicker(),
+          const HorizontalBreak(),
+          const SizedBox(height: 10),
+          const NumberPadFormatPicker(),
         ],
       ),
     );
@@ -1589,7 +1591,7 @@ class _NumberPadFormatPickerState extends State<NumberPadFormatPicker> {
           children: [
             Expanded(
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 500),
                 opacity: selectedNumberPadFormat == NumberPadFormat.format123
                     ? 1
                     : 0.5,
@@ -1612,7 +1614,7 @@ class _NumberPadFormatPickerState extends State<NumberPadFormatPicker> {
                       format: NumberPadFormat.format123,
                     ),
                   ),
-                  padding: EdgeInsetsDirectional.only(
+                  padding: const EdgeInsetsDirectional.only(
                       start: 20, end: 15, top: 10, bottom: 15),
                   iconData: null,
                   onTap: () {
@@ -1628,12 +1630,12 @@ class _NumberPadFormatPickerState extends State<NumberPadFormatPicker> {
             ),
           ],
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 500),
                 opacity: selectedNumberPadFormat == NumberPadFormat.format789
                     ? 1
                     : 0.5,
@@ -1656,7 +1658,7 @@ class _NumberPadFormatPickerState extends State<NumberPadFormatPicker> {
                       format: NumberPadFormat.format789,
                     ),
                   ),
-                  padding: EdgeInsetsDirectional.only(
+                  padding: const EdgeInsetsDirectional.only(
                       start: 20, end: 15, top: 10, bottom: 15),
                   iconData: null,
                   onTap: () {
@@ -1691,7 +1693,7 @@ class ExtraZerosButtonSetting extends StatelessWidget {
           ? Symbols.counter_0_sharp
           : Symbols.counter_0_rounded,
       initial: appStateSettings["extraZerosButton"].toString(),
-      items: ["", "00", "000"],
+      items: const ["", "00", "000"],
       onChanged: (value) async {
         await updateSettings(
           "extraZerosButton",
@@ -1747,7 +1749,7 @@ class PercentagePrecisionSetting extends StatelessWidget {
           : appStateSettings["percentagePrecision"] == 1
               ? "1-decimal"
               : "0-decimals",
-      items: ["0-decimals", "1-decimal", "2-decimals"],
+      items: const ["0-decimals", "1-decimal", "2-decimals"],
       onChanged: (value) async {
         updateSettings(
           "percentagePrecision",
@@ -1783,7 +1785,7 @@ class FirstDayOfWeekSetting extends StatelessWidget {
           ? Icons.calendar_month_outlined
           : Icons.calendar_month_rounded,
       initial: appStateSettings["firstDayOfWeek"].toString(),
-      items: ["-1", "0", "1"],
+      items: const ["-1", "0", "1"],
       onChanged: (value) async {
         int intValue = int.tryParse(value) ?? -1;
         await updateSettings(

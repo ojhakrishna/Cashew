@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:budget/colors.dart';
 
 class Button extends StatefulWidget {
-  Button({
+  const Button({
     Key? key,
     required this.label,
     this.width,
@@ -63,7 +63,7 @@ class _ButtonState extends State<Button> with TickerProviderStateMixin {
     setState(() {
       isTapped = true;
     });
-    timer = Timer(Duration(milliseconds: 200), () {
+    timer = Timer(const Duration(milliseconds: 200), () {
       setState(() {
         isTapped = false;
       });
@@ -96,7 +96,7 @@ class _ButtonState extends State<Button> with TickerProviderStateMixin {
               ? MediaQuery.viewPaddingOf(context).bottom
               : 0),
       child: AnimatedScale(
-        duration: Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 200),
         curve: Curves.easeOutCubic,
         scale: widget.changeScale ? (isTapped ? 0.95 : 1) : 1,
         alignment: widget.expandToFillBottomExtraSafeArea
@@ -107,25 +107,27 @@ class _ButtonState extends State<Button> with TickerProviderStateMixin {
               ? appStateSettings["materialYou"]
                   ? Colors.grey
                   : getColor(context, "lightDarkAccentHeavy")
-              : widget.color != null
-                  ? widget.color
-                  : appStateSettings["materialYou"]
+              : widget.color ??
+                  (appStateSettings["materialYou"]
                       ? dynamicPastel(
                           context, Theme.of(context).colorScheme.primary,
                           amount: 0.15)
-                      : Theme.of(context).colorScheme.secondaryContainer,
+                      : Theme.of(context).colorScheme.secondaryContainer),
           onHighlightChanged: (value) {
-            if (appStateSettings["appAnimations"] == AppAnimations.all.index)
+            if (appStateSettings["appAnimations"] == AppAnimations.all.index) {
               setState(() {
                 isTapped = value;
               });
+            }
           },
           onTap: () {
-            if (appStateSettings["appAnimations"] == AppAnimations.all.index)
+            if (appStateSettings["appAnimations"] == AppAnimations.all.index) {
               _shrink();
+            }
             if (widget.disabled == false) widget.onTap();
-            if (widget.disabled == true && widget.onDisabled != null)
+            if (widget.disabled == true && widget.onDisabled != null) {
               widget.onDisabled!();
+            }
           },
           onLongPress: widget.onLongPress,
           borderRadius:
@@ -153,11 +155,10 @@ class _ButtonState extends State<Button> with TickerProviderStateMixin {
                         child: Icon(
                           widget.icon,
                           size: 21,
-                          color: widget.iconColor == null
-                              ? Theme.of(context)
+                          color: widget.iconColor ??
+                              Theme.of(context)
                                   .colorScheme
-                                  .onSecondaryContainer
-                              : widget.iconColor,
+                                  .onSecondaryContainer,
                         ),
                       ),
                     widget.flexibleLayout
@@ -234,7 +235,7 @@ class TappableOpacityButton extends StatelessWidget {
         ),
       ),
     );
-    if (expandedLayout)
+    if (expandedLayout) {
       return Row(
         children: [
           Expanded(
@@ -242,6 +243,7 @@ class TappableOpacityButton extends StatelessWidget {
           ),
         ],
       );
+    }
     return child;
   }
 }
@@ -267,6 +269,9 @@ class ButtonIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tappable(
+      color: color ?? Theme.of(context).colorScheme.secondaryContainer,
+      borderRadius: getPlatform() == PlatformOS.isIOS ? 10 : 15,
+      onTap: onTap,
       child: Container(
         height: size,
         width: size,
@@ -279,11 +284,6 @@ class ButtonIcon extends StatelessWidget {
           size: size - iconPadding,
         ),
       ),
-      color: color == null
-          ? Theme.of(context).colorScheme.secondaryContainer
-          : color,
-      borderRadius: getPlatform() == PlatformOS.isIOS ? 10 : 15,
-      onTap: onTap,
     );
   }
 }
@@ -298,14 +298,14 @@ class SelectedIconForIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       decoration: BoxDecoration(
         color: isSelected
             ? Theme.of(context).colorScheme.tertiary.withOpacity(0.1)
             : Colors.transparent,
         borderRadius: BorderRadiusDirectional.circular(100),
       ),
-      padding: EdgeInsetsDirectional.all(8),
+      padding: const EdgeInsetsDirectional.all(8),
       child: Icon(
         iconData,
         color: isSelected ? Theme.of(context).colorScheme.tertiary : null,

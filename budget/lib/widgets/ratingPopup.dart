@@ -31,7 +31,7 @@ bool openRatingPopupCheck(BuildContext context) {
   return false;
   if ((appStateSettings["numLogins"] + 1) % 10 == 0 &&
       appStateSettings["submittedFeedback"] != true) {
-    openBottomSheet(context, RatingPopup(), fullSnap: true);
+    openBottomSheet(context, const RatingPopup(), fullSnap: true);
     return true;
   }
   return false;
@@ -45,10 +45,11 @@ class RatingPopup extends StatefulWidget {
 }
 
 class _RatingPopupState extends State<RatingPopup> {
-  int? selectedStars = null;
+  int? selectedStars;
   bool writingFeedback = false;
-  TextEditingController _feedbackController = TextEditingController();
-  TextEditingController _feedbackControllerEmail = TextEditingController();
+  final TextEditingController _feedbackController = TextEditingController();
+  final TextEditingController _feedbackControllerEmail =
+      TextEditingController();
 
   @override
   void initState() {
@@ -76,7 +77,7 @@ class _RatingPopupState extends State<RatingPopup> {
                 ? Theme.of(context).colorScheme.primary.withOpacity(0.7)
                 : getColor(context, "starYellow"),
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           ClipRRect(
             borderRadius: BorderRadiusDirectional.circular(
                 getPlatform() == PlatformOS.isIOS ? 8 : 15),
@@ -130,7 +131,7 @@ class _RatingPopupState extends State<RatingPopup> {
               ],
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           AnimatedExpanded(
             expand: writingFeedback,
             child: Padding(
@@ -158,7 +159,7 @@ class _RatingPopupState extends State<RatingPopup> {
               ),
             ),
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Button(
             label: "submit".tr(),
             onTap: () async {
@@ -239,7 +240,7 @@ Future<bool> shareFeedback(String feedbackText, String feedbackType,
         icon: appStateSettings["outlinedIcons"]
             ? Icons.rate_review_outlined
             : Icons.rate_review_rounded,
-        timeout: Duration(milliseconds: 2500)));
+        timeout: const Duration(milliseconds: 2500)));
   } catch (e) {
     print(e.toString());
     error = true;
@@ -252,7 +253,7 @@ Future<bool> shareFeedback(String feedbackText, String feedbackType,
         icon: appStateSettings["outlinedIcons"]
             ? Icons.warning_outlined
             : Icons.warning_rounded,
-        timeout: Duration(milliseconds: 2500)));
+        timeout: const Duration(milliseconds: 2500)));
   }
   loadingIndeterminateKey.currentState?.setVisibility(false);
 

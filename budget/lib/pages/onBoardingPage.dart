@@ -70,13 +70,13 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
   bool selectedIncludeIncome = false;
 
   bool showImage = false;
-  final Image imageLanding1 = Image(
+  final Image imageLanding1 = const Image(
     image: AssetImage("assets/landing/Graph.png"),
   );
-  final Image imageLanding2 = Image(
+  final Image imageLanding2 = const Image(
     image: AssetImage("assets/landing/BankOrPig.png"),
   );
-  final Image imageLanding3 = Image(
+  final Image imageLanding3 = const Image(
     image: AssetImage("assets/landing/PigBank.png"),
   );
 
@@ -134,7 +134,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
     }
   }
 
-  FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode();
   late FocusAttachment _focusAttachment;
 
   @override
@@ -174,16 +174,16 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
       nextNavigation();
     } else {
       controller.nextPage(
-        duration: Duration(milliseconds: 1100),
-        curve: ElasticOutCurve(1.3),
+        duration: const Duration(milliseconds: 1100),
+        curve: const ElasticOutCurve(1.3),
       );
     }
   }
 
   void previousOnBoardPage() {
     controller.previousPage(
-      duration: Duration(milliseconds: 1100),
-      curve: ElasticOutCurve(1.3),
+      duration: const Duration(milliseconds: 1100),
+      curve: const ElasticOutCurve(1.3),
     );
   }
 
@@ -237,7 +237,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                     : 300),
             child: imageLanding1,
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Padding(
             padding: const EdgeInsetsDirectional.symmetric(horizontal: 25),
             child: TextFont(
@@ -248,7 +248,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
               maxLines: 5,
             ),
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Padding(
             padding: const EdgeInsetsDirectional.symmetric(horizontal: 25),
             child: TextFont(
@@ -258,7 +258,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
               maxLines: 5,
             ),
           ),
-          SizedBox(height: 55),
+          const SizedBox(height: 55),
         ],
         bottomWidget: widget.showPreviewDemoButton
             ? PreviewDemoButton(
@@ -276,7 +276,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                     : 300),
             child: imageLanding2,
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Padding(
             padding: const EdgeInsetsDirectional.symmetric(horizontal: 25),
             child: TextFont(
@@ -287,7 +287,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
               maxLines: 5,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           BudgetDetails(
             determineBottomButton: () {},
             setSelectedAmount: (amount, _) {
@@ -355,7 +355,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                     onTap: () {
                       openBottomSheet(
                         context,
-                        SizedBox.shrink(),
+                        const SizedBox.shrink(),
                         customBuilder:
                             (context2, scrollController, sheetState) {
                           return CustomScrollView(
@@ -367,8 +367,8 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                                   subtitle:
                                       "select-primary-currency-description"
                                           .tr(),
-                                  child: SizedBox.shrink(),
                                   bottomSafeAreaExtraPadding: false,
+                                  child: SizedBox.shrink(),
                                 ),
                               ),
                               CurrencyPicker(
@@ -399,10 +399,10 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                   ),
                 );
               }
-              return SizedBox.shrink();
+              return const SizedBox.shrink();
             },
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Padding(
             padding: const EdgeInsetsDirectional.symmetric(horizontal: 25),
             child: TextFont(
@@ -425,7 +425,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                     : 300),
             child: imageLanding3,
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Padding(
             padding: const EdgeInsetsDirectional.symmetric(horizontal: 25),
             child: TextFont(
@@ -436,7 +436,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
               maxLines: 5,
             ),
           ),
-          SizedBox(height: 25),
+          const SizedBox(height: 25),
           getPlatform() == PlatformOS.isIOS
               ? IntrinsicWidth(
                   child: Padding(
@@ -451,9 +451,9 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                     ),
                   ),
                 )
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           getPlatform() == PlatformOS.isIOS
-              ? SizedBox.shrink()
+              ? const SizedBox.shrink()
               : SettingsContainerOutlined(
                   onTap: () async {
                     loadingIndeterminateKey.currentState?.setVisibility(true);
@@ -524,7 +524,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                             ?.setVisibility(false);
                       },
                       onError: (e) {
-                        print("Error signing in: " + e.toString());
+                        print("Error signing in: $e");
                         loadingIndeterminateKey.currentState
                             ?.setVisibility(false);
                       },
@@ -535,10 +535,10 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                   isExpanded: false,
                 ),
           getPlatform() == PlatformOS.isIOS
-              ? SizedBox.shrink()
-              : SizedBox(height: 8),
+              ? const SizedBox.shrink()
+              : const SizedBox(height: 8),
           getPlatform() == PlatformOS.isIOS
-              ? SizedBox.shrink()
+              ? const SizedBox.shrink()
               : Padding(
                   padding:
                       const EdgeInsetsDirectional.symmetric(horizontal: 25),
@@ -550,10 +550,10 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                   ),
                 ),
           getPlatform() == PlatformOS.isIOS
-              ? SizedBox.shrink()
-              : SizedBox(height: 35),
+              ? const SizedBox.shrink()
+              : const SizedBox(height: 35),
           getPlatform() == PlatformOS.isIOS
-              ? SizedBox.shrink()
+              ? const SizedBox.shrink()
               : LowKeyButton(
                   onTap: () {
                     nextNavigation();
@@ -572,8 +572,9 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
       ),
     ];
 
-    if (numPages != children.length)
+    if (numPages != children.length) {
       print("Error: onboarding pages mismatch in length!");
+    }
 
     return Stack(
       children: [
@@ -590,12 +591,12 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
               foregroundDecoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Theme.of(context).colorScheme.background.withOpacity(0.0),
-                    Theme.of(context).colorScheme.background,
+                    Theme.of(context).colorScheme.surface.withOpacity(0.0),
+                    Theme.of(context).colorScheme.surface,
                   ],
                   begin: AlignmentDirectional.topCenter,
                   end: AlignmentDirectional.bottomCenter,
-                  stops: [0.1, 1],
+                  stops: const [0.1, 1],
                 ),
               ),
             ),
@@ -622,7 +623,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                             controller.page?.round().toInt() ?? 0;
                         return AnimatedOpacity(
                           opacity: currentIndex <= 0 ? 0 : 1,
-                          duration: Duration(milliseconds: 200),
+                          duration: const Duration(milliseconds: 200),
                           child: ButtonIcon(
                             onTap: () {
                               previousOnBoardPage();
@@ -636,8 +637,8 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                                     : Icons.arrow_back_rounded,
                             size: 50,
                             padding: getIsFullScreen(context) == false
-                                ? EdgeInsetsDirectional.all(3)
-                                : EdgeInsetsDirectional.all(6),
+                                ? const EdgeInsetsDirectional.all(3)
+                                : const EdgeInsetsDirectional.all(6),
                           ),
                         );
                       },
@@ -655,7 +656,7 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                               : currentIndex >= children.length - 1
                                   ? 0
                                   : 1,
-                          duration: Duration(milliseconds: 200),
+                          duration: const Duration(milliseconds: 200),
                           child: ButtonIcon(
                             onTap: () => nextOnBoardPage(),
                             icon: getPlatform() == PlatformOS.isIOS
@@ -667,8 +668,8 @@ class OnBoardingPageBodyState extends State<OnBoardingPageBody> {
                                     : Icons.arrow_forward_rounded,
                             size: 50,
                             padding: getIsFullScreen(context) == false
-                                ? EdgeInsetsDirectional.all(3)
-                                : EdgeInsetsDirectional.all(6),
+                                ? const EdgeInsetsDirectional.all(3)
+                                : const EdgeInsetsDirectional.all(6),
                           ),
                         );
                       },
@@ -705,9 +706,9 @@ class OnBoardPage extends StatelessWidget {
               children: <Widget>[
                 Column(
                   children: [
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ...widgets,
-                    SizedBox(height: 80),
+                    const SizedBox(height: 80),
                   ],
                 ),
               ],
@@ -719,7 +720,7 @@ class OnBoardPage extends StatelessWidget {
               bottom: 60 + MediaQuery.paddingOf(context).bottom),
           child: Align(
             alignment: AlignmentDirectional.bottomCenter,
-            child: bottomWidget ?? SizedBox.shrink(),
+            child: bottomWidget ?? const SizedBox.shrink(),
           ),
         ),
       ],

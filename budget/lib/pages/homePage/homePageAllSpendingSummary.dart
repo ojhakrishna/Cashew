@@ -30,9 +30,10 @@ class HomePageAllSpendingSummary extends StatelessWidget {
               appStateSettings["allSpendingSummaryAllWallets"] == true) {
             List<String>? walletPks =
                 (snapshot.data ?? []).map((item) => item.walletPk).toList();
-            if (walletPks.length <= 0 ||
-                appStateSettings["allSpendingSummaryAllWallets"] == true)
+            if (walletPks.isEmpty ||
+                appStateSettings["allSpendingSummaryAllWallets"] == true) {
               walletPks = null;
+            }
             return Padding(
               padding: const EdgeInsetsDirectional.only(
                   bottom: 13, start: 13, end: 13),
@@ -68,7 +69,7 @@ class HomePageAllSpendingSummary extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(width: 13),
+                  const SizedBox(width: 13),
                   Expanded(
                     child: TransactionsAmountBox(
                       onLongPress: () async {
@@ -101,7 +102,7 @@ class HomePageAllSpendingSummary extends StatelessWidget {
               ),
             );
           }
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         },
       ),
     );
@@ -114,7 +115,7 @@ Future openAllSpendingSettings(BuildContext context) {
     PopupFramework(
       title: "income-and-expenses".tr(),
       subtitle: "applies-to-homepage".tr(),
-      child: WalletPickerPeriodCycle(
+      child: const WalletPickerPeriodCycle(
         allWalletsSettingKey: "allSpendingSummaryAllWallets",
         cycleSettingsExtension: "AllSpendingSummary",
         homePageWidgetDisplay: HomePageWidgetDisplay.AllSpendingSummary,

@@ -61,7 +61,7 @@ class OutlinedButtonStacked extends StatelessWidget {
                 children: [
                   Padding(
                     padding: padding ??
-                        EdgeInsetsDirectional.symmetric(
+                        const EdgeInsetsDirectional.symmetric(
                             horizontal: 8, vertical: 30),
                     child: Column(
                       crossAxisAlignment: alignStart
@@ -91,8 +91,9 @@ class OutlinedButtonStacked extends StatelessWidget {
                                           ),
                                         ),
                                       );
-                                      if (customIconBuilder != null)
+                                      if (customIconBuilder != null) {
                                         return customIconBuilder!(icon);
+                                      }
                                       return icon;
                                     }),
                                   if (text != null)
@@ -103,7 +104,7 @@ class OutlinedButtonStacked extends StatelessWidget {
                                       maxLines: 2,
                                       textAlign: TextAlign.center,
                                     ),
-                                  infoButton ?? SizedBox.shrink()
+                                  infoButton ?? const SizedBox.shrink()
                                 ],
                               )
                             : HeaderWithIconAndInfo(
@@ -121,17 +122,17 @@ class OutlinedButtonStacked extends StatelessWidget {
                                         : null,
                               ),
                         afterWidget == null
-                            ? SizedBox.shrink()
-                            : SizedBox(height: 8),
+                            ? const SizedBox.shrink()
+                            : const SizedBox(height: 8),
                         if (afterWidgetPadding == null)
-                          afterWidget ?? SizedBox.shrink()
+                          afterWidget ?? const SizedBox.shrink()
                       ],
                     ),
                   ),
                   if (afterWidgetPadding != null)
                     Padding(
                       padding: afterWidgetPadding ?? EdgeInsetsDirectional.zero,
-                      child: afterWidget ?? SizedBox.shrink(),
+                      child: afterWidget ?? const SizedBox.shrink(),
                     ),
                 ],
               ),
@@ -164,7 +165,7 @@ class OutlinedContainer extends StatelessWidget {
     double borderRadiusValue =
         borderRadius ?? (getPlatform() == PlatformOS.isIOS ? 10 : 15);
     return AnimatedContainer(
-      duration: Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 250),
       decoration: BoxDecoration(
         border: Border.all(
           color: borderColor ??
@@ -198,7 +199,8 @@ class HeaderWithIconAndInfo extends StatelessWidget {
   final EdgeInsetsDirectional padding;
   final Widget? extraWidget;
 
-  HeaderWithIconAndInfo({
+  const HeaderWithIconAndInfo({
+    super.key,
     required this.iconData,
     this.iconScale = 1,
     required this.text,

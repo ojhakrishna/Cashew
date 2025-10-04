@@ -4,7 +4,8 @@ class InfiniteRotationAnimation extends StatefulWidget {
   final Widget child;
   final Duration duration;
 
-  InfiniteRotationAnimation({
+  const InfiniteRotationAnimation({
+    super.key,
     required this.child,
     this.duration = const Duration(milliseconds: 2000),
   });

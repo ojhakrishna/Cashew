@@ -21,7 +21,7 @@ class TableEntry extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadiusDirectional.circular(10),
         child: Table(
-          defaultColumnWidth: IntrinsicColumnWidth(),
+          defaultColumnWidth: const IntrinsicColumnWidth(),
           defaultVerticalAlignment: TableCellVerticalAlignment.middle,
           children: <TableRow>[
             TableRow(

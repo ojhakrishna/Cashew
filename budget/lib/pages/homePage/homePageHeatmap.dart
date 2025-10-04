@@ -81,7 +81,7 @@ class _HomePageHeatMapState extends State<HomePageHeatMap> {
               loadMoreMonths: loadMoreMonths,
             );
           }
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         },
       ),
     );
@@ -163,11 +163,11 @@ class HeatMap extends StatelessWidget {
       child: Container(
         height:
             12 + 7 * dayWidth + 7 * 2 * dayPadding + bottomTitleSpacing + 15,
-        margin: EdgeInsetsDirectional.symmetric(horizontal: 13),
-        padding:
-            EdgeInsetsDirectional.only(start: 0, end: 0, bottom: 12, top: 15),
+        margin: const EdgeInsetsDirectional.symmetric(horizontal: 13),
+        padding: const EdgeInsetsDirectional.only(
+            start: 0, end: 0, bottom: 12, top: 15),
         decoration: BoxDecoration(
-          borderRadius: BorderRadiusDirectional.all(Radius.circular(15)),
+          borderRadius: const BorderRadiusDirectional.all(Radius.circular(15)),
           color: backgroundColor,
           boxShadow: boxShadowCheck(boxShadowGeneral(context)),
         ),
@@ -188,12 +188,12 @@ class HeatMap extends StatelessWidget {
               shrinkWrap: true,
               reverse: true,
               itemCount: totalWeeks + 1,
-              padding: EdgeInsetsDirectional.symmetric(horizontal: 13),
+              padding: const EdgeInsetsDirectional.symmetric(horizontal: 13),
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, itemIndex) {
-                if (itemIndex == totalWeeks)
+                if (itemIndex == totalWeeks) {
                   return loadMoreMonths == null
-                      ? SizedBox.shrink()
+                      ? const SizedBox.shrink()
                       : Tooltip(
                           message: "view-more".tr(),
                           child: Padding(
@@ -211,6 +211,7 @@ class HeatMap extends StatelessWidget {
                             ),
                           ),
                         );
+                }
                 return Container(
                   child: Stack(
                     children: [
@@ -223,19 +224,11 @@ class HeatMap extends StatelessWidget {
                                 builder: (context) {
                                   int index = totalDays - (itemIndex * 7 + j);
                                   double? amount = nullIfIndexOutOfRange(
-                                              pointsOffsetFixed, index) ==
-                                          null
-                                      ? null
-                                      : nullIfIndexOutOfRange(
-                                              pointsOffsetFixed, index)
-                                          ?.y;
+                                          pointsOffsetFixed, index)
+                                      ?.y;
                                   DateTime? day = nullIfIndexOutOfRange(
-                                              pointsOffsetFixed, index) ==
-                                          null
-                                      ? null
-                                      : nullIfIndexOutOfRange(
-                                              pointsOffsetFixed, index)
-                                          ?.dateTime;
+                                          pointsOffsetFixed, index)
+                                      ?.dateTime;
                                   Color color = getHeatMapColor(
                                     context: context,
                                     amount: amount,
@@ -245,7 +238,8 @@ class HeatMap extends StatelessWidget {
                                     maxIncome: maxIncome,
                                   );
                                   return Tooltip(
-                                    waitDuration: Duration(milliseconds: 200),
+                                    waitDuration:
+                                        const Duration(milliseconds: 200),
                                     message: day != null
                                         ? getWordedDate(
                                             day,
@@ -260,6 +254,8 @@ class HeatMap extends StatelessWidget {
                                               context, day);
                                         }
                                       },
+                                      borderRadius: 5,
+                                      color: color,
                                       child: Container(
                                         height: dayWidth,
                                         width: dayWidth,
@@ -273,8 +269,6 @@ class HeatMap extends StatelessWidget {
                                                   5),
                                         ),
                                       ),
-                                      borderRadius: 5,
-                                      color: color,
                                     ),
                                   );
                                 },
@@ -285,7 +279,8 @@ class HeatMap extends StatelessWidget {
                       itemIndex % 4 == 4 - 1
                           ? Container(
                               width: dayWidth,
-                              padding: EdgeInsetsDirectional.only(start: 3),
+                              padding:
+                                  const EdgeInsetsDirectional.only(start: 3),
                               child: OverflowBox(
                                 maxWidth: dayWidth * 4 + dayPadding * 4 * 2,
                                 alignment: Alignment.bottomLeft,
@@ -386,10 +381,17 @@ Future<dynamic> openTransactionsOnDayBottomSheet(
               ),
             );
           } else {
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }
         },
       ),
+      title: day == null
+          ? ""
+          : getWordedDate(
+              day,
+              includeMonthDate: true,
+              includeYearIfNotCurrentYear: true,
+            ),
       child: TransactionEntries(
         renderType: TransactionEntriesRenderType.nonSlivers,
         day,
@@ -404,13 +406,6 @@ Future<dynamic> openTransactionsOnDayBottomSheet(
         limitPerDay: 50,
         enableFutureTransactionsCollapse: false,
       ),
-      title: day == null
-          ? ""
-          : getWordedDate(
-              day,
-              includeMonthDate: true,
-              includeYearIfNotCurrentYear: true,
-            ),
     ),
   );
 }
@@ -459,7 +454,7 @@ class HomePageHeatMapSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupFramework(
       title: "edit-heatmap".tr(),
-      child: FirstDayOfWeekSetting(
+      child: const FirstDayOfWeekSetting(
         // We already update the homepage when we exit edit homepage settings
         updateHomePage: false,
       ),

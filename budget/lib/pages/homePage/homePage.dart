@@ -77,6 +77,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _animationControllerHeader2;
   int selectedSlidingSelector = 1;
 
+  @override
   void initState() {
     super.initState();
     _animationControllerHeader = AnimationController(vsync: this, value: 1);
@@ -127,7 +128,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         HapticFeedback.heavyImpact();
         await openBottomSheet(
           context,
-          TransactionsListHomePageBottomSheetSettings(),
+          const TransactionsListHomePageBottomSheetSettings(),
         );
         homePageStateKey.currentState?.refreshState();
       },
@@ -152,18 +153,18 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   slidingSelector,
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   HomeTransactions(
                       selectedSlidingSelector: selectedSlidingSelector),
-                  SizedBox(height: 7),
-                  Center(
+                  const SizedBox(height: 7),
+                  const Center(
                     child: ViewAllTransactionsButton(),
                   ),
-                  if (enableDoubleColumn(context)) SizedBox(height: 35),
+                  if (enableDoubleColumn(context)) const SizedBox(height: 35),
                 ],
               )
             : null;
-    if (homePageTransactionsList != null)
+    if (homePageTransactionsList != null) {
       homePageTransactionsList = enableDoubleColumn(context)
           ? KeepAliveClientMixin(
               child: homePageTransactionsList,
@@ -174,48 +175,49 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: homePageTransactionsList,
               ),
             );
+    }
 
     Map<String, Widget?> homePageSections = {
       "wallets": isHomeScreenSectionEnabled(context, "showWalletSwitcher")
-          ? HomePageWalletSwitcher()
+          ? const HomePageWalletSwitcher()
           : null,
       "walletsList": isHomeScreenSectionEnabled(context, "showWalletList")
           ? HomePageWalletList()
           : null,
       "budgets": isHomeScreenSectionEnabled(context, "showPinnedBudgets")
-          ? HomePageBudgets()
+          ? const HomePageBudgets()
           : null,
       "overdueUpcoming":
           isHomeScreenSectionEnabled(context, "showOverdueUpcoming")
-              ? HomePageUpcomingTransactions()
+              ? const HomePageUpcomingTransactions()
               : null,
       "allSpendingSummary":
           isHomeScreenSectionEnabled(context, "showAllSpendingSummary")
-              ? HomePageAllSpendingSummary()
+              ? const HomePageAllSpendingSummary()
               : null,
       "netWorth": isHomeScreenSectionEnabled(context, "showNetWorth")
-          ? HomePageNetWorth()
+          ? const HomePageNetWorth()
           : null,
       "objectives": isHomeScreenSectionEnabled(context, "showObjectives")
-          ? HomePageObjectives(objectiveType: ObjectiveType.goal)
+          ? const HomePageObjectives(objectiveType: ObjectiveType.goal)
           : null,
       "creditDebts": isHomeScreenSectionEnabled(context, "showCreditDebt")
-          ? HomePageCreditDebts()
+          ? const HomePageCreditDebts()
           : null,
       "objectiveLoans":
           isHomeScreenSectionEnabled(context, "showObjectiveLoans")
-              ? HomePageObjectives(objectiveType: ObjectiveType.loan)
+              ? const HomePageObjectives(objectiveType: ObjectiveType.loan)
               : null,
       "spendingGraph": isHomeScreenSectionEnabled(context, "showSpendingGraph")
           ? HomePageLineGraph(selectedSlidingSelector: selectedSlidingSelector)
           : null,
       "pieChart": isHomeScreenSectionEnabled(context, "showPieChart")
-          ? HomePagePieChart()
+          ? const HomePagePieChart()
           : null,
       "heatMap": isHomeScreenSectionEnabled(context, "showHeatMap")
-          ? HomePageHeatMap()
+          ? const HomePageHeatMap()
           : null,
-      "transactionsList": homePageTransactionsList ?? SizedBox.shrink(),
+      "transactionsList": homePageTransactionsList ?? const SizedBox.shrink(),
     };
     bool showWelcomeBanner =
         isHomeScreenSectionEnabled(context, "showUsernameWelcomeBanner");
@@ -248,8 +250,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         scrollController: _scrollController,
         child: Stack(
           children: [
-            AndroidOnly(child: CheckWidgetLaunch()),
-            AndroidOnly(child: RenderHomePageWidgets()),
+            const AndroidOnly(child: CheckWidgetLaunch()),
+            const AndroidOnly(child: RenderHomePageWidgets()),
             Scaffold(
               resizeToAvoidBottomInset: false,
               body: ScrollbarWrap(
@@ -257,8 +259,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 child: ListView(
                   controller: _scrollController,
                   children: [
-                    PreviewDemoWarning(),
-                    if (useSmallBanner) SizedBox(height: 13),
+                    const PreviewDemoWarning(),
+                    if (useSmallBanner) const SizedBox(height: 13),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -272,13 +274,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   username: appStateSettings["username"] ?? "",
                                 ),
                               )
-                            : SizedBox.shrink(),
+                            : const SizedBox.shrink(),
                         Tooltip(
                           message: "edit-home".tr(),
                           child: IconButton(
-                            padding: EdgeInsetsDirectional.all(15),
+                            padding: const EdgeInsetsDirectional.all(15),
                             onPressed: () {
-                              pushRoute(context, EditHomePage());
+                              pushRoute(context, const EditHomePage());
                             },
                             icon: Icon(appStateSettings["outlinedIcons"]
                                 ? Icons.more_vert_outlined
@@ -290,7 +292,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     // Wipe all remaining pixels off - sometimes graphics artifacts are left behind
                     Container(
                         height: 1,
-                        color: Theme.of(context).colorScheme.background),
+                        color: Theme.of(context).colorScheme.surface),
 
                     showWelcomeBanner
                         ? ConstrainedBox(
@@ -326,13 +328,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ),
                             ),
                           )
-                        : SizedBox(height: 5),
+                        : const SizedBox(height: 5),
                     // Not full screen
                     if (enableDoubleColumn(context) != true) ...[
-                      KeepAliveClientMixin(child: HomePageRatingBox()),
+                      const KeepAliveClientMixin(child: HomePageRatingBox()),
                       for (String sectionKey
                           in appStateSettings["homePageOrder"])
-                        homePageSections[sectionKey] ?? SizedBox.shrink(),
+                        homePageSections[sectionKey] ?? const SizedBox.shrink(),
                     ],
                     // Full screen top section
                     if (enableDoubleColumn(context) == true) ...[
@@ -340,7 +342,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           in appStateSettings["homePageOrderFullScreen"])
                         if (homePageSectionsFullScreenCenter
                             .contains(sectionKey))
-                          homePageSections[sectionKey] ?? SizedBox.shrink()
+                          homePageSections[sectionKey] ??
+                              const SizedBox.shrink()
                     ],
                     // Full screen bottom split section
                     if (enableDoubleColumn(context) == true)
@@ -362,7 +365,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         child: ClipRRect(
                                           clipper: RightSideClipper(),
                                           child: homePageSections[sectionKey] ??
-                                              SizedBox.shrink(),
+                                              const SizedBox.shrink(),
                                         ),
                                       ),
                                 ],
@@ -382,7 +385,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                         child: ClipRRect(
                                           clipper: RightSideClipper(),
                                           child: homePageSections[sectionKey] ??
-                                              SizedBox.shrink(),
+                                              const SizedBox.shrink(),
                                         ),
                                       ),
                                 ],
@@ -402,12 +405,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     // Wipe all remaining pixels off - sometimes graphics artifacts are left behind
                     Container(
                         height: 1,
-                        color: Theme.of(context).colorScheme.background),
+                        color: Theme.of(context).colorScheme.surface),
                   ],
                 ),
               ),
             ),
-            SelectedTransactionsAppBar(
+            const SelectedTransactionsAppBar(
               pageID: "0",
             ),
           ],
@@ -458,22 +461,22 @@ class _HomePageRatingBoxState extends State<HomePageRatingBox> {
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) return SizedBox.shrink();
+    if (kIsWeb) return const SizedBox.shrink();
     return AnimatedSizeSwitcher(
       child: hidden
           ? Container(
-              key: ValueKey(1),
+              key: const ValueKey(1),
             )
           : Padding(
-              key: ValueKey(2),
+              key: const ValueKey(2),
               padding: const EdgeInsetsDirectional.only(bottom: 13),
               child: Container(
-                padding: EdgeInsetsDirectional.only(
+                padding: const EdgeInsetsDirectional.only(
                     start: 15, end: 15, bottom: 18, top: 18),
-                margin: EdgeInsetsDirectional.symmetric(horizontal: 13),
+                margin: const EdgeInsetsDirectional.symmetric(horizontal: 13),
                 decoration: BoxDecoration(
                   borderRadius:
-                      BorderRadiusDirectional.all(Radius.circular(15)),
+                      const BorderRadiusDirectional.all(Radius.circular(15)),
                   color: getColor(context, "lightDarkAccentHeavyLight"),
                   boxShadow: boxShadowCheck(boxShadowGeneral(context)),
                 ),
@@ -486,7 +489,7 @@ class _HomePageRatingBoxState extends State<HomePageRatingBox> {
                       textAlign: TextAlign.center,
                       maxLines: 3,
                     ),
-                    SizedBox(height: 7),
+                    const SizedBox(height: 7),
                     Padding(
                       padding:
                           const EdgeInsetsDirectional.symmetric(horizontal: 10),
@@ -497,7 +500,7 @@ class _HomePageRatingBoxState extends State<HomePageRatingBox> {
                         maxLines: 5,
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     ScalingStars(
                       selectedStars: 5,
                       onTap: (i) {
@@ -515,9 +518,9 @@ class _HomePageRatingBoxState extends State<HomePageRatingBox> {
                       size: 50,
                       color: getColor(context, "starYellow"),
                       loop: true,
-                      loopDelay: Duration(milliseconds: 1900),
+                      loopDelay: const Duration(milliseconds: 1900),
                     ),
-                    SizedBox(height: 15),
+                    const SizedBox(height: 15),
                     Row(
                       children: [
                         Expanded(
@@ -535,7 +538,7 @@ class _HomePageRatingBoxState extends State<HomePageRatingBox> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Button(
                             label: "rate".tr(),

@@ -42,24 +42,33 @@ class BottomNavBarState extends State<BottomNavBar> {
 
     if (navigationStackedIndex == widget.currentNavigationStackedIndex &&
         allowReApply == false) {
-      if (navigationStackedIndex == 0)
+      if (navigationStackedIndex == 0) {
         homePageStateKey.currentState?.scrollToTop();
-      if (navigationStackedIndex == 1)
+      }
+      if (navigationStackedIndex == 1) {
         transactionsListPageStateKey.currentState?.scrollToTop();
-      if (navigationStackedIndex == 2)
+      }
+      if (navigationStackedIndex == 2) {
         budgetsListPageStateKey.currentState?.scrollToTop();
-      if (navigationStackedIndex == 3)
+      }
+      if (navigationStackedIndex == 3) {
         settingsPageStateKey.currentState?.scrollToTop();
-      if (navigationStackedIndex == 5)
+      }
+      if (navigationStackedIndex == 5) {
         subscriptionsPageStateKey.currentState?.scrollToTop();
-      if (navigationStackedIndex == 7)
+      }
+      if (navigationStackedIndex == 7) {
         walletDetailsAllSpendingPageStateKey.currentState?.scrollToTop();
-      if (navigationStackedIndex == 14)
+      }
+      if (navigationStackedIndex == 14) {
         objectivesListPageStateKey.currentState?.scrollToTop();
-      if (navigationStackedIndex == 16)
+      }
+      if (navigationStackedIndex == 16) {
         upcomingOverdueTransactionsStateKey.currentState?.scrollToTop();
-      if (navigationStackedIndex == 17)
+      }
+      if (navigationStackedIndex == 17) {
         creditDebtTransactionsKey.currentState?.scrollToTop();
+      }
     } else {
       // We need to change to the navigation index
       widget.onChanged(navigationStackedIndex);
@@ -89,9 +98,9 @@ class BottomNavBarState extends State<BottomNavBar> {
     if (stackedIndex ==
         (navBarIconsData[appStateSettings["customNavBarShortcut0"]]
                 ?.navigationIndexedStackIndex ??
-            0))
+            0)) {
       return 0;
-    else if (stackedIndex ==
+    } else if (stackedIndex ==
         (navBarIconsData[appStateSettings["customNavBarShortcut1"]]
                 ?.navigationIndexedStackIndex ??
             1))
@@ -111,7 +120,7 @@ class BottomNavBarState extends State<BottomNavBar> {
     int navigationBarIndex = getNavigationBarIndexFromStackedIndex(
         widget.currentNavigationStackedIndex);
 
-    if (getIsFullScreen(context)) return SizedBox.shrink();
+    if (getIsFullScreen(context)) return const SizedBox.shrink();
     if (getPlatform() == PlatformOS.isIOS) {
       return IntrinsicHeight(
         child: Container(
@@ -227,11 +236,11 @@ class BottomNavBarState extends State<BottomNavBar> {
               ? dynamicPastel(context, Theme.of(context).colorScheme.primary,
                   amount: 0.6)
               : null,
-          labelTextStyle: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
               return TextStyle(
                 fontFamily: appStateSettings["font"],
-                fontFamilyFallback: ['Inter'],
+                fontFamilyFallback: const ['Inter'],
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
                 overflow: TextOverflow.clip,
@@ -239,7 +248,7 @@ class BottomNavBarState extends State<BottomNavBar> {
             } else {
               return TextStyle(
                 fontFamily: appStateSettings["font"],
-                fontFamilyFallback: ['Inter'],
+                fontFamilyFallback: const ['Inter'],
                 fontSize: 13,
                 overflow: TextOverflow.clip,
               );
@@ -248,7 +257,7 @@ class BottomNavBarState extends State<BottomNavBar> {
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         ),
         child: NavigationBar(
-          animationDuration: Duration(milliseconds: 1000),
+          animationDuration: const Duration(milliseconds: 1000),
           destinations: [
             CustomizableNavigationBarIcon(
               shortcutAppSettingKey: "customNavBarShortcut0",
@@ -398,7 +407,7 @@ class SelectNavBarShortcutPopup extends StatelessWidget {
           shortcutAppSettingKey: shortcutAppSettingKey,
           navBarIconDataKey: "home",
           onSettings: () {
-            pushRoute(context, EditHomePage());
+            pushRoute(context, const EditHomePage());
           },
         ),
         NavBarShortcutSelection(
@@ -409,7 +418,7 @@ class SelectNavBarShortcutPopup extends StatelessWidget {
               context,
               PopupFramework(
                 hasPadding: false,
-                child: TransactionsSettings(),
+                child: const TransactionsSettings(),
               ),
             );
           },
@@ -422,7 +431,7 @@ class SelectNavBarShortcutPopup extends StatelessWidget {
               context,
               PopupFramework(
                 hasPadding: false,
-                child: BudgetSettings(),
+                child: const BudgetSettings(),
               ),
             );
           },
@@ -435,7 +444,7 @@ class SelectNavBarShortcutPopup extends StatelessWidget {
               context,
               PopupFramework(
                 hasPadding: false,
-                child: ObjectiveSettings(),
+                child: const ObjectiveSettings(),
               ),
             );
           },
@@ -452,7 +461,7 @@ class SelectNavBarShortcutPopup extends StatelessWidget {
               context,
               PopupFramework(
                 hasPadding: false,
-                child: SubscriptionSettings(),
+                child: const SubscriptionSettings(),
               ),
             );
           },
@@ -465,7 +474,7 @@ class SelectNavBarShortcutPopup extends StatelessWidget {
               context,
               PopupFramework(
                 hasPadding: false,
-                child: UpcomingOverdueSettings(),
+                child: const UpcomingOverdueSettings(),
               ),
             );
           },
@@ -508,9 +517,9 @@ class NavBarShortcutSelection extends StatelessWidget {
               alignStart: true,
               alignBeside: true,
               padding: onSettings == null
-                  ? EdgeInsetsDirectional.symmetric(
+                  ? const EdgeInsetsDirectional.symmetric(
                       horizontal: 20, vertical: 15)
-                  : EdgeInsetsDirectional.only(
+                  : const EdgeInsetsDirectional.only(
                       start: 20,
                       end: 5,
                       top: 3,
@@ -527,7 +536,7 @@ class NavBarShortcutSelection extends StatelessWidget {
               infoButton: onSettings == null
                   ? null
                   : IconButton(
-                      padding: EdgeInsetsDirectional.all(15),
+                      padding: const EdgeInsetsDirectional.all(15),
                       onPressed: onSettings,
                       icon: Icon(
                         appStateSettings["outlinedIcons"]
@@ -566,7 +575,7 @@ class NavBarIcon extends StatelessWidget {
       children: [
         selected
             ? ScaleIn(
-                duration: Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 200),
                 curve: Curves.fastOutSlowIn,
                 child: Container(
                   decoration: BoxDecoration(
@@ -580,17 +589,17 @@ class NavBarIcon extends StatelessWidget {
                   ),
                   height: 52,
                   width: 52,
-                  margin: EdgeInsetsDirectional.all(5),
+                  margin: const EdgeInsetsDirectional.all(5),
                 ),
               )
             : Container(
                 color: Colors.transparent,
                 height: 52,
                 width: 52,
-                margin: EdgeInsetsDirectional.all(5),
+                margin: const EdgeInsetsDirectional.all(5),
               ),
         IconButton(
-          padding: EdgeInsetsDirectional.all(15),
+          padding: const EdgeInsetsDirectional.all(15),
           color: selected
               ? Theme.of(context).colorScheme.onSecondaryContainer
               : null,

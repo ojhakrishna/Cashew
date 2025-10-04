@@ -25,7 +25,7 @@ Future<bool> getExchangeRates() async {
       cachedCurrencyExchange = json.decode(response.body)?["usd"];
     }
   } catch (e) {
-    print("Error getting currency rates: " + e.toString());
+    print("Error getting currency rates: $e");
     return false;
   }
   // print(cachedCurrencyExchange);
@@ -102,9 +102,7 @@ String getCurrencyString(AllWallets allWallets, {String? currencyKey}) {
       allWallets.indexedByPk[appStateSettings["selectedWalletPk"]]?.currency;
   return currencyKey != null
       ? (currenciesJSON[currencyKey]?["Symbol"] ?? "")
-      : selectedWalletCurrency == null
-          ? ""
-          : (currenciesJSON[selectedWalletCurrency]?["Symbol"] ?? "");
+      : (currenciesJSON[selectedWalletCurrency]?["Symbol"] ?? "");
 }
 
 double getCurrencyExchangeRate(

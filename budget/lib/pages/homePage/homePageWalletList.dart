@@ -17,6 +17,8 @@ import 'package:provider/provider.dart';
 import 'package:budget/pages/addButton.dart';
 
 class HomePageWalletList extends StatelessWidget {
+  const HomePageWalletList({super.key});
+
   @override
   Widget build(BuildContext context) {
     const double borderRadius = 15;
@@ -37,7 +39,7 @@ class HomePageWalletList extends StatelessWidget {
               onLongPress: () async {
                 await openBottomSheet(
                   context,
-                  EditHomePagePinnedWalletsPopup(
+                  const EditHomePagePinnedWalletsPopup(
                     homePageWidgetDisplay: HomePageWidgetDisplay.WalletList,
                     showCyclePicker: true,
                   ),
@@ -56,8 +58,8 @@ class HomePageWalletList extends StatelessWidget {
                         return Column(
                           mainAxisSize: MainAxisSize.max,
                           children: [
-                            if (snapshot.hasData && snapshot.data!.length > 0)
-                              SizedBox(height: 8),
+                            if (snapshot.hasData && snapshot.data!.isNotEmpty)
+                              const SizedBox(height: 8),
                             for (WalletWithDetails walletDetails
                                 in snapshot.data!)
                               WalletEntryRow(
@@ -66,9 +68,9 @@ class HomePageWalletList extends StatelessWidget {
                                     walletDetails.wallet.walletPk,
                                 walletWithDetails: walletDetails,
                               ),
-                            if (snapshot.hasData && snapshot.data!.length > 0)
-                              SizedBox(height: 8),
-                            if (snapshot.hasData && snapshot.data!.length <= 0)
+                            if (snapshot.hasData && snapshot.data!.isNotEmpty)
+                              const SizedBox(height: 8),
+                            if (snapshot.hasData && snapshot.data!.isEmpty)
                               Row(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
@@ -77,7 +79,7 @@ class HomePageWalletList extends StatelessWidget {
                                       onTap: () async {
                                         await openBottomSheet(
                                           context,
-                                          EditHomePagePinnedWalletsPopup(
+                                          const EditHomePagePinnedWalletsPopup(
                                             homePageWidgetDisplay:
                                                 HomePageWidgetDisplay
                                                     .WalletList,
@@ -90,8 +92,9 @@ class HomePageWalletList extends StatelessWidget {
                                       height: null,
                                       labelUnder: "account".tr(),
                                       icon: Icons.format_list_bulleted_add,
-                                      padding: EdgeInsetsDirectional.symmetric(
-                                          vertical: 10),
+                                      padding:
+                                          const EdgeInsetsDirectional.symmetric(
+                                              vertical: 10),
                                     ),
                                   ),
                                 ],
@@ -130,8 +133,8 @@ class HomePageWalletList extends StatelessWidget {
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 if (snapshot.hasData &&
-                                    snapshot.data!.length > 0)
-                                  SizedBox(height: 8),
+                                    snapshot.data!.isNotEmpty)
+                                  const SizedBox(height: 8),
                                 for (WalletWithDetails walletDetails
                                     in snapshot.data!)
                                   WalletEntryRow(
@@ -161,8 +164,8 @@ class HomePageWalletList extends StatelessWidget {
                                     ,
                                   ),
                                 if (snapshot.hasData &&
-                                    snapshot.data!.length > 0)
-                                  SizedBox(height: 8),
+                                    snapshot.data!.isNotEmpty)
+                                  const SizedBox(height: 8),
                               ],
                             );
                           }

@@ -37,7 +37,7 @@ class TextFont extends StatelessWidget {
     this.fontWeight = FontWeight.normal,
     this.textAlign = TextAlign.start,
     this.textColor,
-    this.maxLines = null,
+    this.maxLines,
     this.fixParagraphMargin = false,
     this.shadow = false,
     this.selectableText = false,
@@ -64,21 +64,21 @@ class TextFont extends StatelessWidget {
 
     final TextStyle textStyle = TextStyle(
       letterSpacing: letterSpacing,
-      fontWeight: this.fontWeight,
-      fontSize: this.fontSize,
+      fontWeight: fontWeight,
+      fontSize: fontSize,
       fontFamily: fallbackFontLocales.contains(appStateSettings["locale"]) &&
               appStateSettings["font"] == "Avenir"
           ? "DMSans"
           : appStateSettings["font"],
-      fontFamilyFallback: ['Inter'],
+      fontFamilyFallback: const ['Inter'],
       color: finalTextColor,
       decoration: TextDecoration.underline,
       decorationStyle: TextDecorationStyle.double,
-      decorationColor: Color(0x00FFFFFF),
+      decorationColor: const Color(0x00FFFFFF),
       overflow: overflow,
       shadows: shadow == true
           ? [
-              Shadow(
+              const Shadow(
                 offset: Offset(0.0, 0.5),
                 blurRadius: 8.0,
                 color: Color(0x65000000),
@@ -88,12 +88,12 @@ class TextFont extends StatelessWidget {
     );
     Widget textWidget(textPassed) {
       return AnimatedDefaultTextStyle(
-        duration: Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 200),
         style: textStyle,
         child: Transform.translate(
           offset: Offset(
             0,
-            this.fontSize *
+            fontSize *
                 (fallbackFontLocales.contains(appStateSettings["locale"]) ==
                             true ||
                         appStateSettings["font"] != "Avenir"
@@ -163,7 +163,7 @@ List<TextSpan> generateSpans({
   TextStyle textStyle = TextStyle(
     color: getColor(context, "black"),
     fontFamily: appStateSettings["font"],
-    fontFamilyFallback: ['Inter'],
+    fontFamilyFallback: const ['Inter'],
     fontSize: fontSize,
   );
 

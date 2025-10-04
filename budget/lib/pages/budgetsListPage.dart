@@ -44,7 +44,7 @@ class BudgetsListPageState extends State<BudgetsListPage> {
       horizontalPaddingConstrained: enableDoubleColumn(context) == false,
       actions: [
         IconButton(
-          padding: EdgeInsetsDirectional.all(15),
+          padding: const EdgeInsetsDirectional.all(15),
           tooltip: "edit-budgets".tr(),
           onPressed: () {
             pushRoute(
@@ -61,7 +61,7 @@ class BudgetsListPageState extends State<BudgetsListPage> {
         ),
         if (getIsFullScreen(context))
           IconButton(
-            padding: EdgeInsetsDirectional.all(15),
+            padding: const EdgeInsetsDirectional.all(15),
             tooltip: "add-budget".tr(),
             onPressed: () {
               pushRoute(
@@ -82,9 +82,9 @@ class BudgetsListPageState extends State<BudgetsListPage> {
         StreamBuilder<List<Budget>>(
           stream: database.watchAllBudgets(hideArchived: true),
           builder: (context, snapshot) {
-            if (snapshot.hasData && (snapshot.data ?? []).length <= 0) {
+            if (snapshot.hasData && (snapshot.data ?? []).isEmpty) {
               return SliverPadding(
-                padding: EdgeInsetsDirectional.symmetric(
+                padding: const EdgeInsetsDirectional.symmetric(
                     vertical: 7, horizontal: 13),
                 sliver: SliverToBoxAdapter(
                   child: AddButton(
@@ -100,11 +100,12 @@ class BudgetsListPageState extends State<BudgetsListPage> {
             }
             if (snapshot.hasData) {
               return SliverPadding(
-                padding: EdgeInsetsDirectional.symmetric(
+                padding: const EdgeInsetsDirectional.symmetric(
                     vertical: 7, horizontal: 13),
                 sliver: enableDoubleColumn(context)
                     ? SliverGrid(
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        gridDelegate:
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
                           maxCrossAxisExtent: 600.0,
                           mainAxisExtent: 190,
                           mainAxisSpacing: 15.0,
@@ -159,11 +160,11 @@ class BudgetsListPageState extends State<BudgetsListPage> {
                       ),
               );
             } else {
-              return SliverToBoxAdapter();
+              return const SliverToBoxAdapter();
             }
           },
         ),
-        SliverToBoxAdapter(
+        const SliverToBoxAdapter(
           child: SizedBox(height: 50),
         ),
       ],

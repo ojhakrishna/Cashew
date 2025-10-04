@@ -33,9 +33,10 @@ class HomePageNetWorth extends StatelessWidget {
                 appStateSettings["netWorthAllWallets"] == true) {
               List<String>? walletPks =
                   (snapshot.data ?? []).map((item) => item.walletPk).toList();
-              if (walletPks.length <= 0 ||
-                  appStateSettings["netWorthAllWallets"] == true)
+              if (walletPks.isEmpty ||
+                  appStateSettings["netWorthAllWallets"] == true) {
                 walletPks = null;
+              }
               return Padding(
                 padding: const EdgeInsetsDirectional.only(
                     bottom: 13, start: 13, end: 13),
@@ -107,7 +108,7 @@ class HomePageNetWorth extends StatelessWidget {
                 ),
               );
             }
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           }),
     );
   }
@@ -150,13 +151,13 @@ class _WalletPickerPeriodCycleState extends State<WalletPickerPeriodCycle> {
             children: [
               Expanded(
                 child: AnimatedOpacity(
-                  duration: Duration(milliseconds: 500),
+                  duration: const Duration(milliseconds: 500),
                   opacity: allWalletsSelected ? 1 : 0.5,
                   child: OutlinedButtonStacked(
                     filled: allWalletsSelected,
                     alignStart: true,
                     alignBeside: true,
-                    padding: EdgeInsetsDirectional.only(
+                    padding: const EdgeInsetsDirectional.only(
                         start: 20, end: 15, top: 15, bottom: 15),
                     showToggleSwitch: true,
                     text: "all-accounts".tr(),
@@ -176,7 +177,7 @@ class _WalletPickerPeriodCycleState extends State<WalletPickerPeriodCycle> {
               ),
             ],
           ),
-        if (showAllWalletsSelection) SizedBox(height: 10),
+        if (showAllWalletsSelection) const SizedBox(height: 10),
         // CheckItems(
         //   triggerInitialOnChanged: false,
         //   minVerticalPadding: 0,
@@ -260,9 +261,9 @@ Future openNetWorthSettings(BuildContext context) {
       title: "net-worth".tr(),
       subtitle: "applies-to-homepage".tr() +
           (getPlatform(ignoreEmulation: true) == PlatformOS.isAndroid
-              ? " " + "and-applies-to-widget".tr()
+              ? " ${"and-applies-to-widget".tr()}"
               : ""),
-      child: WalletPickerPeriodCycle(
+      child: const WalletPickerPeriodCycle(
         allWalletsSettingKey: "netWorthAllWallets",
         cycleSettingsExtension: "NetWorth",
         homePageWidgetDisplay: HomePageWidgetDisplay.NetWorth,

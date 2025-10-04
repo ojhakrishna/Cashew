@@ -53,14 +53,15 @@ class _RadioItemsState<T> extends State<RadioItems<T>> {
       index += 1;
       bool selected = false;
       if (currentValue == item ||
-          (widget.getSelected != null && widget.getSelected!(item)))
+          (widget.getSelected != null && widget.getSelected!(item))) {
         selected = true;
+      }
       if (item == null && widget.ifNullSelectNone == true) selected = false;
       bool noDescription =
           widget.getDescription == null || widget.getDescription!(item) == "";
       children.add(
         AnimatedSwitcher(
-          duration: Duration(milliseconds: 150),
+          duration: const Duration(milliseconds: 150),
           child: Tappable(
             key: ValueKey((currentValue == item).toString()),
             onLongPress: widget.onLongPress != null
@@ -80,7 +81,7 @@ class _RadioItemsState<T> extends State<RadioItems<T>> {
               contentPadding: EdgeInsetsDirectional.only(
                   start: 16, end: widget.getEndInfo == null ? 16 : 7),
               title: Transform.translate(
-                offset: Offset(-12, 0).withDirectionality(context),
+                offset: const Offset(-12, 0).withDirectionality(context),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -111,7 +112,7 @@ class _RadioItemsState<T> extends State<RadioItems<T>> {
                               maxLines: 3,
                             ),
                           noDescription
-                              ? SizedBox.shrink()
+                              ? const SizedBox.shrink()
                               : TextFont(
                                   fontSize: 14,
                                   text: widget.getDescription == null
@@ -150,7 +151,7 @@ class _RadioItemsState<T> extends State<RadioItems<T>> {
                 },
                 fillColor: widget.colorFilter != null &&
                         widget.colorFilter!(item) != null
-                    ? MaterialStateColor.resolveWith(
+                    ? WidgetStateColor.resolveWith(
                         (states) => widget.colorFilter!(item)!)
                     : null,
                 activeColor: Theme.of(context).colorScheme.primary,
@@ -219,6 +220,7 @@ class _CheckItemsState<T> extends State<CheckItems<T>> {
     });
   }
 
+  @override
   void didUpdateWidget(oldWidget) {
     if (oldWidget != widget && widget.syncWithInitial) {
       setState(() {
@@ -260,7 +262,7 @@ class _CheckItemsState<T> extends State<CheckItems<T>> {
               currentValues.contains(widget.items[itemIndex - 1]);
       children.add(
         AnimatedSwitcher(
-          duration: Duration(milliseconds: 150),
+          duration: const Duration(milliseconds: 150),
           child: Tappable(
             customBorderRadius: BorderRadius.vertical(
               top: Radius.circular(
@@ -292,7 +294,7 @@ class _CheckItemsState<T> extends State<CheckItems<T>> {
             child: ListTile(
               minVerticalPadding: widget.minVerticalPadding,
               title: Transform.translate(
-                offset: Offset(-12, 0).withDirectionality(context),
+                offset: const Offset(-12, 0).withDirectionality(context),
                 child: Row(
                   children: [
                     Expanded(
@@ -307,12 +309,13 @@ class _CheckItemsState<T> extends State<CheckItems<T>> {
                     widget.buildSuffix != null
                         ? widget.buildSuffix!(currentValues, item, selected,
                             addEntry, removeEntry)
-                        : SizedBox.shrink()
+                        : const SizedBox.shrink()
                   ],
                 ),
               ),
               dense: true,
-              contentPadding: EdgeInsetsDirectional.only(end: 0, start: 16),
+              contentPadding:
+                  const EdgeInsetsDirectional.only(end: 0, start: 16),
               leading: Padding(
                 padding: const EdgeInsetsDirectional.only(end: 5),
                 child: selected

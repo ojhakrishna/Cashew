@@ -48,7 +48,7 @@ import 'package:budget/widgets/sliverStickyLabelDivider.dart';
 import 'package:budget/widgets/tappableTextEntry.dart';
 
 class AddBudgetPage extends StatefulWidget {
-  AddBudgetPage({
+  const AddBudgetPage({
     Key? key,
     this.budget,
     this.isAddedOnlyBudget = false,
@@ -126,9 +126,9 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
   ];
   List<String> allMembersOfAllBudgets = [];
   List<String>? selectedMemberTransactionFilters;
-  FocusNode _titleFocusNode = FocusNode();
+  final FocusNode _titleFocusNode = FocusNode();
   bool increaseBudgetWarningShown = false;
-  List<String>? selectedWalletFks = null;
+  List<String>? selectedWalletFks;
   String selectedWalletPk = appStateSettings["selectedWalletPk"];
 
   // BudgetsCompanion budget = BudgetsCompanion();
@@ -293,7 +293,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
       currentInstance =
           await database.getBudgetInstance(widget.budget!.budgetPk);
     }
-    return await Budget(
+    return Budget(
       budgetPk: widget.budget != null ? widget.budget!.budgetPk : "-1",
       name: selectedTitle ?? "",
       amount: selectedAmount ?? 0,
@@ -421,7 +421,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
           widget.budget!.budgetTransactionFilters ??
               [BudgetTransactionFilters.defaultBudgetTransactionFilters];
       selectedMemberTransactionFilters =
-          widget.budget!.memberTransactionFilters ?? null;
+          widget.budget!.memberTransactionFilters;
 
       var amountString = widget.budget!.amount.toStringAsFixed(2);
       if (amountString.substring(amountString.length - 2) == "00") {
@@ -482,14 +482,14 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
         ((selectedRecurrence == "Custom" && selectedEndDate != null) ||
             (selectedRecurrence != "Custom" && selectedPeriodLength != 0))) {
       if (canAddBudget != true) {
-        this.setState(() {
+        setState(() {
           canAddBudget = true;
         });
         return true;
       }
     } else {
       if (canAddBudget != false) {
-        this.setState(() {
+        setState(() {
           canAddBudget = false;
         });
         return false;
@@ -572,7 +572,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
     );
   }
 
-  GlobalKey<_BudgetDetailsState> _budgetDetailsStateKey = GlobalKey();
+  final GlobalKey<_BudgetDetailsState> _budgetDetailsStateKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -671,7 +671,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                   label: "set-name".tr(),
                   onTap: () async {
                     FocusScope.of(context).unfocus();
-                    Future.delayed(Duration(milliseconds: 100), () {
+                    Future.delayed(const Duration(milliseconds: 100), () {
                       _titleFocusNode.requestFocus();
                     });
                   },
@@ -712,7 +712,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                   expenseLabel: "expense-budget".tr(),
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsetsDirectional.symmetric(horizontal: 20),
                 child: IntrinsicWidth(
@@ -726,7 +726,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                     onChanged: (text) {
                       setSelectedTitle(text);
                     },
-                    padding: EdgeInsetsDirectional.only(start: 7, end: 7),
+                    padding: const EdgeInsetsDirectional.only(start: 7, end: 7),
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                     topContentPadding: 18,
@@ -797,7 +797,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                 setSelectedWalletPk: setSelectedWalletPk,
                 initialSelectedWalletPk: selectedWalletPk,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
             ],
           ),
           // SliverToBoxAdapter(
@@ -843,7 +843,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
           // ),
           SliverToBoxAdapter(
             child: widget.budget == null
-                ? SizedBox.shrink()
+                ? const SizedBox.shrink()
                 : Padding(
                     padding: const EdgeInsetsDirectional.only(
                       start: 24,
@@ -859,8 +859,9 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                           StreamBuilder<Budget>(
                             stream: database.getBudget(widget.budget!.budgetPk),
                             builder: (context, snapshot) {
-                              if (snapshot.data == null)
-                                return SizedBox.shrink();
+                              if (snapshot.data == null) {
+                                return const SizedBox.shrink();
+                              }
                               return EditBudgetLimitsPage(
                                 budget: budget,
                                 currentIsAbsoluteSpendingLimit:
@@ -882,7 +883,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                   ),
           ),
           SliverToBoxAdapter(
-            child: Container(
+            child: SizedBox(
               height: 65,
               child: SelectColor(
                 horizontalList: true,
@@ -891,18 +892,18 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
               ),
             ),
           ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
               child: HorizontalBreak(
             padding: EdgeInsetsDirectional.symmetric(vertical: 15),
           )),
 
           widget.budget != null
-              ? SliverToBoxAdapter(child: SizedBox.shrink())
+              ? const SliverToBoxAdapter(child: SizedBox.shrink())
               : SliverStickyLabelDivider(
                   info: "budget-type".tr(),
                   sliver: ColumnSliver(
                     children: [
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       SelectChips(
                         allowMultipleSelected: false,
                         extraWidgetBefore: Transform.scale(
@@ -931,9 +932,9 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                               : [])
                         ],
                         getLabel: (String item) {
-                          if (item == "Shared Group Budget")
-                            return item + " (Unsupported)";
-                          else if (item == "All Transactions")
+                          if (item == "Shared Group Budget") {
+                            return "$item (Unsupported)";
+                          } else if (item == "All Transactions")
                             return "all-transactions".tr();
                           else if (item == "Added Only")
                             return "added-only".tr();
@@ -959,7 +960,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                           return false;
                         },
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                     ],
                   ),
                 ),
@@ -981,7 +982,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           SelectChips(
                             extraWidgetBefore: Transform.scale(
                               scale: 1.3,
@@ -1086,9 +1087,10 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                             getSelected: (dynamic item) {
                               if (selectedBudgetTransactionFilters.contains(
                                   BudgetTransactionFilters
-                                      .defaultBudgetTransactionFilters))
+                                      .defaultBudgetTransactionFilters)) {
                                 return isFilterSelectedWithDefaults(
                                     selectedBudgetTransactionFilters, item);
+                              }
                               return selectedBudgetTransactionFilters
                                   .contains(item);
                             },
@@ -1117,9 +1119,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                                   determineBottomButton();
                                   return;
                                 }
-                                if (selectedMemberTransactionFilters == null) {
-                                  selectedMemberTransactionFilters = [];
-                                }
+                                selectedMemberTransactionFilters ??= [];
                                 if (selectedMemberTransactionFilters!
                                     .contains(item)) {
                                   selectedMemberTransactionFilters!
@@ -1132,17 +1132,19 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                               },
                               getSelected: (String item) {
                                 if (item == "All" &&
-                                    selectedMemberTransactionFilters == null)
+                                    selectedMemberTransactionFilters == null) {
                                   return true;
+                                }
                                 if (item != "All" &&
-                                    selectedMemberTransactionFilters == null)
+                                    selectedMemberTransactionFilters == null) {
                                   return true;
+                                }
                                 return selectedMemberTransactionFilters!
                                     .contains(item);
                               },
                             ),
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                         ],
                       ),
                     );
@@ -1200,7 +1202,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                         widget.budget == null),
             sliver: SliverToBoxAdapter(
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 500),
                 opacity: (selectedCategoryPksExclude == null ||
                         selectedCategoryPksExclude?.isEmpty == true)
                     ? 1
@@ -1237,7 +1239,7 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
                         widget.budget == null),
             sliver: SliverToBoxAdapter(
               child: AnimatedOpacity(
-                duration: Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 500),
                 opacity: (selectedCategoryPks == null ||
                         selectedCategoryPks?.isEmpty == true)
                     ? 1
@@ -1269,8 +1271,8 @@ class _AddBudgetPageState extends State<AddBudgetPage> {
               ? SharedBudgetSettings(
                   budget: widget.budget!,
                 )
-              : SizedBox.shrink(),
-          SizedBox(height: 13),
+              : const SizedBox.shrink(),
+          const SizedBox(height: 13),
           Container(height: 70),
         ],
       ),
@@ -1322,7 +1324,7 @@ class _WalletChipSelectorState extends State<WalletChipSelector> {
         selectedWalletFks!.add(item.walletPk);
       }
     }
-    if (item == null || (selectedWalletFks ?? []).length <= 0) {
+    if (item == null || (selectedWalletFks ?? []).isEmpty) {
       selectedWalletFks = null;
     }
     setState(() {});
@@ -1346,7 +1348,7 @@ class _WalletChipSelectorState extends State<WalletChipSelector> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 SelectChips(
                   items: [null, ...snapshot.data!],
                   onLongPress: (TransactionWallet? item) {
@@ -1379,12 +1381,12 @@ class _WalletChipSelectorState extends State<WalletChipSelector> {
                     );
                   },
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
               ],
             ),
           );
         } else {
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         }
       },
     );
@@ -1397,13 +1399,9 @@ String getSelectedCategoriesText(List<String>? categoryFks,
     return defaultText ?? "all-categories".tr();
   } else {
     if (categoryFks.length == 1) {
-      return categoryFks.length.toString() +
-          " " +
-          "category".tr().toLowerCase();
+      return "${categoryFks.length} ${"category".tr().toLowerCase()}";
     } else {
-      return categoryFks.length.toString() +
-          " " +
-          "categories".tr().toLowerCase();
+      return "${categoryFks.length} ${"categories".tr().toLowerCase()}";
     }
   }
 }
@@ -1418,11 +1416,11 @@ class ColumnSliver extends StatelessWidget {
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Column(
-        children: children,
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment:
             centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+        children: children,
       ),
     );
   }
@@ -1518,7 +1516,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
           },
           nextLabel: "set-amount".tr(),
           enableWalletPicker: true,
-          padding: EdgeInsetsDirectional.symmetric(horizontal: 18),
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 18),
           setSelectedWalletPk: (walletPk) {
             setState(() {
               selectedWalletPk = walletPk;
@@ -1589,7 +1587,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
       PopupFramework(
         title: "select-period".tr(),
         child: RadioItems(
-          items: ["Custom", "Daily", "Weekly", "Monthly", "Yearly"],
+          items: const ["Custom", "Daily", "Weekly", "Monthly", "Yearly"],
           initial: selectedRecurrence,
           displayFilter: (item) {
             return item.toString().toLowerCase().tr();
@@ -1693,9 +1691,9 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                   },
                   fontSize: 35,
                   fontWeight: FontWeight.bold,
-                  internalPadding: EdgeInsetsDirectional.symmetric(
+                  internalPadding: const EdgeInsetsDirectional.symmetric(
                       vertical: 2, horizontal: 4),
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       vertical: 10, horizontal: 3),
                 ),
               ),
@@ -1704,7 +1702,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                   children: [
                     selectedRecurrence != "Custom"
                         ? TappableTextEntry(
-                            title: "/ " + selectedPeriodLength.toString(),
+                            title: "/ $selectedPeriodLength",
                             placeholder: "/ 0",
                             showPlaceHolderWhenTextEquals: "/ 0",
                             onTap: () {
@@ -1712,12 +1710,13 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                             },
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
-                            internalPadding: EdgeInsetsDirectional.symmetric(
-                                vertical: 4, horizontal: 4),
-                            padding: EdgeInsetsDirectional.symmetric(
+                            internalPadding:
+                                const EdgeInsetsDirectional.symmetric(
+                                    vertical: 4, horizontal: 4),
+                            padding: const EdgeInsetsDirectional.symmetric(
                                 vertical: 10, horizontal: 3),
                           )
-                        : TextFont(
+                        : const TextFont(
                             text: " /",
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
@@ -1734,9 +1733,9 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                       },
                       fontSize: 25,
                       fontWeight: FontWeight.bold,
-                      internalPadding: EdgeInsetsDirectional.symmetric(
+                      internalPadding: const EdgeInsetsDirectional.symmetric(
                           vertical: 4, horizontal: 4),
-                      padding: EdgeInsetsDirectional.symmetric(
+                      padding: const EdgeInsetsDirectional.symmetric(
                           vertical: 10, horizontal: 3),
                     ),
                   ],
@@ -1761,7 +1760,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                     color: Colors.transparent,
                     borderRadius: 15,
                     child: Container(
-                      padding: EdgeInsetsDirectional.symmetric(
+                      padding: const EdgeInsetsDirectional.symmetric(
                           horizontal: 5, vertical: 8),
                       child: Center(
                         child: Wrap(
@@ -1773,7 +1772,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                               padding:
                                   const EdgeInsetsDirectional.only(bottom: 5.8),
                               child: TextFont(
-                                text: "beginning".tr() + " ",
+                                text: "${"beginning".tr()} ",
                                 fontSize: 17,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1787,9 +1786,9 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                                 fontSize: 25,
                                 fontWeight: FontWeight.bold,
                                 internalPadding:
-                                    EdgeInsetsDirectional.symmetric(
+                                    const EdgeInsetsDirectional.symmetric(
                                         vertical: 2, horizontal: 4),
-                                padding: EdgeInsetsDirectional.symmetric(
+                                padding: const EdgeInsetsDirectional.symmetric(
                                     vertical: 0, horizontal: 5),
                               ),
                             ),
@@ -1805,7 +1804,7 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                     color: Colors.transparent,
                     borderRadius: 15,
                     child: Container(
-                      padding: EdgeInsetsDirectional.symmetric(
+                      padding: const EdgeInsetsDirectional.symmetric(
                           horizontal: 5, vertical: 8),
                       child: Center(
                         child: Row(
@@ -1816,17 +1815,15 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                               child: TappableTextEntry(
                                 title: selectedEndDate == null
                                     ? null
-                                    : getWordedDateShort(selectedStartDate) +
-                                        " – " +
-                                        getWordedDateShort(selectedEndDate!),
+                                    : "${getWordedDateShort(selectedStartDate)} – ${getWordedDateShort(selectedEndDate!)}",
                                 placeholder: "select-custom-period".tr(),
                                 onTap: () {},
                                 fontSize: 25,
                                 fontWeight: FontWeight.bold,
                                 internalPadding:
-                                    EdgeInsetsDirectional.symmetric(
+                                    const EdgeInsetsDirectional.symmetric(
                                         vertical: 2, horizontal: 4),
-                                padding: EdgeInsetsDirectional.symmetric(
+                                padding: const EdgeInsetsDirectional.symmetric(
                                     vertical: 0, horizontal: 5),
                               ),
                             ),
@@ -1862,11 +1859,8 @@ class _BudgetDetailsState extends State<BudgetDetails> {
                 ),
                 DateTime.now(),
               );
-              String text = "current-period".tr() +
-                  "\n" +
-                  getWordedDateShortMore(budgetRange.start) +
-                  " – " +
-                  getWordedDateShortMore(budgetRange.end);
+              String text =
+                  "${"current-period".tr()}\n${getWordedDateShortMore(budgetRange.start)} – ${getWordedDateShortMore(budgetRange.end)}";
               return Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1914,7 +1908,7 @@ class SelectBudgetIncomeTypePopup extends StatelessWidget {
                 child: OutlinedButtonStacked(
                   alignStart: true,
                   alignBeside: true,
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       horizontal: 20, vertical: 20),
                   text: "savings-budget".tr(),
                   iconData: appStateSettings["outlinedIcons"]
@@ -1937,14 +1931,14 @@ class SelectBudgetIncomeTypePopup extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 13),
+          const SizedBox(height: 13),
           Row(
             children: [
               Expanded(
                 child: OutlinedButtonStacked(
                   alignStart: true,
                   alignBeside: true,
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       horizontal: 20, vertical: 20),
                   text: "expense-budget".tr(),
                   iconData: appStateSettings["outlinedIcons"]
@@ -1997,7 +1991,7 @@ class SelectBudgetTypePopup extends StatelessWidget {
                   filled: selectedBudgetTypeAdded == true,
                   alignStart: true,
                   alignBeside: true,
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       horizontal: 20, vertical: 20),
                   text: "added-only".tr(),
                   iconData: appStateSettings["outlinedIcons"]
@@ -2029,7 +2023,7 @@ class SelectBudgetTypePopup extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 13),
+          const SizedBox(height: 13),
           Row(
             children: [
               Expanded(
@@ -2037,7 +2031,7 @@ class SelectBudgetTypePopup extends StatelessWidget {
                   filled: selectedBudgetTypeAll == true,
                   alignStart: true,
                   alignBeside: true,
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       horizontal: 20, vertical: 20),
                   text: "all-transactions".tr(),
                   iconData: appStateSettings["outlinedIcons"]
@@ -2153,7 +2147,7 @@ class _ViewBudgetTransactionFilterInfoState
                       BudgetTransactionFilters.defaultBudgetTransactionFilters),
                   alignStart: true,
                   alignBeside: true,
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       horizontal: 20, vertical: 20),
                   text: "default".tr(),
                   iconData: appStateSettings["outlinedIcons"]
@@ -2290,7 +2284,7 @@ class FilterTypeInfoEntry extends StatelessWidget {
   final Function(BudgetTransactionFilters filter) onTap;
   final BudgetTransactionFilters budgetTransactionFilter;
 
-  FilterTypeInfoEntry({
+  const FilterTypeInfoEntry({
     Key? key,
     required this.selectedBudgetFilters,
     required this.setSelectedBudgetFilters,
@@ -2304,7 +2298,7 @@ class FilterTypeInfoEntry extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedOpacity(
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       opacity: selectedBudgetFilters.contains(
               BudgetTransactionFilters.defaultBudgetTransactionFilters)
           ? 0.5
@@ -2321,7 +2315,7 @@ class FilterTypeInfoEntry extends StatelessWidget {
                 ),
                 alignStart: true,
                 alignBeside: true,
-                padding: EdgeInsetsDirectional.symmetric(
+                padding: const EdgeInsetsDirectional.symmetric(
                     horizontal: 20, vertical: 20),
                 text: title,
                 iconData: icon,

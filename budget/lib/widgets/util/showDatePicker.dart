@@ -1,12 +1,8 @@
-import 'dart:math';
-import 'dart:ui';
 import 'package:budget/colors.dart';
 import 'package:budget/functions.dart';
 import 'package:budget/pages/addTransactionPage.dart';
-import 'package:budget/pages/editBudgetPage.dart';
 import 'package:budget/pages/walletDetailsPage.dart';
 import 'package:budget/struct/settings.dart';
-import 'package:budget/widgets/animatedExpanded.dart';
 import 'package:budget/widgets/fab.dart';
 import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/globalSnackbar.dart';
@@ -18,10 +14,8 @@ import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/util/showTimePicker.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:budget/struct/dateTimePickerLocalizationsDelegate.dart';
-import 'package:flutter/widgets.dart';
 
 Future<DateTime?> showCustomDatePicker(
   BuildContext context,
@@ -59,7 +53,7 @@ Future<DateTime?> showCustomDatePicker(
                 ? Theme.of(context).colorScheme.secondaryContainer
                 : null,
           ),
-          child: child ?? SizedBox.shrink(),
+          child: child ?? const SizedBox.shrink(),
         ),
       );
     },
@@ -118,7 +112,6 @@ class _DateRangePickerPopupState extends State<DateRangePickerPopup> {
       builder: (BuildContext context2, Widget? child) {
         return ApplyStartOfTheWeekSetting(
           child: Theme(
-            child: child ?? Container(),
             data: Theme.of(context2).copyWith(
               // ignore: deprecated_member_use
               useMaterial3: appStateSettings["materialYou"],
@@ -136,12 +129,13 @@ class _DateRangePickerPopupState extends State<DateRangePickerPopup> {
                       .colorScheme
                       .secondaryContainer
                       .withOpacity(0.5),
-                  animationDuration: Duration(milliseconds: 250),
-                  textStyle:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  animationDuration: const Duration(milliseconds: 250),
+                  textStyle: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 15),
                 ),
               ),
             ),
+            child: child ?? Container(),
           ),
         );
       },
@@ -157,8 +151,9 @@ class _DateRangePickerPopupState extends State<DateRangePickerPopup> {
     if (allTime || forceAllTime) return DateTimeRangeOrAllTime(allTime: true);
     DateTimeRange? safeRange =
         createSafeDateTimeRange(start: startDate, end: endDate);
-    if (safeRange != null)
+    if (safeRange != null) {
       return DateTimeRangeOrAllTime(allTime: false, dateTimeRange: safeRange);
+    }
     return null;
   }
 
@@ -209,7 +204,7 @@ class _DateRangePickerPopupState extends State<DateRangePickerPopup> {
           ),
         ),
         Padding(
-          padding: EdgeInsetsDirectional.only(top: 20, bottom: 15),
+          padding: const EdgeInsetsDirectional.only(top: 20, bottom: 15),
           child: Column(
             children: [
               Padding(
@@ -232,7 +227,7 @@ class _DateRangePickerPopupState extends State<DateRangePickerPopup> {
                         letterSpacing: materialYou ? null : 1.5,
                       ),
                     ),
-                    SizedBox(height: 35),
+                    const SizedBox(height: 35),
                     Center(
                       child: Wrap(
                         alignment: WrapAlignment.center,
@@ -258,7 +253,7 @@ class _DateRangePickerPopupState extends State<DateRangePickerPopup> {
                             },
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            padding: EdgeInsetsDirectional.symmetric(
+                            padding: const EdgeInsetsDirectional.symmetric(
                                 vertical: 0, horizontal: 4),
                           ),
                           Icon(
@@ -284,7 +279,7 @@ class _DateRangePickerPopupState extends State<DateRangePickerPopup> {
                             },
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            padding: EdgeInsetsDirectional.symmetric(
+                            padding: const EdgeInsetsDirectional.symmetric(
                                 vertical: 0, horizontal: 4),
                           )
                         ],
@@ -293,7 +288,7 @@ class _DateRangePickerPopupState extends State<DateRangePickerPopup> {
                   ],
                 ),
               ),
-              HorizontalBreak(
+              const HorizontalBreak(
                   padding: EdgeInsetsDirectional.only(top: 25, bottom: 20)),
               Padding(
                 padding: const EdgeInsetsDirectional.symmetric(horizontal: 25),
@@ -470,7 +465,7 @@ class ApplyStartOfTheWeekSetting extends StatelessWidget {
 
     return Localizations.override(
       context: context,
-      locale: Locale("en", "US"),
+      locale: const Locale("en", "US"),
       delegates: [translations],
       child: child,
     );

@@ -20,7 +20,7 @@ import 'package:flutter/services.dart';
 import 'package:gradient_borders/gradient_borders.dart';
 
 class SelectColor extends StatefulWidget {
-  SelectColor({
+  const SelectColor({
     Key? key,
     this.setSelectedColor,
     this.selectedColor,
@@ -115,7 +115,7 @@ class _SelectColorState extends State<SelectColor> {
                 child: widget.includeThemeColor && index == 0
                     ? ThemeColorIcon(
                         outline: selectedIndex == 0 && selectedColor == null,
-                        margin: EdgeInsetsDirectional.all(5),
+                        margin: const EdgeInsetsDirectional.all(5),
                         size: 55,
                         onTap: () {
                           widget.setSelectedColor!(null);
@@ -135,7 +135,7 @@ class _SelectColorState extends State<SelectColor> {
                               outline: selectedIndex == -1 ||
                                   selectedIndex ==
                                       selectableColorsList.length - 1,
-                              margin: EdgeInsetsDirectional.all(5),
+                              margin: const EdgeInsetsDirectional.all(5),
                               size: 55,
                               onTap: (colorPassed) {
                                 widget.setSelectedColor!(colorPassed);
@@ -147,7 +147,7 @@ class _SelectColorState extends State<SelectColor> {
                             ),
                           )
                         : ColorIcon(
-                            margin: EdgeInsetsDirectional.all(5),
+                            margin: const EdgeInsetsDirectional.all(5),
                             color: (widget.supportCustomColors &&
                                     index + 1 == selectableColorsList.length)
                                 ? (selectedColor ?? Colors.transparent)
@@ -160,7 +160,8 @@ class _SelectColorState extends State<SelectColor> {
                                   selectedColor = color;
                                   selectedIndex = index;
                                 });
-                                Future.delayed(Duration(milliseconds: 70), () {
+                                Future.delayed(const Duration(milliseconds: 70),
+                                    () {
                                   if (widget.next != null) {
                                     widget.next!();
                                   }
@@ -208,9 +209,9 @@ class _SelectColorState extends State<SelectColor> {
                       ? Icons.devices_outlined
                       : Icons.devices_rounded,
                 )
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           AnimatedOpacity(
-            duration: Duration(milliseconds: 400),
+            duration: const Duration(milliseconds: 400),
             opacity:
                 widget.useSystemColorPrompt == true && useSystemColor == false
                     ? 1
@@ -230,7 +231,7 @@ class _SelectColorState extends State<SelectColor> {
                                   previewBuilder: widget.previewBuilder,
                                   initialSelectedColor: selectedColor ??
                                       Theme.of(context).colorScheme.primary,
-                                  margin: EdgeInsetsDirectional.all(5),
+                                  margin: const EdgeInsetsDirectional.all(5),
                                   size: 55,
                                   onTap: (colorPassed) {
                                     widget.setSelectedColor!(colorPassed);
@@ -238,8 +239,8 @@ class _SelectColorState extends State<SelectColor> {
                                       selectedColor = color;
                                       selectedIndex = index;
                                     });
-                                    Future.delayed(Duration(milliseconds: 70),
-                                        () {
+                                    Future.delayed(
+                                        const Duration(milliseconds: 70), () {
                                       popRoute(context);
                                       if (widget.next != null) {
                                         widget.next!();
@@ -252,7 +253,7 @@ class _SelectColorState extends State<SelectColor> {
                                 ),
                               )
                             : ColorIcon(
-                                margin: EdgeInsetsDirectional.all(5),
+                                margin: const EdgeInsetsDirectional.all(5),
                                 color: color,
                                 size: 55,
                                 onTap: () {
@@ -261,8 +262,8 @@ class _SelectColorState extends State<SelectColor> {
                                     setState(() {
                                       selectedColor = color;
                                     });
-                                    Future.delayed(Duration(milliseconds: 70),
-                                        () {
+                                    Future.delayed(
+                                        const Duration(milliseconds: 70), () {
                                       popRoute(context);
                                       if (widget.next != null) {
                                         widget.next!();
@@ -287,7 +288,7 @@ class _SelectColorState extends State<SelectColor> {
 }
 
 class ColorIcon extends StatelessWidget {
-  ColorIcon({
+  const ColorIcon({
     Key? key,
     required this.color,
     required this.size,
@@ -305,9 +306,9 @@ class ColorIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 250),
       margin: margin ??
-          EdgeInsetsDirectional.only(start: 8, end: 8, top: 8, bottom: 8),
+          const EdgeInsetsDirectional.only(start: 8, end: 8, top: 8, bottom: 8),
       height: size,
       width: size,
       decoration: outline
@@ -317,14 +318,16 @@ class ColorIcon extends StatelessWidget {
                     amountLight: 0.5, amountDark: 0.4, inverse: true),
                 width: 3,
               ),
-              borderRadius: BorderRadiusDirectional.all(Radius.circular(500)),
+              borderRadius:
+                  const BorderRadiusDirectional.all(Radius.circular(500)),
             )
           : BoxDecoration(
               border: Border.all(
                 color: Colors.transparent,
                 width: 0,
               ),
-              borderRadius: BorderRadiusDirectional.all(Radius.circular(500)),
+              borderRadius:
+                  const BorderRadiusDirectional.all(Radius.circular(500)),
             ),
       child: Tappable(
         color: color,
@@ -355,9 +358,10 @@ class ThemeColorIcon extends StatelessWidget {
     return Tooltip(
       message: "theme-color".tr(),
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 250),
+        duration: const Duration(milliseconds: 250),
         margin: margin ??
-            EdgeInsetsDirectional.only(start: 8, end: 8, top: 8, bottom: 8),
+            const EdgeInsetsDirectional.only(
+                start: 8, end: 8, top: 8, bottom: 8),
         height: size,
         width: size,
         decoration: outline
@@ -394,7 +398,7 @@ class ThemeColorIcon extends StatelessWidget {
 }
 
 class ColorIconCustom extends StatefulWidget {
-  ColorIconCustom({
+  const ColorIconCustom({
     Key? key,
     required this.size,
     required this.onTap,
@@ -471,7 +475,7 @@ class _ColorIconCustomState extends State<ColorIconCustom> {
             },
             previewBuilder: widget.previewBuilder,
           ),
-          SizedBox(
+          const SizedBox(
             height: 8,
           ),
           Button(
@@ -492,7 +496,8 @@ class _ColorIconCustomState extends State<ColorIconCustom> {
         },
         child: Container(
           margin: widget.margin ??
-              EdgeInsetsDirectional.only(start: 8, end: 8, top: 8, bottom: 8),
+              const EdgeInsetsDirectional.only(
+                  start: 8, end: 8, top: 8, bottom: 8),
           height: widget.size,
           width: widget.size,
           decoration: widget.outline
@@ -503,7 +508,7 @@ class _ColorIconCustomState extends State<ColorIconCustom> {
                     width: 3,
                   ),
                   borderRadius:
-                      BorderRadiusDirectional.all(Radius.circular(500)),
+                      const BorderRadiusDirectional.all(Radius.circular(500)),
                 )
               : BoxDecoration(
                   border: GradientBoxBorder(
@@ -574,7 +579,7 @@ class _HexColorPickerState extends State<HexColorPicker> {
 
   setColor(String input) {
     if (input.length == 8) {
-      Color color = HexColor("0xFF" + input.replaceAll("0x", ""),
+      Color color = HexColor("0xFF${input.replaceAll("0x", "")}",
           defaultColor: widget.initialSelectedColor);
 
       setState(() {
@@ -608,7 +613,7 @@ class _HexColorPickerState extends State<HexColorPicker> {
       widgetBeside: Padding(
         padding: const EdgeInsetsDirectional.only(start: 12),
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 500),
+          duration: const Duration(milliseconds: 500),
           height: 45,
           width: 45,
           decoration: BoxDecoration(
@@ -648,7 +653,7 @@ class ColorCodeFormatter extends TextInputFormatter {
         .replaceAll("0x", "")
         .allCaps
         .replaceAll(RegExp(r'[^a-fA-F0-9]'), '');
-    cleanedInput = "0x" + cleanedInput;
+    cleanedInput = "0x$cleanedInput";
 
     if (cleanedInput.length > 8) {
       cleanedInput = cleanedInput.substring(0, 8);

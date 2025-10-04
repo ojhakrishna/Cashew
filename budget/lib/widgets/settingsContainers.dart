@@ -104,7 +104,7 @@ class _SettingsContainerSwitchState extends State<SettingsContainerSwitch> {
       description = widget.descriptionWithValue!(value);
     }
     return AnimatedOpacity(
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       opacity: waiting ? 0.5 : 1,
       child: SettingsContainer(
         isOutlined: widget.isOutlined,
@@ -135,13 +135,13 @@ class PlatformSwitch extends StatelessWidget {
   final bool value;
   final Function onTap;
 
-  PlatformSwitch({required this.value, required this.onTap});
+  const PlatformSwitch({super.key, required this.value, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     if (getPlatform() == PlatformOS.isIOS) {
       return CupertinoSwitch(
-        activeColor: Theme.of(context).colorScheme.primary,
+        activeTrackColor: Theme.of(context).colorScheme.primary,
         value: value,
         onChanged: (_) {
           onTap();
@@ -149,7 +149,7 @@ class PlatformSwitch extends StatelessWidget {
       );
     } else {
       return Switch(
-        activeColor: Theme.of(context).colorScheme.primary,
+        activeThumbColor: Theme.of(context).colorScheme.primary,
         value: value,
         onChanged: (_) {
           onTap();
@@ -202,12 +202,12 @@ class SettingsContainerOpenPage extends StatelessWidget {
     return Padding(
       padding: isOutlined == false || isOutlined == null
           ? EdgeInsetsDirectional.zero
-          : EdgeInsetsDirectional.only(top: 5, bottom: 5, start: 4, end: 4),
+          : const EdgeInsetsDirectional.only(
+              top: 5, bottom: 5, start: 4, end: 4),
       child: OpenContainerNavigation(
         onClosed: onClosed,
         onOpen: onOpen,
-        closedColor:
-            backgroundColor ?? Theme.of(context).colorScheme.background,
+        closedColor: backgroundColor ?? Theme.of(context).colorScheme.surface,
         borderRadius: isOutlined == true
             ? 10
             : getIsFullScreen(context)
@@ -245,7 +245,7 @@ class SettingsContainerOpenPage extends StatelessWidget {
                     // );
                   },
             afterWidget: isOutlined ?? false
-                ? SizedBox.shrink()
+                ? const SizedBox.shrink()
                 : Row(
                     children: [
                       if (afterWidget != null) afterWidget!,
@@ -320,7 +320,7 @@ class SettingsContainerDropdown extends StatefulWidget {
 }
 
 class _SettingsContainerDropdownState extends State<SettingsContainerDropdown> {
-  late GlobalKey<DropdownSelectState>? _dropdownKey = GlobalKey();
+  late final GlobalKey<DropdownSelectState>? _dropdownKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -410,7 +410,7 @@ class SettingsContainerOutlined extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             icon == null
-                ? SizedBox.shrink()
+                ? const SizedBox.shrink()
                 : Transform.scale(
                     scale: iconScale ?? 1,
                     child: Icon(
@@ -419,7 +419,7 @@ class SettingsContainerOutlined extends StatelessWidget {
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextFont(
               text: title,
               fontSize: 13,
@@ -487,7 +487,7 @@ class SettingsContainerOutlined extends StatelessWidget {
               isExpanded == false ? MainAxisSize.min : MainAxisSize.max,
           children: [
             icon == null
-                ? SizedBox.shrink()
+                ? const SizedBox.shrink()
                 : Padding(
                     padding: EdgeInsetsDirectional.only(
                         end: 8 +
@@ -502,7 +502,9 @@ class SettingsContainerOutlined extends StatelessWidget {
                       ),
                     ),
                   ),
-            isWideOutlined == true ? SizedBox(width: 3) : SizedBox.shrink(),
+            isWideOutlined == true
+                ? const SizedBox(width: 3)
+                : const SizedBox.shrink(),
             isExpanded
                 ? Expanded(child: textContent)
                 : Flexible(
@@ -511,7 +513,7 @@ class SettingsContainerOutlined extends StatelessWidget {
                       child: textContent,
                     ),
                   ),
-            afterWidget ?? SizedBox()
+            afterWidget ?? const SizedBox()
           ],
         ),
       );
@@ -614,7 +616,7 @@ class SettingsContainer extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           icon == null
-                              ? SizedBox.shrink()
+                              ? const SizedBox.shrink()
                               : Padding(
                                   padding:
                                       const EdgeInsetsDirectional.only(end: 16),
@@ -679,9 +681,9 @@ class SettingsContainer extends StatelessWidget {
                       ),
                     ),
                     hasMoreOptionsIcon == true
-                        ? HasMoreOptionsIcon()
-                        : SizedBox.shrink(),
-                    afterWidget ?? SizedBox()
+                        ? const HasMoreOptionsIcon()
+                        : const SizedBox.shrink(),
+                    afterWidget ?? const SizedBox()
                   ],
                 ),
               ),
@@ -700,7 +702,7 @@ class SettingsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsDirectional.only(
+      padding: const EdgeInsetsDirectional.only(
         start: 63,
         end: 63,
         top: 15,

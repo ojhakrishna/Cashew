@@ -68,7 +68,7 @@ Future<void> loadRecentlyDeletedTransactions() async {
             ))
         .toList();
   } catch (e) {
-    print("Error loading recently deleted transactions: " + e.toString());
+    print("Error loading recently deleted transactions: $e");
   }
 }
 
@@ -150,7 +150,7 @@ class ActivityPageState extends State<ActivityPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if ((globalSelectedID.value[pageId] ?? []).length > 0) {
+        if ((globalSelectedID.value[pageId] ?? []).isNotEmpty) {
           globalSelectedID.value[pageId] = [];
           globalSelectedID.value = globalSelectedID.value;
           return false;
@@ -184,13 +184,13 @@ class ActivityPageState extends State<ActivityPage> {
                     // print(snapshot2.data);
                     if (snapshot1.hasData == false &&
                         snapshot2.hasData == false) {
-                      return SliverToBoxAdapter();
+                      return const SliverToBoxAdapter();
                     }
                     List<TransactionActivityLog> activityLogList = [
                       ...(snapshot1.data ?? []),
                       ...(snapshot2.data ?? [])
                     ]..sort((a, b) => b.dateTime.compareTo(a.dateTime));
-                    if (activityLogList.length <= 0) {
+                    if (activityLogList.isEmpty) {
                       return SliverToBoxAdapter(
                         child: Center(
                           child:
@@ -256,12 +256,13 @@ class ActivityPageState extends State<ActivityPage> {
                                       ? () {
                                           if (wasADeletedTransaction &&
                                               item.deleteLog != null &&
-                                              item.transaction != null)
+                                              item.transaction != null) {
                                             restoreTransaction(
                                               context,
                                               item.deleteLog!,
                                               item.transaction!,
                                             );
+                                          }
                                         }
                                       : null,
 
@@ -289,7 +290,7 @@ class ActivityPageState extends State<ActivityPage> {
                                     ),
                                   ),
                                 )
-                              : SizedBox.shrink();
+                              : const SizedBox.shrink();
                           return Column(
                             key: ValueKey(
                                 (item.transaction?.transactionPk ?? "") +
@@ -299,14 +300,8 @@ class ActivityPageState extends State<ActivityPage> {
                               DateDivider(
                                 date: transaction?.dateCreated ?? item.dateTime,
                                 maxLines: 2,
-                                afterDate: " • " +
-                                    (wasADeletedTransaction
-                                            ? "deleted"
-                                            : "modified")
-                                        .tr()
-                                        .capitalizeFirst +
-                                    " " +
-                                    getTimeAgo(item.dateTime),
+                                afterDate:
+                                    " • ${(wasADeletedTransaction ? "deleted" : "modified").tr().capitalizeFirst} ${getTimeAgo(item.dateTime)}",
                               ),
                               transaction == null
                                   ? noTransactionFound
@@ -321,7 +316,7 @@ class ActivityPageState extends State<ActivityPage> {
               );
             },
           ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: SizedBox(height: 75),
           ),
         ],

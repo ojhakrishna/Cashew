@@ -46,7 +46,7 @@ class TransactionsAmountBox extends StatelessWidget {
           BoxDecoration(boxShadow: boxShadowCheck(boxShadowGeneral(context))),
       child: OpenContainerNavigation(
         closedColor: getColor(context, "lightDarkAccentHeavyLight"),
-        openPage: openPage ?? SizedBox.shrink(),
+        openPage: openPage ?? const SizedBox.shrink(),
         borderRadius: 15,
         button: (openContainer) {
           return Tappable(
@@ -72,7 +72,7 @@ class TransactionsAmountBox extends StatelessWidget {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     DoubleTotalWithCountStreamBuilder(
                       totalWithCountStream: totalWithCountStream,
                       totalWithCountStream2: totalWithCountStream2,
@@ -89,7 +89,7 @@ class TransactionsAmountBox extends StatelessWidget {
                           children: [
                             CountNumber(
                               count: finalAmount,
-                              duration: Duration(milliseconds: 1000),
+                              duration: const Duration(milliseconds: 1000),
                               initialCount: (0),
                               textBuilder: (number) {
                                 return TextFont(
@@ -111,14 +111,11 @@ class TransactionsAmountBox extends StatelessWidget {
                                 );
                               },
                             ),
-                            SizedBox(height: 6),
+                            const SizedBox(height: 6),
                             TextFont(
                               maxLines: 2,
-                              text: totalCount.toString() +
-                                  " " +
-                                  (totalCount == 1
-                                      ? "transaction".tr().toLowerCase()
-                                      : "transactions".tr().toLowerCase()),
+                              text:
+                                  "$totalCount ${totalCount == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()}",
                               fontSize: 13,
                               textAlign: TextAlign.center,
                               textColor: getColor(context, "textLight"),

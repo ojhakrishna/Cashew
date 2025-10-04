@@ -33,8 +33,9 @@ Future<T?> openPopup<T extends Object?>(
   VoidCallback? onExtra2,
   bool barrierDismissible = true,
 }) {
-  if ((contextPassed ?? navigatorKey.currentContext) == null)
+  if ((contextPassed ?? navigatorKey.currentContext) == null) {
     return Future.error("No context");
+  }
   BuildContext context = contextPassed ?? navigatorKey.currentContext!;
 
   minimizeKeyboard(context);
@@ -53,14 +54,14 @@ Future<T?> openPopup<T extends Object?>(
       }
       return ScaleTransition(
         scale: tween.animate(
-            new CurvedAnimation(parent: anim, curve: Curves.easeInOutQuart)),
+            CurvedAnimation(parent: anim, curve: Curves.easeInOutQuart)),
         child: FadeTransition(
           opacity: anim,
           child: child,
         ),
       );
     },
-    transitionDuration: Duration(milliseconds: 200),
+    transitionDuration: const Duration(milliseconds: 200),
     pageBuilder: (_, __, ___) {
       double borderRadius = getPlatform() == PlatformOS.isIOS ? 10 : 25;
       Color tertiaryButtonColor = appStateSettings["materialYou"] == false &&
@@ -122,11 +123,11 @@ Future<T?> openPopup<T extends Object?>(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Padding(
-                        padding:
-                            EdgeInsetsDirectional.symmetric(horizontal: 25),
+                        padding: const EdgeInsetsDirectional.symmetric(
+                            horizontal: 25),
                         child: Column(
                           children: [
-                            SizedBox(height: 17),
+                            const SizedBox(height: 17),
                             if (icon != null)
                               Padding(
                                 padding: const EdgeInsetsDirectional.symmetric(
@@ -221,7 +222,7 @@ Future<T?> openPopup<T extends Object?>(
                                               }),
                                             ),
                                           )
-                                        : SizedBox.shrink(),
+                                        : const SizedBox.shrink(),
                                     onExtraLabel != null
                                         ? IntrinsicWidth(
                                             child: Padding(
@@ -238,7 +239,7 @@ Future<T?> openPopup<T extends Object?>(
                                               ),
                                             ),
                                           )
-                                        : SizedBox.shrink(),
+                                        : const SizedBox.shrink(),
                                     onSubmitLabel != null
                                         ? IntrinsicWidth(
                                             child: Padding(
@@ -254,13 +255,13 @@ Future<T?> openPopup<T extends Object?>(
                                               ),
                                             ),
                                           )
-                                        : SizedBox.shrink(),
+                                        : const SizedBox.shrink(),
                                   ],
                                 ),
                               ),
                             onExtraLabel2 == null
-                                ? SizedBox(height: 17)
-                                : SizedBox(height: 5),
+                                ? const SizedBox(height: 17)
+                                : const SizedBox(height: 5),
                           ],
                         ),
                       ),
@@ -286,8 +287,9 @@ Future<T?> openPopup<T extends Object?>(
                   // Only use intrinsic width if the content is controlled
                   if (onExtraLabel2 != null &&
                       descriptionWidget == null &&
-                      beforeDescriptionWidget == null)
+                      beforeDescriptionWidget == null) {
                     return IntrinsicWidth(child: content);
+                  }
                   return content;
                 }),
               ),
@@ -368,14 +370,14 @@ Future<T?> openPopupCustom<T extends Object?>(
       }
       return ScaleTransition(
         scale: tween.animate(
-            new CurvedAnimation(parent: anim, curve: Curves.easeInOutQuart)),
+            CurvedAnimation(parent: anim, curve: Curves.easeInOutQuart)),
         child: FadeTransition(
           opacity: anim,
           child: child,
         ),
       );
     },
-    transitionDuration: Duration(milliseconds: 200),
+    transitionDuration: const Duration(milliseconds: 200),
     pageBuilder: (_, __, ___) {
       return WillPopScope(
         //Stop back button
@@ -406,7 +408,7 @@ Future<T?> openPopupCustom<T extends Object?>(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   title == null
-                      ? SizedBox.shrink()
+                      ? const SizedBox.shrink()
                       : Padding(
                           padding: const EdgeInsetsDirectional.only(bottom: 15),
                           child: TextFont(
@@ -444,22 +446,22 @@ Future<T?> openLoadingPopup<T extends Object?>(BuildContext context) {
       }
       return ScaleTransition(
         scale: tween.animate(
-            new CurvedAnimation(parent: anim, curve: Curves.easeInOutQuart)),
+            CurvedAnimation(parent: anim, curve: Curves.easeInOutQuart)),
         child: FadeTransition(
           opacity: anim,
           child: child,
         ),
       );
     },
-    transitionDuration: Duration(milliseconds: 200),
+    transitionDuration: const Duration(milliseconds: 200),
     pageBuilder: (_, __, ___) {
       return WillPopScope(
         //Stop back button
         onWillPop: () async => false,
         child: Center(
           child: Container(
-            padding:
-                EdgeInsetsDirectional.symmetric(horizontal: 20, vertical: 20),
+            padding: const EdgeInsetsDirectional.symmetric(
+                horizontal: 20, vertical: 20),
             margin: EdgeInsetsDirectional.only(
               start: 20,
               end: 20,
@@ -475,7 +477,7 @@ Future<T?> openLoadingPopup<T extends Object?>(BuildContext context) {
               borderRadius: BorderRadiusDirectional.circular(
                   getPlatform() == PlatformOS.isIOS ? 10 : 25),
             ),
-            child: CircularProgressIndicator(),
+            child: const CircularProgressIndicator(),
           ),
         ),
       );
@@ -496,11 +498,11 @@ Future openLoadingPopupTryCatch(
     if (onSuccess != null) onSuccess(result);
     return result;
   } catch (e) {
-    print("Error caught: " + e.toString());
+    print("Error caught: $e");
     popRoute(context ?? navigatorKey.currentContext!, null);
-    if (onError != null)
+    if (onError != null) {
       onError(e);
-    else
+    } else {
       openSnackbar(
         SnackbarMessage(
           title: "an-error-occured".tr(),
@@ -510,6 +512,7 @@ Future openLoadingPopupTryCatch(
           description: e.toString(),
         ),
       );
+    }
   }
   return null;
 }
@@ -534,7 +537,8 @@ void discardChangesPopup(context,
     return;
   }
 
-  previousObject = previousObject?.copyWith(dateTimeModified: Value(null));
+  previousObject =
+      previousObject?.copyWith(dateTimeModified: const Value(null));
 
   if (forceShow == false &&
       previousObject != null &&
@@ -587,7 +591,7 @@ class CodeBlock extends StatelessWidget {
           : Theme.of(context).colorScheme.secondaryContainer,
       onLongPress: () => copyToClipboard(text),
       child: Padding(
-        padding: EdgeInsetsDirectional.all(10),
+        padding: const EdgeInsetsDirectional.all(10),
         child: TextFont(
           text: "",
           textAlign: textAlign ?? TextAlign.center,

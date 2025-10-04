@@ -62,9 +62,9 @@ class _SelectDateRangeState extends State<SelectDateRange> {
                   },
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
-                  internalPadding: EdgeInsetsDirectional.symmetric(
+                  internalPadding: const EdgeInsetsDirectional.symmetric(
                       vertical: 5, horizontal: 4),
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       vertical: 3, horizontal: 5),
                 ),
               ),
@@ -75,8 +75,8 @@ class _SelectDateRangeState extends State<SelectDateRange> {
             children: [
               AnimatedExpanded(
                 expand: selectedEndDate != null,
-                child: Padding(
-                  padding: const EdgeInsetsDirectional.only(top: 5, bottom: 0),
+                child: const Padding(
+                  padding: EdgeInsetsDirectional.only(top: 5, bottom: 0),
                   child: Icon(
                     Icons.arrow_downward_rounded,
                     size: 25,
@@ -115,16 +115,16 @@ class _SelectDateRangeState extends State<SelectDateRange> {
                   },
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
-                  internalPadding: EdgeInsetsDirectional.symmetric(
+                  internalPadding: const EdgeInsetsDirectional.symmetric(
                       vertical: 5, horizontal: 4),
-                  padding: EdgeInsetsDirectional.symmetric(
+                  padding: const EdgeInsetsDirectional.symmetric(
                       vertical: 3, horizontal: 5),
                 ),
               ),
               AnimatedSizeSwitcher(
                 child: selectedEndDate != null
                     ? Opacity(
-                        key: ValueKey(1),
+                        key: const ValueKey(1),
                         opacity: 0.5,
                         child: IconButtonScaled(
                           tooltip: "clear".tr(),
@@ -140,7 +140,7 @@ class _SelectDateRangeState extends State<SelectDateRange> {
                         ),
                       )
                     : Container(
-                        key: ValueKey(2),
+                        key: const ValueKey(2),
                       ),
               )
             ],

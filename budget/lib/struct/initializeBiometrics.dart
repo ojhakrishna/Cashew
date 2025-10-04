@@ -45,7 +45,7 @@ Future<AuthResult> checkBiometrics({
       //bool biometricsOnly = (await auth.canCheckBiometrics);
       return (await auth.authenticate(
         localizedReason: "verify-identity".tr(),
-        options: AuthenticationOptions(biometricOnly: false),
+        options: const AuthenticationOptions(biometricOnly: false),
       ))
           ? AuthResult.authenticated
           : AuthResult.unauthenticated;
@@ -97,7 +97,7 @@ class _InitializeBiometricsState extends State<InitializeBiometrics> {
     // Wait so that we get a context on the navigatorKey
     // Since Initialize biometrics does not have access to Material navigator in the widget tree
     // because we want to keep the app fully locked
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       openPopup(
         null,
         barrierDismissible: false,
@@ -130,14 +130,14 @@ class _InitializeBiometricsState extends State<InitializeBiometrics> {
           _biometricCheck();
         },
         child: Column(
-          key: ValueKey(0),
+          key: const ValueKey(0),
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             BreathingWidget(
               child: Center(
                 child: AnimatedSwitcher(
-                  duration: Duration(milliseconds: 500),
+                  duration: const Duration(milliseconds: 500),
                   switchInCurve: Curves.easeInOut,
                   switchOutCurve: Curves.easeInOut,
                   transitionBuilder:
@@ -151,7 +151,7 @@ class _InitializeBiometricsState extends State<InitializeBiometrics> {
                           size: 50,
                           color: Theme.of(context).colorScheme.secondary,
                         )
-                      : SizedBox.shrink(),
+                      : const SizedBox.shrink(),
                 ),
               ),
             ),
@@ -162,9 +162,8 @@ class _InitializeBiometricsState extends State<InitializeBiometrics> {
                 padding: const EdgeInsetsDirectional.symmetric(
                     horizontal: 18, vertical: 20),
                 child: TextFont(
-                  text: "biometrics-error-description".tr() +
-                      "\n" +
-                      "please-check-your-system-settings".tr(),
+                  text:
+                      "${"biometrics-error-description".tr()}\n${"please-check-your-system-settings".tr()}",
                   textAlign: TextAlign.center,
                   maxLines: 5,
                   fontSize: 16,
@@ -176,10 +175,10 @@ class _InitializeBiometricsState extends State<InitializeBiometrics> {
       ),
     );
     if (authResult == AuthResult.authenticated) {
-      child = SizedBox(key: ValueKey(1), child: widget.child);
+      child = SizedBox(key: const ValueKey(1), child: widget.child);
     }
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       switchInCurve: Curves.easeInOut,
       switchOutCurve: Curves.easeInOut,
       transitionBuilder: (Widget child, Animation<double> animation) {

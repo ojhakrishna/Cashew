@@ -24,7 +24,8 @@ import 'package:budget/struct/commonDateFormats.dart';
 import 'package:budget/widgets/tableEntry.dart';
 import 'package:provider/provider.dart';
 
-Throttler appLinksThrottler = Throttler(duration: Duration(milliseconds: 350));
+Throttler appLinksThrottler =
+    Throttler(duration: const Duration(milliseconds: 350));
 
 class InitializeAppLinks extends StatelessWidget {
   const InitializeAppLinks({required this.child, super.key});
@@ -53,7 +54,7 @@ class _AppLinksWebState extends State<AppLinksWeb> {
   void initState() {
     super.initState();
     // This delay is required by the web app
-    Future.delayed(Duration(milliseconds: 0), () {
+    Future.delayed(const Duration(milliseconds: 0), () {
       executeAppLink(navigatorKey.currentContext, Uri.base);
     });
   }
@@ -73,7 +74,7 @@ class AppLinksNative extends StatefulWidget {
 }
 
 class _AppLinksNativeState extends State<AppLinksNative> {
-  AppLinks _appLinks = AppLinks();
+  final AppLinks _appLinks = AppLinks();
   StreamSubscription<Uri>? _linkSubscription;
 
   @override
@@ -92,7 +93,7 @@ class _AppLinksNativeState extends State<AppLinksNative> {
     Uri? appLink = await _appLinks.getInitialLink();
     // This delay may or may not be needed...
     // we need to make sure Material navigator is accessible by the context though!
-    Future.delayed(Duration(milliseconds: 0), () {
+    Future.delayed(const Duration(milliseconds: 0), () {
       if (appLink != null) {
         executeAppLink(navigatorKey.currentContext, appLink);
       }
@@ -130,13 +131,13 @@ Future<Transaction?> processAddTransactionFromParams(
       await getMainAndSubcategoryFromParams(params);
   TransactionWallet? wallet = await getWalletFromParams(params);
   String walletPk = wallet?.walletPk ?? appStateSettings["selectedWalletPk"];
-  DateTime? dateCreated = await getDateTimeFromParams(params, context);
+  DateTime? dateCreated = getDateTimeFromParams(params, context);
   double amount = getAmountFromParams(params);
   String title = params["title"] ?? params["name"] ?? "";
   String note = params["note"] ?? params["notes"] ?? "";
 
   if (mainAndSubCategory.main == null) {
-    Future.delayed(Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       bottomSheetControllerGlobal.snapToExtent(0);
     });
     mainAndSubCategory = await selectCategorySequence(
@@ -234,10 +235,10 @@ Future processAddTransactionRouteFromParams(
   MainAndSubcategory mainAndSubCategory =
       await getMainAndSubcategoryFromParams(params);
   TransactionWallet? wallet = await getWalletFromParams(params);
-  DateTime? dateCreated = await getDateTimeFromParams(params, context);
+  DateTime? dateCreated = getDateTimeFromParams(params, context);
   double amount = getAmountFromParams(params);
   // Add a delay so the keyboard can focus
-  await Future.delayed(Duration(milliseconds: 50), () async {
+  await Future.delayed(const Duration(milliseconds: 50), () async {
     await pushRoute(
       context,
       AddTransactionPage(
@@ -262,7 +263,7 @@ Future processMessageToParse(
   dynamic result = await queueTransactionFromMessage(
     messageString,
     willPushRoute: true,
-    dateTime: await getDateTimeFromParams(params, context),
+    dateTime: getDateTimeFromParams(params, context),
   );
   if (result == false) {
     pushRoute(

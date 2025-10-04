@@ -56,7 +56,7 @@ class WalletEntry extends StatelessWidget {
                       : Colors.transparent,
                 ),
               ),
-              duration: Duration(milliseconds: 450),
+              duration: const Duration(milliseconds: 450),
               child: Padding(
                 padding: const EdgeInsetsDirectional.symmetric(
                     horizontal: 18, vertical: 13),
@@ -97,12 +97,8 @@ class WalletEntry extends StatelessWidget {
                           ),
                           TextFont(
                             textAlign: TextAlign.start,
-                            text: walletWithDetails.numberTransactions
-                                    .toString() +
-                                " " +
-                                (walletWithDetails.numberTransactions == 1
-                                    ? "transaction".tr().toLowerCase()
-                                    : "transactions".tr().toLowerCase()),
+                            text:
+                                "${walletWithDetails.numberTransactions} ${walletWithDetails.numberTransactions == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()}",
                             fontSize: 14,
                             textColor:
                                 getColor(context, "black").withOpacity(0.65),
@@ -246,14 +242,13 @@ class WalletEntryRow extends StatelessWidget {
                                     fontSize: 18,
                                     color: getColor(context, "black"),
                                     fontFamily: appStateSettings["font"],
-                                    fontFamilyFallback: ['Inter'],
+                                    fontFamilyFallback: const ['Inter'],
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 if (percent != null)
                                   TextSpan(
-                                    text: "  " +
-                                        "(" +
+                                    text: "  " "(" +
                                         convertToPercent(percent ?? 0,
                                             useLessThanZero: true) +
                                         ")",
@@ -261,7 +256,7 @@ class WalletEntryRow extends StatelessWidget {
                                       fontSize: 15,
                                       color: getColor(context, "textLight"),
                                       fontFamily: appStateSettings["font"],
-                                      fontFamilyFallback: ['Inter'],
+                                      fontFamilyFallback: const ['Inter'],
                                     ),
                                   ),
                               ],
@@ -292,7 +287,7 @@ class WalletEntryRow extends StatelessWidget {
             if (isCurrencyRow) {
               await openBottomSheet(
                 context,
-                EditHomePagePinnedWalletsPopup(
+                const EditHomePagePinnedWalletsPopup(
                   homePageWidgetDisplay: HomePageWidgetDisplay.WalletList,
                   showCyclePicker: true,
                 ),
@@ -351,10 +346,10 @@ class AmountAccount extends StatelessWidget {
           AnimatedSizeSwitcher(
             child: roundedWalletWithTotal == 0
                 ? Container(
-                    key: ValueKey(1),
+                    key: const ValueKey(1),
                   )
                 : IncomeOutcomeArrow(
-                    key: ValueKey(2),
+                    key: const ValueKey(2),
                     isIncome: (walletWithDetails.totalSpent ?? 0) > 0,
                     iconSize: 24,
                     width: 14,
@@ -364,7 +359,7 @@ class AmountAccount extends StatelessWidget {
         CountNumber(
           lazyFirstRender: false,
           count: finalTotal,
-          duration: Duration(milliseconds: 1000),
+          duration: const Duration(milliseconds: 1000),
           decimals: walletWithDetails.wallet.decimals,
           initialCount: 0,
           textBuilder: (number) {

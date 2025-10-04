@@ -75,11 +75,11 @@ class _ImportCSVState extends State<ImportCSV> {
         throw "no-file-selected".tr();
       }
     }, onError: (e) {
-      print("Error opening CSV: " + e.toString());
+      print("Error opening CSV: $e");
       openPopup(
         context,
         title: "csv-error".tr(),
-        description: "consider-csv-template".tr() + "\n" + e.toString(),
+        description: "${"consider-csv-template".tr()}\n$e",
         onCancelWithBoxContext: (BuildContext boxContext) async {
           await saveSampleCSV(boxContext: boxContext);
           popRoute(context);
@@ -104,7 +104,7 @@ class _ImportCSVState extends State<ImportCSV> {
   Future<void> _assignColumns(String csvString,
       {bool importFromSheets = false}) async {
     try {
-      List<List<String>> fileContents = CsvToListConverter().convert(
+      List<List<String>> fileContents = const CsvToListConverter().convert(
         csvString,
         eol: '\n',
         shouldParseNumbers: false,
@@ -207,9 +207,9 @@ class _ImportCSVState extends State<ImportCSV> {
                 ? Icons.warning_outlined
                 : Icons.warning_rounded,
             title: "csv-error".tr(),
-            description: "consider-csv-template".tr() + "\n" + e.toString(),
+            description: "${"consider-csv-template".tr()}\n$e",
             onCancelWithBoxContext: (BuildContext boxContext) async {
-              await importFromSheets
+              importFromSheets
                   ? getGoogleSheetTemplate(context)
                   : saveSampleCSV(boxContext: boxContext);
               popRoute(context);
@@ -246,9 +246,8 @@ class _ImportCSVState extends State<ImportCSV> {
                 )
               : null,
           title: "assign-columns".tr(),
-          subtitle: (fileContents.length - 1).toString() +
-              " " +
-              "transactions-in-the-csv".tr(),
+          subtitle:
+              "${fileContents.length - 1} ${"transactions-in-the-csv".tr()}",
           child: Column(
             children: [
               TableEntry(
@@ -264,7 +263,7 @@ class _ImportCSVState extends State<ImportCSV> {
                     Padding(
                       padding: const EdgeInsetsDirectional.only(bottom: 5),
                       child: Container(
-                        padding: EdgeInsetsDirectional.symmetric(
+                        padding: const EdgeInsetsDirectional.symmetric(
                             vertical: 10, horizontal: 15),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadiusDirectional.circular(10),
@@ -286,7 +285,7 @@ class _ImportCSVState extends State<ImportCSV> {
                       Padding(
                         padding: const EdgeInsetsDirectional.only(bottom: 5),
                         child: Container(
-                          padding: EdgeInsetsDirectional.symmetric(
+                          padding: const EdgeInsetsDirectional.symmetric(
                               vertical: 10, horizontal: 15),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadiusDirectional.circular(10),
@@ -308,7 +307,7 @@ class _ImportCSVState extends State<ImportCSV> {
                                           .capitalizeFirst,
                                       fontSize: 15,
                                     ),
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     DropdownSelect(
                                       compact: true,
                                       initial: assignedColumns[key]![
@@ -327,17 +326,15 @@ class _ImportCSVState extends State<ImportCSV> {
                                                   ...headers
                                                 ]
                                               : ["~None~", ...headers],
-                                      boldedValues: [
+                                      boldedValues: const [
                                         "~Current Wallet~",
                                         "~None~"
                                       ],
                                       getLabel: (label) {
                                         if (label == "~Current Wallet~") {
-                                          return "~" +
-                                              "current-account".tr() +
-                                              "~";
+                                          return "~${"current-account".tr()}~";
                                         } else if (label == "~None~") {
-                                          return "~" + "none".tr() + "~";
+                                          return "~${"none".tr()}~";
                                         }
                                         return label;
                                       },
@@ -388,15 +385,14 @@ class _ImportCSVState extends State<ImportCSV> {
                             ? Icons.warning_outlined
                             : Icons.warning_rounded,
                         title: "csv-error".tr(),
-                        description:
-                            "consider-csv-template".tr() + "\n" + e.toString(),
+                        description: "${"consider-csv-template".tr()}\n$e",
                         onSubmit: () {
                           popRoute(context);
                         },
                         onSubmitLabel: "ok".tr(),
                         onCancelWithBoxContext:
                             (BuildContext boxContext) async {
-                          await importFromSheets
+                          importFromSheets
                               ? getGoogleSheetTemplate(context)
                               : saveSampleCSV(boxContext: boxContext);
                           popRoute(context);
@@ -415,7 +411,7 @@ class _ImportCSVState extends State<ImportCSV> {
       openPopup(
         context,
         title: "csv-error".tr(),
-        description: "consider-csv-template".tr() + "\n" + e.toString(),
+        description: "${"consider-csv-template".tr()}\n$e",
         onCancelWithBoxContext: (BuildContext boxContext) async {
           await saveSampleCSV(boxContext: boxContext);
           popRoute(context);
@@ -472,22 +468,9 @@ class _ImportCSVState extends State<ImportCSV> {
             icon: appStateSettings["outlinedIcons"]
                 ? Icons.check_circle_outline_outlined
                 : Icons.check_circle_outline_rounded,
-            title: "done".tr() + "!",
-            description: "successfully-imported".tr().capitalizeFirst +
-                " " +
-                // Subtract one, since we don't count the header of the CSV as an entry
-                (fileContents.length - firstEntryIndex - numberOfErrors)
-                    .toString() +
-                " " +
-                "transactions".tr().toLowerCase() +
-                "." +
-                (numberOfErrors > 0
-                    ? (" " +
-                        "errors".tr().capitalizeFirst +
-                        ": " +
-                        numberOfErrors.toString() +
-                        ".")
-                    : ""),
+            title: "${"done".tr()}!",
+            description:
+                "${"successfully-imported".tr().capitalizeFirst} ${fileContents.length - firstEntryIndex - numberOfErrors} ${"transactions".tr().toLowerCase()}.${numberOfErrors > 0 ? (" " + "errors".tr().capitalizeFirst + ": " + numberOfErrors.toString() + ".") : ""}",
             onSubmitLabel: "ok".tr(),
             onSubmit: () {
               popRoute(context);
@@ -542,7 +525,7 @@ class _ImportCSVState extends State<ImportCSV> {
               openPopup(
                 context,
                 title: "csv-error".tr(),
-                description: "consider-csv-template".tr() + "\n" + e.toString(),
+                description: "${"consider-csv-template".tr()}\n$e",
                 onCancelWithBoxContext: (BuildContext boxContext) async {
                   await saveSampleCSV(boxContext: boxContext);
                   popRoute(context);
@@ -689,10 +672,7 @@ class _CustomDateFormatInputState extends State<CustomDateFormatInput> {
     }
     String parsedDateText = dateTimeParsed == null
         ? "???"
-        : getWordedDateShort(dateTimeParsed,
-                includeYear: true, showTodayTomorrow: false) +
-            " " +
-            getWordedTime(context.locale.toString(), dateTimeParsed);
+        : "${getWordedDateShort(dateTimeParsed, includeYear: true, showTodayTomorrow: false)} ${getWordedTime(context.locale.toString(), dateTimeParsed)}";
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -702,7 +682,7 @@ class _CustomDateFormatInputState extends State<CustomDateFormatInput> {
           fontSize: 15,
         ),
         TextFont(
-          text: "example".tr() + " " + "dd/MM/yyyy HH:mm",
+          text: "${"example".tr()} dd/MM/yyyy HH:mm",
           fontSize: 12,
           maxLines: 5,
         ),
@@ -711,7 +691,7 @@ class _CustomDateFormatInputState extends State<CustomDateFormatInput> {
           maxLines: 5,
           fontSize: 12,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         TextInput(
           labelText: "date-format".tr(),
           padding: EdgeInsetsDirectional.zero,
@@ -830,10 +810,9 @@ Future saveSampleCSV({required BuildContext boxContext}) async {
       "",
       "",
     ]);
-    String csv = ListToCsvConverter().convert(csvData);
-    String fileName = "cashew-import-template" +
-        DateTime.now().millisecondsSinceEpoch.toString() +
-        ".csv";
+    String csv = const ListToCsvConverter().convert(csvData);
+    String fileName =
+        "cashew-import-template${DateTime.now().millisecondsSinceEpoch}.csv";
     return saveCSV(boxContext: boxContext, csv: csv, fileName: fileName);
   });
   return;
@@ -1019,8 +998,7 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
                         .trim()))
                 .walletPk;
           } catch (e) {
-            throw "Wallet not found! If you want to import to the current wallet, please select '~Current Wallet~'. Details: " +
-                e.toString();
+            throw "Wallet not found! If you want to import to the current wallet, please select '~Current Wallet~'. Details: $e";
           }
         }
       }
@@ -1051,11 +1029,9 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
           if (result != null) break;
         }
         if (result == null) {
-          throw "Failed to parse date and time! Please use the custom 'Date Format' that matches your data. \n\n  Details: " +
-              e.toString();
+          throw "Failed to parse date and time! Please use the custom 'Date Format' that matches your data. \n\n  Details: $e";
         } else {
-          print("Successfully parsed data with a common date format: " +
-              result.toString());
+          print("Successfully parsed data with a common date format: $result");
           dateCreated = result;
         }
       } else {
@@ -1155,8 +1131,7 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
           );
         } catch (e) {
           transactionAndTitle = null;
-          skippedError
-              .add("Skipping row #" + i.toString() + "\n" + e.toString());
+          skippedError.add("Skipping row #$i\n$e");
         }
         if (transactionAndTitle == null) continue;
 
@@ -1164,14 +1139,14 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
         TransactionsCompanion companionTransactionToInsert =
             transactionAndTitle.transaction.toCompanion(true);
         companionTransactionToInsert = companionTransactionToInsert.copyWith(
-            transactionPk: Value.absent());
+            transactionPk: const Value.absent());
         transactionsInserting.add(companionTransactionToInsert);
         // Use auto generated ID when inserting
         if (transactionAndTitle.title != null) {
           AssociatedTitlesCompanion companionTitleToInsert =
               transactionAndTitle.title!.toCompanion(true);
           companionTitleToInsert = companionTitleToInsert.copyWith(
-              associatedTitlePk: Value.absent());
+              associatedTitlePk: const Value.absent());
           titlesInserting.add(companionTitleToInsert);
         }
       }
@@ -1189,17 +1164,12 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
       await database.createBatchAssociatedTitlesOnly(filteredList);
       await database.fixOrderAssociatedTitles();
 
-      if (skippedError.length > 0) {
+      if (skippedError.isNotEmpty) {
         await openPopup(
           context,
           title: "csv-error".tr(),
-          description: "consider-csv-template".tr() +
-              "\n" +
-              "Skipped importing " +
-              skippedError.length.toString() +
-              " entries: " +
-              "\n\n" +
-              skippedError.take(10).join("\n\n"),
+          description:
+              "${"consider-csv-template".tr()}\nSkipped importing ${skippedError.length} entries: \n\n${skippedError.take(10).join("\n\n")}",
           onCancelWithBoxContext: (BuildContext boxContext) async {
             await saveSampleCSV(boxContext: boxContext);
             popRoute(context);
@@ -1221,7 +1191,7 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
       openPopup(
         context,
         title: "csv-error".tr(),
-        description: "consider-csv-template".tr() + "\n" + e.toString(),
+        description: "${"consider-csv-template".tr()}\n$e",
         onCancelWithBoxContext: (BuildContext boxContext) async {
           await saveSampleCSV(boxContext: boxContext);
           popRoute(context);
@@ -1248,12 +1218,10 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
           currentPercent: currentPercent,
           color: Theme.of(context).colorScheme.primary,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         TextFont(
           fontSize: 15,
-          text: currentEntryIndex.toString() +
-              " / " +
-              currentFileLength.toString(),
+          text: "$currentEntryIndex / $currentFileLength",
         )
       ],
     );
@@ -1289,7 +1257,7 @@ DateTime? tryDateFormatting(
     if (dateCreated.year < 1500) throw ("Invalid year, try another format");
   } catch (e) {
     dateCreated = null;
-    print("Failed to parse date and time!" + e.toString());
+    print("Failed to parse date and time!$e");
   }
   return dateCreated;
 }
@@ -1305,8 +1273,7 @@ DateTime tryToParseCustomDateFormat(
     try {
       dateCreated = format.parse(stringToParse.replaceAll("  ", " ").trim());
     } catch (e) {
-      throw "Failed to parse date and time! Please use the custom 'Date Format' that matches your data. \n\n  Details: " +
-          e.toString();
+      throw "Failed to parse date and time! Please use the custom 'Date Format' that matches your data. \n\n  Details: $e";
     }
   }
   dateCreated = DateTime(

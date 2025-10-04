@@ -39,7 +39,7 @@ class DropdownSelect extends StatefulWidget {
 class DropdownSelectState extends State<DropdownSelect> {
   String? currentValue;
 
-  late GlobalKey? _dropdownButtonKey = GlobalKey();
+  late final GlobalKey? _dropdownButtonKey = GlobalKey();
 
   void openDropdown() {
     GestureDetector? detector;
@@ -79,18 +79,15 @@ class DropdownSelectState extends State<DropdownSelect> {
           top: widget.compact ? 2 : 10,
           bottom: widget.compact ? 2 : 10),
       decoration: BoxDecoration(
-        color: widget.backgroundColor == null
-            ? getColor(context, "lightDarkAccent")
-            : widget.backgroundColor,
+        color: widget.backgroundColor ?? getColor(context, "lightDarkAccent"),
         borderRadius: BorderRadiusDirectional.circular(10),
       ),
       child: DropdownButton<String>(
         key: _dropdownButtonKey,
         underline: Container(),
         style: TextStyle(color: getColor(context, "black"), fontSize: 15),
-        dropdownColor: widget.backgroundColor == null
-            ? getColor(context, "lightDarkAccent")
-            : widget.backgroundColor,
+        dropdownColor:
+            widget.backgroundColor ?? getColor(context, "lightDarkAccent"),
         isDense: true,
         value: currentValue ?? widget.initial,
         elevation: 15,
@@ -111,6 +108,7 @@ class DropdownSelectState extends State<DropdownSelect> {
             .map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem(
             alignment: AlignmentDirectional.centerStart,
+            value: value,
             child: TextFont(
               text: widget.getLabel != null ? widget.getLabel!(value) : value,
               fontSize: widget.compact ? 14 : 18,
@@ -120,7 +118,6 @@ class DropdownSelectState extends State<DropdownSelect> {
               textColor: getColor(context, "black")
                   .withOpacity(widget.faintValues.contains(value) ? 0.3 : 1),
             ),
-            value: value,
           );
         }).toList(),
       ),
@@ -155,7 +152,8 @@ class CustomPopupMenuButton extends StatelessWidget {
   final bool forceKeepOutFirst;
   final double buttonPadding;
 
-  CustomPopupMenuButton({
+  const CustomPopupMenuButton({
+    super.key,
     required this.items,
     this.showButtons = false,
     this.keepOutFirst = true,
@@ -172,7 +170,7 @@ class CustomPopupMenuButton extends StatelessWidget {
           AnimatedScale(
             scale: menuItem.selected ? 1.8 : 0,
             curve: Curves.easeInOutCubicEmphasized,
-            duration: Duration(milliseconds: 700),
+            duration: const Duration(milliseconds: 700),
             child: Container(
               height: 22,
               width: 22,
@@ -224,10 +222,10 @@ class CustomPopupMenuButton extends StatelessWidget {
     bool keepOutFirstConsideringHeader = (keepOutFirst &&
             getCenteredTitleSmall(context: context, backButtonEnabled: true) ==
                 false) ||
-        this.items.length == 1;
+        items.length == 1;
     List<DropdownItemMenu> itemsFiltered = [...items];
     if ((keepOutFirstConsideringHeader || forceKeepOutFirst) &&
-        items.length > 0) {
+        items.isNotEmpty) {
       itemsFiltered.removeAt(0);
       if (items.length == 2) itemsFiltered.removeAt(0);
     }
@@ -251,7 +249,7 @@ class CustomPopupMenuButton extends StatelessWidget {
     return Row(
       children: [
         if ((keepOutFirstConsideringHeader || forceKeepOutFirst) &&
-            items.length > 0)
+            items.isNotEmpty)
           Transform.translate(
             offset:
                 Offset(itemsFiltered.isNotEmpty || items.length == 2 ? 7 : 0, 0)
@@ -259,7 +257,7 @@ class CustomPopupMenuButton extends StatelessWidget {
             child: menuIconButtonBuilder(context, items[0]),
           ),
         if ((keepOutFirstConsideringHeader || forceKeepOutFirst) &&
-            items.length > 0 &&
+            items.isNotEmpty &&
             items.length == 2)
           Transform.translate(
             offset: Offset(itemsFiltered.isNotEmpty ? 7 : 0, 0)
@@ -308,8 +306,8 @@ class CustomPopupMenuButton extends StatelessWidget {
                           },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      constraints:
-                          BoxConstraints(minHeight: kMinInteractiveDimension),
+                      constraints: const BoxConstraints(
+                          minHeight: kMinInteractiveDimension),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -318,7 +316,7 @@ class CustomPopupMenuButton extends StatelessWidget {
                             alignment: AlignmentDirectional.center,
                             children: [
                               BreathingWidget(
-                                duration: Duration(milliseconds: 700),
+                                duration: const Duration(milliseconds: 700),
                                 endScale: 1.2,
                                 child: Transform.scale(
                                   scale: 1.5,
@@ -342,7 +340,7 @@ class CustomPopupMenuButton extends StatelessWidget {
                               ),
                             ],
                           ),
-                          SizedBox(width: 9),
+                          const SizedBox(width: 9),
                           TextFont(
                             text: menuItem.label,
                             fontSize: 14.5,

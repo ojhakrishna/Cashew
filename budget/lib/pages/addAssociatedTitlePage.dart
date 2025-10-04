@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class AddAssociatedTitlePage extends StatefulWidget {
-  AddAssociatedTitlePage({
+  const AddAssociatedTitlePage({
     Key? key,
     this.associatedTitle,
   }) : super(key: key);
@@ -76,7 +76,7 @@ class _AddAssociatedTitlePageState extends State<AddAssociatedTitlePage> {
   @override
   void initState() {
     super.initState();
-    _focusNode = new FocusNode();
+    _focusNode = FocusNode();
     if (widget.associatedTitle != null) {
       //We are editing a Title
       //Fill in the information from the passed in Title
@@ -114,15 +114,17 @@ class _AddAssociatedTitlePageState extends State<AddAssociatedTitlePage> {
     if (selectedTitle != null &&
         selectedTitle != "" &&
         selectedCategory != null) {
-      if (canAddTitle != true)
-        this.setState(() {
+      if (canAddTitle != true) {
+        setState(() {
           canAddTitle = true;
         });
+      }
     } else {
-      if (canAddTitle != false)
-        this.setState(() {
+      if (canAddTitle != false) {
+        setState(() {
           canAddTitle = false;
         });
+      }
     }
   }
 
@@ -176,7 +178,7 @@ class _AddAssociatedTitlePageState extends State<AddAssociatedTitlePage> {
                   onChanged: (text) {
                     setSelectedTitle(text);
                   },
-                  padding: EdgeInsetsDirectional.only(start: 7, end: 7),
+                  padding: const EdgeInsetsDirectional.only(start: 7, end: 7),
                   fontSize: getIsFullScreen(context) ? 25 : 23,
                   fontWeight: FontWeight.bold,
                   topContentPadding: 0,
@@ -186,7 +188,7 @@ class _AddAssociatedTitlePageState extends State<AddAssociatedTitlePage> {
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 12,
           ),
           canAddTitle ?? false

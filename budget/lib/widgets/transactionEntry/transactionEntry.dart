@@ -50,7 +50,7 @@ class RecentlyAddedTransactionInfo {
     shouldAnimate = false;
     isRunningAnimation = true;
     recentlyAddedTransactionInfo.value = recentlyAddedTransactionInfo.value;
-    Future.delayed(Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       isRunningAnimation = false;
       recentlyAddedTransactionInfo.value = recentlyAddedTransactionInfo.value;
     });
@@ -69,7 +69,7 @@ class TransactionEntryHitBox extends RenderProxyBox {
 class TransactionEntryBox extends SingleChildRenderObjectWidget {
   final String transactionKey;
 
-  TransactionEntryBox(
+  const TransactionEntryBox(
       {required Widget child, required this.transactionKey, Key? key})
       : super(child: child, key: key);
 
@@ -81,12 +81,12 @@ class TransactionEntryBox extends SingleChildRenderObjectWidget {
   @override
   void updateRenderObject(
       BuildContext context, TransactionEntryHitBox renderObject) {
-    renderObject..transactionKey = transactionKey;
+    renderObject.transactionKey = transactionKey;
   }
 }
 
 class TransactionEntry extends StatelessWidget {
-  TransactionEntry({
+  const TransactionEntry({
     Key? key,
     required this.openPage,
     required this.transaction,
@@ -301,7 +301,7 @@ class TransactionEntry extends StatelessWidget {
               listID: listID,
               selectTransaction: selectTransaction,
             )
-          : SizedBox.shrink();
+          : const SizedBox.shrink();
       Widget categoryIcon = CategoryIcon(
         cacheImage: true,
         category: category,
@@ -322,13 +322,13 @@ class TransactionEntry extends StatelessWidget {
         );
         if (highlightActionButton) {
           actionButton = BreathingWidget(
-            duration: Duration(milliseconds: 600),
+            duration: const Duration(milliseconds: 600),
             endScale: 1.2,
             child: actionButton,
           );
         }
         actionButton = AnimatedSwitcher(
-          duration: Duration(milliseconds: 800),
+          duration: const Duration(milliseconds: 800),
           child: isTransactionActionDealtWith(transaction)
               ? Container(child: actionButton)
               : actionButton,
@@ -359,11 +359,11 @@ class TransactionEntry extends StatelessWidget {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(100),
                           color: Theme.of(context).colorScheme.secondary),
-                      padding: EdgeInsetsDirectional.symmetric(
+                      padding: const EdgeInsetsDirectional.symmetric(
                           vertical: 2, horizontal: 4),
                       child: TextFont(
                         textColor: Theme.of(context).colorScheme.onSecondary,
-                        text: " ×" + numberRepeats.toString() + " ",
+                        text: " ×$numberRepeats ",
                         fontSize: 10,
                       ),
                     );
@@ -407,7 +407,7 @@ class TransactionEntry extends StatelessWidget {
           TransactionEntryNote(
             transaction: transaction,
             iconColor: iconColor,
-            padding: EdgeInsetsDirectional.only(end: 5),
+            padding: const EdgeInsetsDirectional.only(end: 5),
           ),
           Expanded(
             child: TextFont(
@@ -442,7 +442,7 @@ class TransactionEntry extends StatelessWidget {
                   categoryIcon,
                   Expanded(
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: 45),
+                      constraints: const BoxConstraints(minHeight: 45),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -458,7 +458,7 @@ class TransactionEntry extends StatelessWidget {
                                     end: 0,
                                   ),
                                 ),
-                                SizedBox(width: 5),
+                                const SizedBox(width: 5),
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsetsDirectional.only(
@@ -479,7 +479,7 @@ class TransactionEntry extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 7,
                                 ),
                                 if (getIsFullScreen(context))
@@ -525,7 +525,7 @@ class TransactionEntry extends StatelessWidget {
                 children: [
                   transactionSelectionCheck,
                   categoryIcon,
-                  SizedBox(width: 5),
+                  const SizedBox(width: 5),
                   actionButton(
                     const EdgeInsetsDirectional.only(
                       start: 3,
@@ -534,7 +534,7 @@ class TransactionEntry extends StatelessWidget {
                       end: 0,
                     ),
                   ),
-                  SizedBox(width: 5),
+                  const SizedBox(width: 5),
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -548,7 +548,7 @@ class TransactionEntry extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 7,
                   ),
                   if (getIsFullScreen(context)) transactionActionLabelButton,
@@ -558,20 +558,21 @@ class TransactionEntry extends StatelessWidget {
               ),
             );
 
-      if (aboveWidget != null)
+      if (aboveWidget != null) {
         return Column(
           children: [
             Padding(
               padding: EdgeInsetsDirectional.only(
                 start: getPlatform() == PlatformOS.isIOS ? 10 : 0,
               ),
-              child: aboveWidget ?? SizedBox.shrink(),
+              child: aboveWidget ?? const SizedBox.shrink(),
             ),
             finalTransactionContainer,
           ],
         );
-      else
+      } else {
         return finalTransactionContainer;
+      }
     }
 
     return Padding(
@@ -651,14 +652,13 @@ class TransactionEntry extends StatelessWidget {
                           isTransactionAfterSelected ? 0 : borderRadius,
                         ),
                       ),
-                      closedColor: containerColor == null
-                          ? Theme.of(context).colorScheme.surface
-                          : containerColor,
+                      closedColor: containerColor ??
+                          Theme.of(context).colorScheme.surface,
                       button: (openContainer) {
                         return FlashingContainer(
                           loopCount: loopCount,
                           isAnimating: triggerAnimation,
-                          flashDuration: Duration(milliseconds: 500),
+                          flashDuration: const Duration(milliseconds: 500),
                           backgroundColor: selectedColor.withOpacity(
                             appStateSettings["materialYou"]
                                 ? categoryTintColor == null
@@ -817,7 +817,8 @@ class FlashingContainer extends StatefulWidget {
   final Color backgroundColor;
   final int loopCount; // Add this property
 
-  FlashingContainer({
+  const FlashingContainer({
+    super.key,
     required this.child,
     this.flashDuration = const Duration(milliseconds: 500),
     this.isAnimating = true,
@@ -906,6 +907,7 @@ class TransactionSelectionCheck extends StatelessWidget {
       selectTransaction;
 
   const TransactionSelectionCheck({
+    super.key,
     required this.selected,
     required this.areTransactionsBeingSelected,
     this.listID,
@@ -916,7 +918,7 @@ class TransactionSelectionCheck extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedSize(
-      duration: Duration(milliseconds: 550),
+      duration: const Duration(milliseconds: 550),
       curve: Curves.easeInOutCubicEmphasized,
       child: selected || areTransactionsBeingSelected == true
           ? ScaleIn(
@@ -937,12 +939,12 @@ class TransactionSelectionCheck extends StatelessWidget {
                     },
                     color: Colors.transparent,
                     child: Padding(
-                      padding: EdgeInsetsDirectional.symmetric(
+                      padding: const EdgeInsetsDirectional.symmetric(
                         horizontal: 10,
                         vertical: 12,
                       ),
                       child: ScaledAnimatedSwitcher(
-                        duration: Duration(milliseconds: 275),
+                        duration: const Duration(milliseconds: 275),
                         keyToWatch: selected.toString(),
                         child: Transform.scale(
                           scale: selected ? 1 : 0.95,
@@ -962,7 +964,7 @@ class TransactionSelectionCheck extends StatelessWidget {
                                 width: 2,
                               ),
                             ),
-                            padding: EdgeInsetsDirectional.all(2),
+                            padding: const EdgeInsetsDirectional.all(2),
                             child: Icon(
                               Icons.check,
                               size: 14,

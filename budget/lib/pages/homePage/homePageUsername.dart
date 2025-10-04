@@ -13,7 +13,8 @@ class HomePageUsername extends StatelessWidget {
   final String username;
   final Function enterNameBottomSheet;
 
-  HomePageUsername({
+  const HomePageUsername({
+    super.key,
     required this.animationControllerHeader,
     required this.animationControllerHeader2,
     required this.showUsername,
@@ -73,14 +74,15 @@ class HomePageUsername extends StatelessWidget {
                   enterNameBottomSheet(context);
                 },
                 borderRadius: 15,
-                child: child ?? SizedBox.shrink(),
+                child: child ?? const SizedBox.shrink(),
               ),
             );
           },
           child: Padding(
             padding: const EdgeInsetsDirectional.symmetric(horizontal: 9),
             child: MediaQuery(
-              data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+              data: MediaQuery.of(context)
+                  .copyWith(textScaler: const TextScaler.linear(1.0)),
               child: PartyHat(
                 size: 28,
                 enabled: !(showUsername && showGreeting),
@@ -159,7 +161,7 @@ class PartyHat extends StatelessWidget {
           child: Transform.rotate(
             angle: -0.24,
             child: Image.asset(
-              "assets/icons/fun/" + hatIcon,
+              "assets/icons/fun/$hatIcon",
               width: size,
             ),
           ),

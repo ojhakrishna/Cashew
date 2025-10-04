@@ -45,7 +45,7 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
   late AnimationController _animationControllerSearch;
   final _debouncer = Debouncer(milliseconds: 500);
   late SearchFilters searchFilters;
-  TextEditingController searchInputController = new TextEditingController();
+  TextEditingController searchInputController = TextEditingController();
 
   @override
   void initState() {
@@ -90,7 +90,7 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
         ),
       ),
     );
-    Future.delayed(Duration(milliseconds: 250), () {
+    Future.delayed(const Duration(milliseconds: 250), () {
       updateSettings(
         "searchTransactionsSetFiltersString",
         searchFilters.getFilterString(),
@@ -131,7 +131,7 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
   }
 
   Future<void> selectDateRange(BuildContext context) async {
-    final DateTimeRangeOrAllTime? picked = await showCustomDateRangePicker(
+    final DateTimeRangeOrAllTime picked = await showCustomDateRangePicker(
       context,
       DateTimeRangeOrAllTime(
         allTime: searchFilters.dateTimeRange == null,
@@ -141,8 +141,8 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
       allTimeButton: true,
     );
     if (picked != null) {
-      if (searchFilters.dateTimeRange != picked.dateTimeRange)
-        Future.delayed(Duration(milliseconds: 175), () {
+      if (searchFilters.dateTimeRange != picked.dateTimeRange) {
+        Future.delayed(const Duration(milliseconds: 175), () {
           setState(() {
             searchFilters.dateTimeRange = picked.dateTimeRange;
           });
@@ -152,6 +152,7 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
             updateGlobalState: false,
           );
         });
+      }
     }
   }
 
@@ -159,7 +160,7 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if ((globalSelectedID.value["TransactionsSearch"] ?? []).length > 0) {
+        if ((globalSelectedID.value["TransactionsSearch"] ?? []).isNotEmpty) {
           globalSelectedID.value["TransactionsSearch"] = [];
           globalSelectedID.value = globalSelectedID.value;
           return false;
@@ -198,7 +199,7 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
                 },
                 child: Row(
                   children: [
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                     Expanded(
                       child: TextInput(
                         controller: searchInputController,
@@ -214,20 +215,21 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
                         },
                         onChanged: (value) {
                           _debouncer.run(() {
-                            if (searchFilters.searchQuery != value)
+                            if (searchFilters.searchQuery != value) {
                               setState(() {
                                 searchFilters.searchQuery = value;
                               });
+                            }
                           });
                         },
-                        padding: EdgeInsetsDirectional.all(0),
+                        padding: const EdgeInsetsDirectional.all(0),
                       ),
                     ),
-                    SizedBox(width: 7),
+                    const SizedBox(width: 7),
                     Builder(builder: (context) {
                       // Wrap in a builder to prevent entire page from reloading with popup
                       return AnimatedSwitcher(
-                        duration: Duration(milliseconds: 500),
+                        duration: const Duration(milliseconds: 500),
                         child: ButtonIcon(
                           key: ValueKey(
                             (searchFilters.dateTimeRange == null).toString(),
@@ -249,9 +251,9 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
                         ),
                       );
                     }),
-                    SizedBox(width: 7),
+                    const SizedBox(width: 7),
                     AnimatedSwitcher(
-                      duration: Duration(milliseconds: 500),
+                      duration: const Duration(milliseconds: 500),
                       child: ButtonIcon(
                         key: ValueKey(
                           searchFilters.isClear(
@@ -279,13 +281,13 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
                             : Icons.filter_alt_rounded,
                       ),
                     ),
-                    SizedBox(width: 20),
+                    const SizedBox(width: 20),
                   ],
                 ),
               ),
             ),
           ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: SizedBox(height: 13),
           ),
           SliverToBoxAdapter(
@@ -319,15 +321,7 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
                 child: TextFont(
                   text: searchFilters.dateTimeRange == null
                       ? "all-time".tr()
-                      : getWordedDateShortMore(
-                              searchFilters.dateTimeRange?.start ??
-                                  DateTime.now(),
-                              includeYear: true) +
-                          " – " +
-                          getWordedDateShortMore(
-                              searchFilters.dateTimeRange?.end ??
-                                  DateTime.now(),
-                              includeYear: true),
+                      : "${getWordedDateShortMore(searchFilters.dateTimeRange?.start ?? DateTime.now(), includeYear: true)} – ${getWordedDateShortMore(searchFilters.dateTimeRange?.end ?? DateTime.now(), includeYear: true)}",
                   fontSize: 13,
                   textAlign: TextAlign.center,
                   textColor: getColor(context, "textLight"),
@@ -347,7 +341,7 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
               // limit: 250,
               noResultsExtraWidget: dateRangeWidget,
               totalCashFlowExtraWidget: Transform.translate(
-                  offset: Offset(0, -15), child: dateRangeWidget),
+                  offset: const Offset(0, -15), child: dateRangeWidget),
               showTotalCashFlow: true,
             );
           }),
@@ -371,11 +365,11 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
           //     selectDateRange(context);
           //   },
           // ),
-          SliverToBoxAdapter(
+          const SliverToBoxAdapter(
             child: SizedBox(height: 50),
           ),
         ],
-        selectedTransactionsAppBar: SelectedTransactionsAppBar(
+        selectedTransactionsAppBar: const SelectedTransactionsAppBar(
           pageID: "TransactionsSearch",
         ),
       ),
@@ -409,8 +403,8 @@ class AppliedFilterChip extends StatelessWidget {
             ? Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5)
             : null),
         child: Container(
-          padding:
-              EdgeInsetsDirectional.only(start: 14, end: 14, top: 7, bottom: 7),
+          padding: const EdgeInsetsDirectional.only(
+              start: 14, end: 14, top: 7, bottom: 7),
           decoration: BoxDecoration(
             borderRadius: BorderRadiusDirectional.circular(8),
             border: Border.all(
@@ -422,7 +416,7 @@ class AppliedFilterChip extends StatelessWidget {
           child: Row(
             children: [
               icon == null
-                  ? SizedBox.shrink()
+                  ? const SizedBox.shrink()
                   : Padding(
                       padding: const EdgeInsetsDirectional.only(end: 5),
                       child: Icon(icon, size: 23),

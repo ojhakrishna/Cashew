@@ -40,6 +40,7 @@ class SaveBottomButton extends StatelessWidget {
 
 class AddGradientOnTop extends StatelessWidget {
   const AddGradientOnTop({
+    super.key,
     required this.child,
   });
 
@@ -53,24 +54,24 @@ class AddGradientOnTop extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Transform.translate(
-            offset: Offset(0, 1),
+            offset: const Offset(0, 1),
             child: Container(
               height: 12,
               foregroundDecoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Theme.of(context).colorScheme.background.withOpacity(0),
-                    Theme.of(context).colorScheme.background,
+                    Theme.of(context).colorScheme.surface.withOpacity(0),
+                    Theme.of(context).colorScheme.surface,
                   ],
                   begin: AlignmentDirectional.topCenter,
                   end: AlignmentDirectional.bottomCenter,
-                  stops: [0.1, 1],
+                  stops: const [0.1, 1],
                 ),
               ),
             ),
           ),
           Container(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             child: child,
           ),
         ],
@@ -100,10 +101,11 @@ class _MinimizeKeyboardFABOverlayState extends State<MinimizeKeyboardFABOverlay>
   @override
   void didChangeMetrics() {
     bool status = getIsKeyboardOpen(context);
-    if (status != isKeyboardOpen)
+    if (status != isKeyboardOpen) {
       setState(() {
         isKeyboardOpen = status;
       });
+    }
   }
 
   @override
@@ -118,7 +120,7 @@ class _MinimizeKeyboardFABOverlayState extends State<MinimizeKeyboardFABOverlay>
       end: 10,
       bottom: 10,
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 100),
+        duration: const Duration(milliseconds: 100),
         curve: Curves.easeInOutCubic,
         transform: Matrix4.translationValues(
           0,
@@ -179,9 +181,9 @@ class _KeyboardHeightAreaAnimatedState extends State<KeyboardHeightAreaAnimated>
   Widget build(BuildContext context) {
     // print(isKeyboardOpen);
     return AnimatedContainer(
-      duration: Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 400),
       curve: Curves.easeInOutCubic,
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       height: isKeyboardOpen ? getKeyboardHeight(context) : 0,
       child: Container(color: Colors.red),
     );

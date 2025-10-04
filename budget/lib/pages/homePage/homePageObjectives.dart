@@ -90,7 +90,7 @@ class _HomePageObjectivesState extends State<HomePageObjectives> {
                       );
                     }).toList() ??
                     []);
-                if (objectiveContainers.length <= 0) return SizedBox.shrink();
+                if (objectiveContainers.isEmpty) return const SizedBox.shrink();
 
                 List<Widget> objectiveItems = [
                   ...objectiveContainers,
@@ -109,7 +109,7 @@ class _HomePageObjectivesState extends State<HomePageObjectives> {
                       },
                       height: null,
                       width: null,
-                      margin: EdgeInsetsDirectional.all(0),
+                      margin: const EdgeInsetsDirectional.all(0),
                       labelUnder: widget.objectiveType == ObjectiveType.goal
                           ? "goal".tr()
                           : "loan".tr(),
@@ -149,6 +149,9 @@ class _HomePageObjectivesState extends State<HomePageObjectives> {
                                 addAutomaticKeepAlives: true,
                                 clipBehavior: Clip.none,
                                 scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsetsDirectional.symmetric(
+                                  horizontal: 10,
+                                ),
                                 children: [
                                   for (Widget widget in objectiveItems)
                                     Padding(
@@ -160,9 +163,6 @@ class _HomePageObjectivesState extends State<HomePageObjectives> {
                                       ),
                                     )
                                 ],
-                                padding: EdgeInsetsDirectional.symmetric(
-                                  horizontal: 10,
-                                ),
                               ),
                             )
                           : CarouselSlider(
@@ -181,7 +181,7 @@ class _HomePageObjectivesState extends State<HomePageObjectives> {
                   ],
                 );
               } else {
-                return SizedBox.shrink();
+                return const SizedBox.shrink();
               }
             },
           ),
@@ -198,8 +198,8 @@ class _HomePageObjectivesState extends State<HomePageObjectives> {
                     snapshot.data != null &&
                     (snapshot.data?.length ?? 0) > 0) {
                   List<Widget> objectiveItems = [
-                    if (snapshot.hasData && snapshot.data!.length > 0)
-                      SizedBox(height: 8),
+                    if (snapshot.hasData && snapshot.data!.isNotEmpty)
+                      const SizedBox(height: 8),
                     ...(snapshot.data?.map((Objective objective) {
                           return ObjectiveContainerDifferenceLoan(
                             objective: objective,
@@ -209,8 +209,8 @@ class _HomePageObjectivesState extends State<HomePageObjectives> {
                           );
                         }).toList() ??
                         []),
-                    if (snapshot.hasData && snapshot.data!.length > 0)
-                      SizedBox(height: 8),
+                    if (snapshot.hasData && snapshot.data!.isNotEmpty)
+                      const SizedBox(height: 8),
                   ];
 
                   return Padding(
@@ -246,7 +246,7 @@ class _HomePageObjectivesState extends State<HomePageObjectives> {
                     ),
                   );
                 } else {
-                  return SizedBox.shrink();
+                  return const SizedBox.shrink();
                 }
               },
             ),
@@ -297,9 +297,9 @@ class EditHomePagePinnedGoalsPopup extends StatelessWidget {
               if (showGoalsTotalLabelSetting)
                 ClipRRect(
                   borderRadius: BorderRadiusDirectional.circular(15),
-                  child: TotalSpentToggle(isForGoalTotal: true),
+                  child: const TotalSpentToggle(isForGoalTotal: true),
                 ),
-              if (allObjectives.length <= 0)
+              if (allObjectives.isEmpty)
                 NoResultsCreate(
                   message: objectiveType == ObjectiveType.goal
                       ? "no-goals-found".tr()
@@ -321,7 +321,7 @@ class EditHomePagePinnedGoalsPopup extends StatelessWidget {
                     objective.objectivePk.toString()
                 ],
                 getColor: (objectivePk, selected) {
-                  for (Objective objective in allObjectives)
+                  for (Objective objective in allObjectives) {
                     if (objective.objectivePk.toString() ==
                         objectivePk.toString()) {
                       return HexColor(objective.colour,
@@ -329,14 +329,16 @@ class EditHomePagePinnedGoalsPopup extends StatelessWidget {
                                   Theme.of(context).colorScheme.primary)
                           .withOpacity(selected == true ? 0.7 : 0.5);
                     }
+                  }
                   return null;
                 },
                 displayFilter: (objectivePk) {
-                  for (Objective objective in allObjectives)
+                  for (Objective objective in allObjectives) {
                     if (objective.objectivePk.toString() ==
                         objectivePk.toString()) {
                       return objective.name;
                     }
+                  }
                   return "";
                 },
                 initialItems: [
@@ -365,7 +367,7 @@ class EditHomePagePinnedGoalsPopup extends StatelessWidget {
                   );
                 },
               ),
-              if (allObjectives.length > 0)
+              if (allObjectives.isNotEmpty)
                 AddButton(
                   onTap: () {},
                   height: 50,
@@ -381,7 +383,7 @@ class EditHomePagePinnedGoalsPopup extends StatelessWidget {
                     objectiveType: objectiveType,
                   ),
                   afterOpenPage: () {
-                    Future.delayed(Duration(milliseconds: 100), () {
+                    Future.delayed(const Duration(milliseconds: 100), () {
                       bottomSheetControllerGlobalCustomAssigned
                           ?.snapToExtent(0);
                     });

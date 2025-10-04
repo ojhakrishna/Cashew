@@ -35,7 +35,7 @@ class CurrencyPicker extends StatefulWidget {
 
 class _CurrencyPickerState extends State<CurrencyPicker> {
   bool viewAll = false;
-  String? selectedCurrency = null;
+  String? selectedCurrency;
   String? searchText = "";
   Map<String, dynamic> currencies = {};
   late String? initialCurrency = widget.initialCurrency;
@@ -56,8 +56,9 @@ class _CurrencyPickerState extends State<CurrencyPicker> {
           popularCurrenciesLocal =
               popularCurrencies.sublist(0, popularCurrencies.length - 1);
           // Don't add again if selected and custom currency
-          if (currenciesJSON[widget.initialCurrency] != null)
+          if (currenciesJSON[widget.initialCurrency] != null) {
             popularCurrenciesLocal.insert(0, widget.initialCurrency!);
+          }
         }
       });
     }
@@ -66,7 +67,7 @@ class _CurrencyPickerState extends State<CurrencyPicker> {
   }
 
   void populateCurrencies() {
-    Future.delayed(Duration(milliseconds: 0), () async {
+    Future.delayed(const Duration(milliseconds: 0), () async {
       setState(() {
         currencies = currenciesJSON;
         searchText = "";
@@ -112,8 +113,9 @@ class _CurrencyPickerState extends State<CurrencyPicker> {
         popularCurrenciesLocal =
             popularCurrencies.sublist(0, popularCurrencies.length - 1);
         // Don't add again if selected and custom currency
-        if (currenciesJSON[currency] != null)
+        if (currenciesJSON[currency] != null) {
           popularCurrenciesLocal.insert(0, currency);
+        }
       });
     }
     widget.onSelected(currency);
@@ -122,7 +124,7 @@ class _CurrencyPickerState extends State<CurrencyPicker> {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: EdgeInsetsDirectional.symmetric(horizontal: 24),
+      padding: const EdgeInsetsDirectional.symmetric(horizontal: 24),
       sliver: MultiSliver(
         children: [
           SliverToBoxAdapter(
@@ -133,8 +135,9 @@ class _CurrencyPickerState extends State<CurrencyPicker> {
                     Expanded(
                       child: Focus(
                         onFocusChange: (hasFocus) {
-                          if (hasFocus && widget.onHasFocus != null)
+                          if (hasFocus && widget.onHasFocus != null) {
                             widget.onHasFocus!();
+                          }
                         },
                         child: TextInput(
                           labelText: "search-currencies-placeholder".tr(),
@@ -168,7 +171,7 @@ class _CurrencyPickerState extends State<CurrencyPicker> {
                               onSubmit: () async {
                                 checkIfExchangeRateChangeBefore();
                                 popRoute(context);
-                                await pushRoute(context, ExchangeRates());
+                                await pushRoute(context, const ExchangeRates());
                                 checkIfExchangeRateChangeAfter();
                               },
                               onSubmitLabel: "exchange-rates".tr(),
@@ -181,12 +184,12 @@ class _CurrencyPickerState extends State<CurrencyPicker> {
                       ),
                   ],
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
               ],
             ),
           ),
           SliverGrid(
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
               maxCrossAxisExtent: 125,
               crossAxisSpacing: 7,
               mainAxisSpacing: 7,
@@ -226,7 +229,7 @@ class _CurrencyPickerState extends State<CurrencyPicker> {
             child: Column(
               children: [
                 searchText != "" || viewAll == true
-                    ? SizedBox.shrink()
+                    ? const SizedBox.shrink()
                     : Padding(
                         padding: const EdgeInsetsDirectional.only(top: 15),
                         child: LowKeyButton(
@@ -239,19 +242,19 @@ class _CurrencyPickerState extends State<CurrencyPicker> {
                           text: "view-all-currencies".tr(),
                         ),
                       ),
-                currencies.length <= 0
+                currencies.isEmpty
                     ? Padding(
                         padding: const EdgeInsetsDirectional.only(bottom: 15),
                         child: NoResults(
                           message: "no-currencies-found".tr(),
                         ),
                       )
-                    : SizedBox.shrink(),
-                currencies.length < 9 && currencies.length > 0
-                    ? SizedBox(
+                    : const SizedBox.shrink(),
+                currencies.length < 9 && currencies.isNotEmpty
+                    ? const SizedBox(
                         height: 180,
                       )
-                    : SizedBox(
+                    : const SizedBox(
                         height: 20,
                       )
               ],
@@ -281,7 +284,7 @@ class CurrencyItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 500),
       child: Tappable(
         key: ValueKey(selected),
         onTap: () {
@@ -307,9 +310,9 @@ class CurrencyItem extends StatelessWidget {
                   : Colors.transparent,
             ),
           ),
-          duration: Duration(milliseconds: 450),
+          duration: const Duration(milliseconds: 450),
           child: ConstrainedBox(
-            constraints: BoxConstraints(minWidth: 500, minHeight: 500),
+            constraints: const BoxConstraints(minWidth: 500, minHeight: 500),
             child: Padding(
               padding: const EdgeInsetsDirectional.symmetric(
                   horizontal: 13, vertical: 5),
@@ -319,13 +322,13 @@ class CurrencyItem extends StatelessWidget {
                   if (customCurrency == false &&
                       currenciesJSON[currencyKey]?["NotKnown"] != true)
                     TextFont(
-                      key: ValueKey("currencyKey"),
+                      key: const ValueKey("currencyKey"),
                       text: currencyKey.toUpperCase(),
                       fontSize: 18,
                       textAlign: TextAlign.center,
                     ),
                   TextFont(
-                    key: ValueKey("symbol"),
+                    key: const ValueKey("symbol"),
                     text: customCurrency
                         ? currencyKey.toUpperCase()
                         : currenciesJSON[currencyKey]?["Symbol"] == null ||
@@ -352,7 +355,7 @@ class CurrencyItem extends StatelessWidget {
                                   "")) ==
                       false)
                     TextFont(
-                      key: ValueKey("extraName"),
+                      key: const ValueKey("extraName"),
                       text: currenciesJSON[currencyKey]?["CountryName"] ??
                           (currenciesJSON[currencyKey]["Currency"])
                               .toString()
@@ -364,7 +367,7 @@ class CurrencyItem extends StatelessWidget {
                     ),
                   if (customCurrency)
                     TextFont(
-                      key: ValueKey("info"),
+                      key: const ValueKey("info"),
                       text: "custom-currency".tr(),
                       fontSize: 10,
                       textAlign: TextAlign.center,

@@ -53,7 +53,7 @@ Future createNewSubscriptionTransaction(
         openSnackbar(
           SnackbarMessage(
             title: "end-date-reached".tr(),
-            description: "for".tr().capitalizeFirst + " " + transactionName,
+            description: "${"for".tr().capitalizeFirst} $transactionName",
             icon: appStateSettings["outlinedIcons"]
                 ? Icons.event_available_outlined
                 : Icons.event_available_rounded,
@@ -74,18 +74,20 @@ Future createNewSubscriptionTransaction(
         bool willBeOverObjective = (totalSpentOfObjective ?? 0) >=
             (objective.amount * (objective.income ? 1 : -1));
 
-        if (objective.income == false)
+        if (objective.income == false) {
           willBeOverObjective = !willBeOverObjective;
+        }
 
         if ((totalSpentOfObjective ?? 0) ==
-            (objective.amount * (objective.income ? 1 : -1)))
+            (objective.amount * (objective.income ? 1 : -1))) {
           willBeOverObjective = true;
+        }
 
         if (willBeOverObjective) {
           openSnackbar(
             SnackbarMessage(
               title: "goal-reached".tr(),
-              description: "for".tr().capitalizeFirst + " " + objective.name,
+              description: "${"for".tr().capitalizeFirst} ${objective.name}",
               icon: appStateSettings["outlinedIcons"]
                   ? Icons.event_available_outlined
                   : Icons.event_available_rounded,
@@ -99,21 +101,19 @@ Future createNewSubscriptionTransaction(
         paid: false,
         transactionPk: updatePredictableKey(transaction.transactionPk),
         dateCreated: newDate,
-        createdAnotherFutureTransaction: Value(false),
+        createdAnotherFutureTransaction: const Value(false),
         pairedTransactionFk: closelyRelatedPairedTransactionFk != null
             ? Value(updatePredictableKey(closelyRelatedPairedTransactionFk))
-            : Value(null),
+            : const Value(null),
       );
       await database.createOrUpdateTransaction(insert: false, newTransaction);
       String transactionName = await getTransactionLabel(transaction);
       openSnackbar(
         SnackbarMessage(
-          title: (transaction.income ? "deposited".tr() : "paid".tr()) +
-              ": " +
-              transactionName,
-          description: "created-new-for".tr() +
-              " " +
-              getWordedDateShort(newDate, lowerCaseTodayTomorrow: true),
+          title:
+              "${transaction.income ? "deposited".tr() : "paid".tr()}: $transactionName",
+          description:
+              "${"created-new-for".tr()} ${getWordedDateShort(newDate, lowerCaseTodayTomorrow: true)}",
           icon: appStateSettings["outlinedIcons"]
               ? Icons.event_repeat_outlined
               : Icons.event_repeat_rounded,
@@ -146,7 +146,9 @@ int? countTransactionOccurrences({
   if (endDate == null ||
       reoccurrence == null ||
       reoccurrence == BudgetReoccurence.custom ||
-      periodLength == null) return null;
+      periodLength == null) {
+    return null;
+  }
 
   int yearOffset = 0;
   int monthOffset = 0;
@@ -203,7 +205,7 @@ String updatePredictableKey(String originalKey) {
 
       return "${parts[0]}::predict::$newNumber";
     } catch (e) {
-      print("Error creating predictable key! " + e.toString());
+      print("Error creating predictable key! $e");
       return uuid.v4();
     }
   } else {
@@ -228,21 +230,13 @@ Future openPayPopup(
         );
   String repeatsLeftLabel = numberRepeats == null
       ? ""
-      : "\n× " +
-          numberRepeats.toString() +
-          " " +
-          "remain".tr() +
-          " " +
-          "until".tr() +
-          " " +
-          getWordedDateShort(transaction.endDate ?? DateTime.now(),
-              includeYear: transaction.endDate?.year != DateTime.now().year);
+      : "\n× $numberRepeats ${"remain".tr()} ${"until".tr()} ${getWordedDateShort(transaction.endDate ?? DateTime.now(), includeYear: transaction.endDate?.year != DateTime.now().year)}";
   return await openPopup(
     context,
     icon: appStateSettings["outlinedIcons"]
         ? Icons.check_circle_outlined
         : Icons.check_circle_rounded,
-    title: (transaction.income ? "deposit".tr() : "pay".tr()) + "?",
+    title: "${transaction.income ? "deposit".tr() : "pay".tr()}?",
     subtitle: transactionName,
     description: (transaction.income
             ? "deposit-description".tr()
@@ -310,7 +304,7 @@ Future markAsPaid({
     paid: true,
     dateCreated:
         appStateSettings["markAsPaidOnOriginalDay"] ? null : DateTime.now(),
-    createdAnotherFutureTransaction: Value(true),
+    createdAnotherFutureTransaction: const Value(true),
     originalDateDue: Value(transaction.dateCreated),
   );
   await database.createOrUpdateTransaction(transactionNew);
@@ -343,7 +337,7 @@ Future markAsSkipped({
   Transaction transactionNew = transaction.copyWith(
     skipPaid: true,
     dateCreated: DateTime.now(),
-    createdAnotherFutureTransaction: Value(true),
+    createdAnotherFutureTransaction: const Value(true),
   );
   await database.createOrUpdateTransaction(transactionNew);
   await createNewSubscriptionTransaction(
@@ -365,12 +359,8 @@ Future openPayDebtCreditPopup(
     icon: appStateSettings["outlinedIcons"]
         ? Icons.check_circle_outlined
         : Icons.check_circle_rounded,
-    title: (transaction.type == TransactionSpecialType.credit
-            ? "collect".tr()
-            : transaction.type == TransactionSpecialType.debt
-                ? "settled".tr()
-                : "") +
-        "?",
+    title:
+        "${transaction.type == TransactionSpecialType.credit ? "collect".tr() : transaction.type == TransactionSpecialType.debt ? "settled".tr() : ""}?",
     subtitle: transactionName,
     description: transaction.type == TransactionSpecialType.credit
         ? "collect-description".tr()
@@ -427,7 +417,7 @@ Future openPayDebtCreditPopup(
           underTitleSpace: false,
           child: SelectAmount(
             amountPassed: selectedAmount.toString(),
-            padding: EdgeInsetsDirectional.symmetric(horizontal: 18),
+            padding: const EdgeInsetsDirectional.symmetric(horizontal: 18),
             onlyShowCurrencyIcon: true,
             selectedWalletPk: selectedWalletFk,
             walletPkForCurrency: selectedWalletFk,
@@ -485,7 +475,7 @@ Future openPayDebtCreditPopup(
       // Set up the initial amount
       await database.createOrUpdateTransaction(
         transaction.copyWith(
-          type: Value(null),
+          type: const Value(null),
           objectiveLoanFk: Value(objectiveJustAdded.objectivePk),
           amount: transaction.amount,
           name: "initial-record".tr(),
@@ -495,7 +485,7 @@ Future openPayDebtCreditPopup(
       // Inverse polarity!
       await database.createOrUpdateTransaction(
         transaction.copyWith(
-          type: Value(null),
+          type: const Value(null),
           objectiveLoanFk: Value(objectiveJustAdded.objectivePk),
           income: !transaction.income,
           amount: selectedAmount * (!transaction.income ? 1 : -1),
@@ -519,7 +509,7 @@ Future openRemoveSkipPopup(
     icon: appStateSettings["outlinedIcons"]
         ? Icons.unpublished_outlined
         : Icons.unpublished_rounded,
-    title: "remove-skip".tr() + "?",
+    title: "${"remove-skip".tr()}?",
     subtitle: transactionName,
     description: "remove-skip-description".tr(),
     onCancelLabel: "cancel".tr(),
@@ -548,7 +538,7 @@ Future openUnpayPopup(
       icon: appStateSettings["outlinedIcons"]
           ? Icons.unpublished_outlined
           : Icons.unpublished_rounded,
-      title: "remove-payment".tr() + "?",
+      title: "${"remove-payment".tr()}?",
       subtitle: transactionName,
       description: "remove-payment-description".tr(),
       onCancelLabel: "cancel".tr(),
@@ -561,10 +551,10 @@ Future openUnpayPopup(
         await database.deleteTransaction(transaction.transactionPk);
         Transaction transactionNew = transaction.copyWith(
           paid: false,
-          sharedKey: Value(null),
-          transactionOriginalOwnerEmail: Value(null),
-          sharedDateUpdated: Value(null),
-          sharedStatus: Value(null),
+          sharedKey: const Value(null),
+          transactionOriginalOwnerEmail: const Value(null),
+          sharedDateUpdated: const Value(null),
+          sharedStatus: const Value(null),
         );
         popRoute(context, true);
         await database.createOrUpdateTransaction(transactionNew);
@@ -583,7 +573,7 @@ Future openUnpayDebtCreditPopup(
     icon: appStateSettings["outlinedIcons"]
         ? Icons.unpublished_outlined
         : Icons.unpublished_rounded,
-    title: "remove-payment".tr() + "?",
+    title: "${"remove-payment".tr()}?",
     subtitle: transactionName,
     description: "remove-payment-description".tr(),
     onCancelLabel: "cancel".tr(),
@@ -629,12 +619,12 @@ Future<bool> markSubscriptionsAsPaid(BuildContext context,
       // Add one minute so that if a notification is tapped right away, it will automatically be marked as paid since it will be overdue
       if (transaction.createdAnotherFutureTransaction != true &&
           transaction.dateCreated
-              .isBefore(DateTime.now().add(Duration(minutes: 1)))) {
+              .isBefore(DateTime.now().add(const Duration(minutes: 1)))) {
         hasUpdatedASubscription = true;
         Transaction transactionNew = transaction.copyWith(
           paid: true,
           dateCreated: transaction.dateCreated,
-          createdAnotherFutureTransaction: Value(true),
+          createdAnotherFutureTransaction: const Value(true),
         );
         await database.createOrUpdateTransaction(transactionNew);
         if (transaction.categoryFk == "0" &&
@@ -653,8 +643,7 @@ Future<bool> markSubscriptionsAsPaid(BuildContext context,
     if (hasUpdatedASubscription) {
       await markSubscriptionsAsPaid(context, iteration: (iteration ?? 0) + 1);
     }
-    print("Automatically paid subscriptions with iteration: " +
-        iteration.toString());
+    print("Automatically paid subscriptions with iteration: $iteration");
   }
   return true;
 }
@@ -668,7 +657,7 @@ Future<bool> markUpcomingAsPaid() async {
       // Add one minute so that if a notification is tapped right away, it will automatically be marked as paid since it will be overdue
       if (transaction.createdAnotherFutureTransaction != true &&
           transaction.dateCreated
-              .isBefore(DateTime.now().add(Duration(minutes: 1)))) {
+              .isBefore(DateTime.now().add(const Duration(minutes: 1)))) {
         Transaction transactionNew = transaction.copyWith(
           paid: true,
           dateCreated: transaction.dateCreated,

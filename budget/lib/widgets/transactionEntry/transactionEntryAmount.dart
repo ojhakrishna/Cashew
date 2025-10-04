@@ -35,7 +35,7 @@ class TransactionEntryAmount extends StatelessWidget {
           children: [
             CountNumber(
               count: count,
-              duration: Duration(milliseconds: 1000),
+              duration: const Duration(milliseconds: 1000),
               initialCount: count,
               textBuilder: (number) {
                 return Row(
@@ -46,7 +46,7 @@ class TransactionEntryAmount extends StatelessWidget {
                                       transaction.type ==
                                           TransactionSpecialType.debt) &&
                                   transaction.paid == false)
-                              ? SizedBox.shrink()
+                              ? const SizedBox.shrink()
                               : IncomeOutcomeArrow(
                                   isIncome: transaction.income,
                                   color: getTransactionAmountColor(
@@ -78,7 +78,7 @@ class TransactionEntryAmount extends StatelessWidget {
         AnimatedSizeSwitcher(
           child: showOtherCurrency
               ? TextFont(
-                  key: ValueKey(1),
+                  key: const ValueKey(1),
                   text: convertToMoney(
                     Provider.of<AllWallets>(context),
                     transaction.amount.abs(),
@@ -95,7 +95,7 @@ class TransactionEntryAmount extends StatelessWidget {
                   textColor: getTransactionAmountColor(context, transaction),
                 )
               : Container(
-                  key: ValueKey(0),
+                  key: const ValueKey(0),
                 ),
         ),
       ],

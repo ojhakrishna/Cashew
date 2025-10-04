@@ -5,7 +5,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/foundation.dart' show clampDouble;
-import 'package:flutter/widgets.dart';
 
 import 'package:flutter/material.dart';
 
@@ -293,7 +292,7 @@ class NavigationDestination extends StatelessWidget {
   /// selected.
   ///
   /// The icon will use [NavigationBarThemeData.iconTheme] with
-  /// [MaterialState.selected]. If this is null, the default [IconThemeData]
+  /// [WidgetState.selected]. If this is null, the default [IconThemeData]
   /// would use a size of 24.0 and [ColorScheme.onSurface].
   final Widget? selectedIcon;
 
@@ -317,10 +316,8 @@ class NavigationDestination extends StatelessWidget {
   Widget build(BuildContext context) {
     final _NavigationDestinationInfo info =
         _NavigationDestinationInfo.of(context);
-    const Set<MaterialState> selectedState = <MaterialState>{
-      MaterialState.selected
-    };
-    const Set<MaterialState> unselectedState = <MaterialState>{};
+    const Set<WidgetState> selectedState = <WidgetState>{WidgetState.selected};
+    const Set<WidgetState> unselectedState = <WidgetState>{};
 
     final NavigationBarThemeData navigationBarTheme =
         NavigationBarTheme.of(context);
@@ -1060,11 +1057,11 @@ class _ClampTextScaleFactor extends StatelessWidget {
   Widget build(BuildContext context) {
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(
-        textScaleFactor: clampDouble(
+        textScaler: TextScaler.linear(clampDouble(
           MediaQuery.textScaleFactorOf(context),
           0.0,
           upperLimit,
-        ),
+        )),
       ),
       child: child,
     );
@@ -1346,8 +1343,8 @@ class _NavigationBarDefaultsM2 extends NavigationBarThemeData {
       _colors.surface, _colors.onSurface, 3.0);
 
   @override
-  MaterialStateProperty<IconThemeData?>? get iconTheme {
-    return MaterialStatePropertyAll<IconThemeData>(IconThemeData(
+  WidgetStateProperty<IconThemeData?>? get iconTheme {
+    return WidgetStatePropertyAll<IconThemeData>(IconThemeData(
       size: 24,
       color: _colors.onSurface,
     ));
@@ -1357,8 +1354,8 @@ class _NavigationBarDefaultsM2 extends NavigationBarThemeData {
   Color? get indicatorColor => _colors.secondary.withOpacity(0.24);
 
   @override
-  MaterialStateProperty<TextStyle?>? get labelTextStyle =>
-      MaterialStatePropertyAll<TextStyle?>(
+  WidgetStateProperty<TextStyle?>? get labelTextStyle =>
+      WidgetStatePropertyAll<TextStyle?>(
           _theme.textTheme.labelSmall!.copyWith(color: _colors.onSurface));
 }
 
@@ -1391,11 +1388,11 @@ class _NavigationBarDefaultsM3 extends NavigationBarThemeData {
   Color? get surfaceTintColor => _colors.surfaceTint;
 
   @override
-  MaterialStateProperty<IconThemeData?>? get iconTheme {
-    return MaterialStateProperty.resolveWith((Set<MaterialState> states) {
+  WidgetStateProperty<IconThemeData?>? get iconTheme {
+    return WidgetStateProperty.resolveWith((Set<WidgetState> states) {
       return IconThemeData(
         size: 24.0,
-        color: states.contains(MaterialState.selected)
+        color: states.contains(WidgetState.selected)
             ? _colors.onSecondaryContainer
             : _colors.onSurfaceVariant,
       );
@@ -1408,11 +1405,11 @@ class _NavigationBarDefaultsM3 extends NavigationBarThemeData {
   ShapeBorder? get indicatorShape => const StadiumBorder();
 
   @override
-  MaterialStateProperty<TextStyle?>? get labelTextStyle {
-    return MaterialStateProperty.resolveWith((Set<MaterialState> states) {
+  WidgetStateProperty<TextStyle?>? get labelTextStyle {
+    return WidgetStateProperty.resolveWith((Set<WidgetState> states) {
       final TextStyle style = _textTheme.labelMedium!;
       return style.apply(
-          color: states.contains(MaterialState.selected)
+          color: states.contains(WidgetState.selected)
               ? _colors.onSurface
               : _colors.onSurfaceVariant);
     });

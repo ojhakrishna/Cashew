@@ -6,7 +6,8 @@ import 'dart:async';
 import 'package:budget/functions.dart';
 
 class FadeIn extends StatefulWidget {
-  FadeIn({Key? key, required this.child, this.duration}) : super(key: key);
+  const FadeIn({Key? key, required this.child, this.duration})
+      : super(key: key);
 
   final Widget child;
   final Duration? duration;
@@ -23,7 +24,7 @@ class _FadeInState extends State<FadeIn> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: widget.duration ?? Duration(milliseconds: 500),
+      duration: widget.duration ?? const Duration(milliseconds: 500),
       vsync: this,
     );
 
@@ -59,7 +60,7 @@ class _FadeInState extends State<FadeIn> with SingleTickerProviderStateMixin {
 }
 
 class ScaleIn extends StatefulWidget {
-  ScaleIn({
+  const ScaleIn({
     Key? key,
     required this.child,
     this.duration,
@@ -88,7 +89,7 @@ class _ScaleInState extends State<ScaleIn> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: widget.duration ?? Duration(milliseconds: 1500),
+      duration: widget.duration ?? const Duration(milliseconds: 1500),
       vsync: this,
     );
 
@@ -105,7 +106,7 @@ class _ScaleInState extends State<ScaleIn> with SingleTickerProviderStateMixin {
       });
     }
 
-    if (widget.loop)
+    if (widget.loop) {
       _controller.addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           Future.delayed(widget.loopDelay, () {
@@ -117,6 +118,7 @@ class _ScaleInState extends State<ScaleIn> with SingleTickerProviderStateMixin {
           _controller.forward();
         }
       });
+    }
   }
 
   @override
@@ -147,7 +149,8 @@ class ScalingWidget extends StatefulWidget {
   final String keyToWatch;
   final Widget child;
 
-  ScalingWidget({required this.keyToWatch, required this.child});
+  const ScalingWidget(
+      {super.key, required this.keyToWatch, required this.child});
 
   @override
   _ScalingWidgetState createState() => _ScalingWidgetState();
@@ -233,14 +236,14 @@ class ScaledAnimatedSwitcher extends StatelessWidget {
         final fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
           CurvedAnimation(
             parent: animation,
-            curve: Interval(0.5, 1),
+            curve: const Interval(0.5, 1),
           ),
         );
 
         final scaleAnimation = Tween<double>(begin: 0, end: 1.0).animate(
           CurvedAnimation(
             parent: animation,
-            curve: Interval(0, 1.0),
+            curve: const Interval(0, 1.0),
           ),
         );
 
@@ -261,7 +264,8 @@ class ScaledAnimatedSwitcher extends StatelessWidget {
 enum Direction { vertical, horizontal }
 
 class SlideFadeTransition extends StatefulWidget {
-  SlideFadeTransition({
+  const SlideFadeTransition({
+    super.key,
     required this.child,
     this.offset = 1,
     this.curve = Curves.decelerate,
@@ -305,7 +309,7 @@ class _SlideFadeTransitionState extends State<SlideFadeTransition>
         _animationSlide = Tween<Offset>(
                 begin:
                     Offset(0, widget.reverse ? -widget.offset : widget.offset),
-                end: Offset(0, 0))
+                end: const Offset(0, 0))
             .animate(CurvedAnimation(
           curve: widget.curve,
           parent: _animationController,
@@ -314,7 +318,7 @@ class _SlideFadeTransitionState extends State<SlideFadeTransition>
         _animationSlide = Tween<Offset>(
                 begin:
                     Offset(widget.reverse ? -widget.offset : widget.offset, 0),
-                end: Offset(0, 0))
+                end: const Offset(0, 0))
             .animate(CurvedAnimation(
           curve: widget.curve,
           parent: _animationController,
@@ -376,18 +380,20 @@ class _AnimateFABDelayedState extends State<AnimateFABDelayed> {
   @override
   void initState() {
     super.initState();
-    if (appStateSettings["appAnimations"] == AppAnimations.all.index)
+    if (appStateSettings["appAnimations"] == AppAnimations.all.index) {
       Future.delayed(widget.delay, () {
         setState(() {
           scaleIn = true;
         });
       });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (appStateSettings["appAnimations"] != AppAnimations.all.index)
+    if (appStateSettings["appAnimations"] != AppAnimations.all.index) {
       return widget.fab;
+    }
     return AnimateFAB(
       condition: widget.enabled ?? scaleIn,
       fab: widget.fab,
@@ -424,10 +430,11 @@ class _ShakeAnimationState extends State<ShakeAnimation> {
   @override
   void initState() {
     _future = Future.delayed(widget.delay, () {
-      if (mounted)
+      if (mounted) {
         setState(() {
           startAnimation = true;
         });
+      }
     });
     // Future.delayed(
     //     widget.delay + widget.duration - Duration(milliseconds: 1600),
@@ -530,8 +537,8 @@ class AnimatedScaleOpacity extends StatelessWidget {
         scale: animateIn ? 1 : 0,
         duration: duration,
         curve: curve,
-        child: child,
         alignment: alignment.toAlignment(),
+        child: child,
       ),
     );
   }
@@ -543,8 +550,9 @@ class BouncingWidget extends StatefulWidget {
   final double amountEnd;
   final Duration duration;
 
-  BouncingWidget(
-      {required this.child,
+  const BouncingWidget(
+      {super.key,
+      required this.child,
       required this.animate,
       this.amountEnd = -8,
       this.duration = const Duration(milliseconds: 800)});
@@ -570,7 +578,7 @@ class _BouncingWidgetState extends State<BouncingWidget>
     _animation = Tween<double>(begin: 0.0, end: widget.amountEnd).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: ElasticOutCurve(0.6),
+        curve: const ElasticOutCurve(0.6),
         reverseCurve: Curves.bounceIn,
       ),
     )..addStatusListener((status) {

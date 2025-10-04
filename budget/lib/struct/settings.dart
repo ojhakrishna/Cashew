@@ -56,7 +56,7 @@ Future<bool> initializeSettings() async {
       userSettings["databaseJustImported"] = false;
       print("Settings were restored");
     } catch (e) {
-      print("Error restoring imported settings " + e.toString());
+      print("Error restoring imported settings $e");
       if (e is DriftRemoteException) {
         if (e.remoteCause
             .toString()
@@ -108,7 +108,7 @@ Future<bool> initializeSettings() async {
   appStateSettings["appOpenedHour"] = DateTime.now().hour;
   appStateSettings["appOpenedMinute"] = DateTime.now().minute;
 
-  String? retrievedClientID = await sharedPreferences.getString("clientID");
+  String? retrievedClientID = sharedPreferences.getString("clientID");
   clientID = retrievedClientID ?? "";
 
   timeDilation = double.parse(appStateSettings["animationSpeed"].toString());
@@ -133,15 +133,14 @@ Future<bool> initializeSettings() async {
       return MapEntry(key, value is bool ? value : false);
     });
   } catch (e) {
-    print("There was an error restoring globalCollapsedFutureID preference: " +
-        e.toString());
+    print(
+        "There was an error restoring globalCollapsedFutureID preference: $e");
   }
 
   try {
     loadRecentlyDeletedTransactions();
   } catch (e) {
-    print("There was an error loading recently deleted transactions map: " +
-        e.toString());
+    print("There was an error loading recently deleted transactions map: $e");
   }
 
   return true;
@@ -165,10 +164,7 @@ Future<bool> updateSettings(
   if (updateGlobalState == true) {
     // Only refresh global state if the value is different
     if (isChanged || forceGlobalStateUpdate) {
-      print("Rebuilt Main Request from: " +
-          setting.toString() +
-          " : " +
-          value.toString());
+      print("Rebuilt Main Request from: $setting : $value");
       appStateKey.currentState?.refreshAppState();
     }
   } else {
@@ -179,7 +175,7 @@ Future<bool> updateSettings(
     }
     //Refresh any pages listed
     for (int page in pagesNeedingRefresh) {
-      print("Pages Rebuilt and Refreshed: " + pagesNeedingRefresh.toString());
+      print("Pages Rebuilt and Refreshed: $pagesNeedingRefresh");
       if (page == 0) {
         homePageStateKey.currentState?.refreshState();
       } else if (page == 1) {
@@ -231,7 +227,7 @@ Future<Map<String, dynamic>> getUserSettings() async {
     });
     return userSettingsJSON;
   } catch (e) {
-    print("There was an error, settings corrupted: " + e.toString());
+    print("There was an error, settings corrupted: $e");
     await sharedPreferences.setString(
         'userSettings', json.encode(userPreferencesDefault));
     return userPreferencesDefault;
@@ -257,8 +253,8 @@ void openLanguagePicker(BuildContext context) {
       title: "language".tr(),
       child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsetsDirectional.only(bottom: 10),
+          const Padding(
+            padding: EdgeInsetsDirectional.only(bottom: 10),
             child: TranslationsHelp(),
           ),
           RadioItems(
@@ -275,8 +271,9 @@ void openLanguagePicker(BuildContext context) {
               if (value == "System") {
                 context.resetLocale();
               } else {
-                if (supportedLocales[value] != null)
+                if (supportedLocales[value] != null) {
                   context.setLocale(supportedLocales[value]!);
+                }
               }
               updateSettings(
                 "locale",
@@ -284,7 +281,7 @@ void openLanguagePicker(BuildContext context) {
                 pagesNeedingRefresh: [3],
                 updateGlobalState: false,
               );
-              await Future.delayed(Duration(milliseconds: 50));
+              await Future.delayed(const Duration(milliseconds: 50));
               initializeLocalizedMonthNames();
               popRoute(context);
             },
@@ -366,11 +363,11 @@ class TranslationsHelp extends StatelessWidget {
                     showIcon == true ? TextAlign.start : TextAlign.center,
                 richTextSpan: [
                   TextSpan(
-                    text: "translations-help".tr() + " ",
+                    text: "${"translations-help".tr()} ",
                     style: TextStyle(
                       color: getColor(context, "black"),
                       fontFamily: appStateSettings["font"],
-                      fontFamilyFallback: ['Inter'],
+                      fontFamilyFallback: const ['Inter'],
                     ),
                   ),
                   TextSpan(
@@ -383,7 +380,7 @@ class TranslationsHelp extends StatelessWidget {
                       color:
                           getColor(context, "unPaidOverdue").withOpacity(0.8),
                       fontFamily: appStateSettings["font"],
-                      fontFamilyFallback: ['Inter'],
+                      fontFamilyFallback: const ['Inter'],
                     ),
                   ),
                 ],

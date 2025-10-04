@@ -33,8 +33,7 @@ Future<bool> saveFile({
   }
   if (kIsWeb) {
     try {
-      String base64String = base64Encode(
-          dataStore != null ? dataStore : utf8.encode(dataString!));
+      String base64String = base64Encode(dataStore ?? utf8.encode(dataString!));
       AnchorElement anchor = AnchorElement(
           href: 'data:application/octet-stream;base64,$base64String')
         ..download = fileName
@@ -56,7 +55,7 @@ Future<bool> saveFile({
             ? Icons.warning_outlined
             : Icons.warning_rounded,
       ));
-      print("Error saving file to device: " + e.toString());
+      print("Error saving file to device: $e");
       return false;
     }
   }
@@ -111,7 +110,7 @@ Future<bool> saveFile({
         icon: appStateSettings["outlinedIcons"]
             ? Icons.download_done_outlined
             : Icons.download_done_rounded,
-        timeout: Duration(milliseconds: 5000),
+        timeout: const Duration(milliseconds: 5000),
       ));
       return true;
     } catch (e) {
@@ -122,7 +121,7 @@ Future<bool> saveFile({
             ? Icons.warning_outlined
             : Icons.warning_rounded,
       ));
-      print("Error saving file to device: " + e.toString());
+      print("Error saving file to device: $e");
       return false;
     }
   }
@@ -133,7 +132,7 @@ Future<bool> saveFile({
             ? "/storage/emulated/0/Download"
             : (await getApplicationDocumentsDirectory()).path);
 
-    String filePath = "${directory}/${fileName}";
+    String filePath = "$directory/$fileName";
     File savedFile = File(filePath);
     if (dataStore != null) {
       await savedFile.writeAsBytes(dataStore);
@@ -147,35 +146,23 @@ Future<bool> saveFile({
       icon: appStateSettings["outlinedIcons"]
           ? Icons.download_done_outlined
           : Icons.download_done_rounded,
-      timeout: Duration(milliseconds: 5000),
+      timeout: const Duration(milliseconds: 5000),
     ));
     return true;
   } catch (e) {
-    print("Error saving file to device: " + e.toString());
+    print("Error saving file to device: $e");
     if (customDirectory == null) {
       // Try again with selecting a custom directory
       String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-      if (selectedDirectory == null) {
-        openSnackbar(SnackbarMessage(
-          title: errorMessage.tr(),
-          description: "no-folder-selected".tr(),
-          icon: appStateSettings["outlinedIcons"]
-              ? Icons.warning_outlined
-              : Icons.warning_rounded,
-        ));
-        print("No folder selected");
-        return false;
-      } else {
-        return await saveFile(
-          boxContext: boxContext,
-          dataStore: dataStore,
-          dataString: dataString,
-          fileName: fileName,
-          successMessage: successMessage,
-          errorMessage: errorMessage,
-          customDirectory: selectedDirectory,
-        );
-      }
+      return await saveFile(
+        boxContext: boxContext,
+        dataStore: dataStore,
+        dataString: dataString,
+        fileName: fileName,
+        successMessage: successMessage,
+        errorMessage: errorMessage,
+        customDirectory: selectedDirectory,
+      );
     } else {
       return await saveFile(
         boxContext: boxContext,

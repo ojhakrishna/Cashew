@@ -25,10 +25,10 @@ class IncomeOutcomeArrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedRotation(
-      duration: Duration(milliseconds: 1700),
-      curve: ElasticOutCurve(0.5),
+      duration: const Duration(milliseconds: 1700),
+      curve: const ElasticOutCurve(0.5),
       turns: isIncome ? 0.5 : 0,
-      child: Container(
+      child: SizedBox(
         width: width,
         height: height,
         child: UnconstrainedBox(
@@ -38,11 +38,10 @@ class IncomeOutcomeArrow extends StatelessWidget {
             appStateSettings["outlinedIcons"]
                 ? Icons.arrow_drop_down_outlined
                 : Icons.arrow_drop_down_rounded,
-            color: color == null
-                ? (isIncome
+            color: color ??
+                (isIncome
                     ? getColor(context, "incomeAmount")
-                    : getColor(context, "expenseAmount"))
-                : color,
+                    : getColor(context, "expenseAmount")),
             size: iconSize,
           ),
         ),
@@ -107,8 +106,9 @@ class AmountWithColorAndArrow extends StatelessWidget {
             : totalSpent;
 
     Widget textBuilder(double number) {
-      if (customTextBuilder != null)
+      if (customTextBuilder != null) {
         return customTextBuilder!(number, finalColor);
+      }
       return TextFont(
         text: convertToMoney(
           Provider.of<AllWallets>(context),
@@ -130,10 +130,10 @@ class AmountWithColorAndArrow extends StatelessWidget {
           AnimatedSizeSwitcher(
             child: finalNumber.abs() == 0 && alwaysShowArrow == false
                 ? Container(
-                    key: ValueKey(1),
+                    key: const ValueKey(1),
                   )
                 : IncomeOutcomeArrow(
-                    key: ValueKey(2),
+                    key: const ValueKey(2),
                     color: finalColor,
                     isIncome: isIncome ?? (totalSpent > 0),
                     iconSize: iconSize,

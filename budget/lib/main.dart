@@ -56,7 +56,7 @@ void main() async {
     await loadLanguageNamesJSON();
     await initializeSettings();
     tz.initializeTimeZones();
-    final String? locationName = await FlutterTimezone.getLocalTimezone();
+    final String locationName = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(locationName ?? "America/New_York"));
     iconObjects.sort((a, b) => (a.mostLikelyCategoryName ?? a.icon)
         .compareTo((b.mostLikelyCategoryName ?? b.icon)));
@@ -79,7 +79,7 @@ GlobalKey<PageNavigationFrameworkState> pageNavigationFrameworkKey =
     GlobalKey();
 
 class InitializeApp extends StatefulWidget {
-  InitializeApp({Key? key}) : super(key: key);
+  const InitializeApp({Key? key}) : super(key: key);
 
   @override
   State<InitializeApp> createState() => _InitializeAppState();
@@ -92,7 +92,7 @@ class _InitializeAppState extends State<InitializeApp> {
 
   @override
   Widget build(BuildContext context) {
-    return App(key: ValueKey("Main App"));
+    return const App(key: ValueKey("Main App"));
   }
 }
 
@@ -110,9 +110,9 @@ class App extends StatelessWidget {
           enableDevicePreview ? DevicePreview.locale(context) : context.locale,
       shortcuts: shortcuts,
       actions: keyboardIntents,
-      themeAnimationDuration: Duration(milliseconds: 400),
+      themeAnimationDuration: const Duration(milliseconds: 400),
       themeAnimationCurve: CustomDelayedCurve(),
-      key: ValueKey('CashewAppMain'),
+      key: const ValueKey('CashewAppMain'),
       title: 'Cashew',
       theme: getLightTheme(),
       darkTheme: getDarkTheme(),
@@ -127,13 +127,13 @@ class App extends StatelessWidget {
                 Expanded(
                     child: Stack(
                   children: [
-                    InitialPageRouteNavigator(),
+                    const InitialPageRouteNavigator(),
                     GlobalSnackbar(key: snackbarKey),
                   ],
                 )),
               ],
             ),
-            EnableSignInWithGoogleFlyIn(),
+            const EnableSignInWithGoogleFlyIn(),
             GlobalLoadingIndeterminate(key: loadingIndeterminateKey),
             GlobalLoadingProgress(key: loadingProgressKey),
           ],
@@ -157,7 +157,7 @@ class App extends StatelessWidget {
                 child: WatchForDayChange(
                   child: WatchSelectedWalletPk(
                     child: WatchAllWallets(
-                      child: child ?? SizedBox.shrink(),
+                      child: child ?? const SizedBox.shrink(),
                     ),
                   ),
                 ),
@@ -168,7 +168,7 @@ class App extends StatelessWidget {
 
         if (kIsWeb) {
           return FadeIn(
-              duration: Duration(milliseconds: 1000), child: mainWidget);
+              duration: const Duration(milliseconds: 1000), child: mainWidget);
         } else {
           return mainWidget;
         }

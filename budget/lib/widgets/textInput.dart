@@ -4,7 +4,6 @@ import 'package:budget/widgets/framework/popupFramework.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/util/contextMenu.dart';
 import 'package:budget/widgets/util/onAppResume.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +15,7 @@ bool shouldAutoRefocus = false;
 void minimizeKeyboard(BuildContext context) {
   FocusNode? currentFocus = WidgetsBinding.instance.focusManager.primaryFocus;
   currentFocus?.unfocus();
-  Future.delayed(Duration(milliseconds: 10), () {
+  Future.delayed(const Duration(milliseconds: 10), () {
     shouldAutoRefocus = false;
   });
 }
@@ -31,7 +30,7 @@ class ResumeTextFieldFocus extends StatelessWidget {
         onFocusChange: (value) {
           if (value == false &&
               appLifecycleState == AppLifecycleState.resumed) {
-            Future.delayed(Duration(milliseconds: 50), () {
+            Future.delayed(const Duration(milliseconds: 50), () {
               _currentTextInputFocus = FocusScope.of(context).focusedChild;
             });
           } else if (value == true &&
@@ -49,7 +48,7 @@ class ResumeTextFieldFocus extends StatelessWidget {
               _currentTextInputFocus?.unfocus();
               // 30 milliseconds seems optimal
               // Especially when app is resuming back from an inactive state (notification panel opened and then closed)
-              Future.delayed(Duration(milliseconds: 30), () {
+              Future.delayed(const Duration(milliseconds: 30), () {
                 _currentTextInputFocus?.requestFocus();
                 shouldAutoRefocus = true;
               });
@@ -176,13 +175,10 @@ class TextInput extends StatelessWidget {
               //incognito keyboard
               enableIMEPersonalizedLearning:
                   !appStateSettings["incognitoKeyboard"],
-              scrollPadding: EdgeInsets.only(bottom: 80),
+              scrollPadding: const EdgeInsets.only(bottom: 80),
               focusNode: focusNode,
-              keyboardType: keyboardType != null
-                  ? keyboardType
-                  : numbersOnly
-                      ? TextInputType.number
-                      : TextInputType.text,
+              keyboardType: keyboardType ??
+                  (numbersOnly ? TextInputType.number : TextInputType.text),
               maxLines: maxLines,
               minLines: minLines,
               onTap: onTap,
@@ -195,8 +191,7 @@ class TextInput extends StatelessWidget {
               textAlign: textAlign,
               autocorrect: autocorrect,
               style: TextStyle(
-                fontSize:
-                    fontSize != null ? fontSize : (bubbly == false ? 18 : 15),
+                fontSize: fontSize ?? (bubbly == false ? 18 : 15),
                 height: kIsWeb
                     ? null
                     : bubbly == true
@@ -204,12 +199,12 @@ class TextInput extends StatelessWidget {
                         : 1.3,
                 fontWeight: fontWeight,
                 fontFamily: appStateSettings["font"],
-                fontFamilyFallback: ['Inter'],
+                fontFamilyFallback: const ['Inter'],
               ),
               cursorColor: dynamicPastel(
                   context, Theme.of(context).colorScheme.primary,
                   amount: 0.2, inverse: false),
-              decoration: new InputDecoration(
+              decoration: InputDecoration(
                 counterText: "",
                 hintStyle: TextStyle(color: getColor(context, "textLight")),
                 alignLabelWithHint: true,
@@ -228,7 +223,7 @@ class TextInput extends StatelessWidget {
                 filled: bubbly == false ? true : false,
                 fillColor: Colors.transparent,
                 isDense: true,
-                suffixIconConstraints: BoxConstraints(maxHeight: 20),
+                suffixIconConstraints: const BoxConstraints(maxHeight: 20),
                 suffixIcon: bubbly == false || icon == null
                     ? null
                     : Padding(
@@ -257,8 +252,8 @@ class TextInput extends StatelessWidget {
                     : null,
                 enabledBorder: bubbly == false
                     ? UnderlineInputBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(10)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(10)),
                         borderSide: BorderSide(
                           color: appStateSettings["materialYou"]
                               ? Theme.of(context)
@@ -278,8 +273,8 @@ class TextInput extends StatelessWidget {
                     : null,
                 focusedBorder: bubbly == false
                     ? UnderlineInputBorder(
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(5.0)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(5.0)),
                         borderSide: BorderSide(
                           color: Theme.of(context).colorScheme.secondary,
                           width: 2,

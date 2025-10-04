@@ -45,7 +45,9 @@ class RenderSliverPinnedOverlapInjector extends RenderSliver {
     if (attached) {
       handle.addListener(markNeedsLayout);
       if (handle.layoutExtent != _currentLayoutExtent ||
-          handle.scrollExtent != _currentMaxExtent) markNeedsLayout();
+          handle.scrollExtent != _currentMaxExtent) {
+        markNeedsLayout();
+      }
     }
   }
 
@@ -54,7 +56,9 @@ class RenderSliverPinnedOverlapInjector extends RenderSliver {
     super.attach(owner);
     handle.addListener(markNeedsLayout);
     if (handle.layoutExtent != _currentLayoutExtent ||
-        handle.scrollExtent != _currentMaxExtent) markNeedsLayout();
+        handle.scrollExtent != _currentMaxExtent) {
+      markNeedsLayout();
+    }
   }
 
   @override

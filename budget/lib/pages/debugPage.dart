@@ -48,7 +48,7 @@ class DebugPage extends StatelessWidget {
               label: "logs",
               icon: Icons.list,
               action: () {
-                pushRoute(context, LogPage());
+                pushRoute(context, const LogPage());
               },
             ),
           ],
@@ -423,10 +423,11 @@ class DebugPage extends StatelessWidget {
             return SettingsContainer(
               icon: Icons.store,
               title: "Test store review integration",
-              description: "Available: " + snapshot.data.toString(),
+              description: "Available: ${snapshot.data}",
               onTap: () async {
-                if (await inAppReview.isAvailable())
+                if (await inAppReview.isAvailable()) {
                   inAppReview.requestReview();
+                }
               },
             );
           },
@@ -498,9 +499,8 @@ class DebugPage extends StatelessWidget {
               appStateSettings["longTermLoansDifferenceFeature"] == true,
           icon: Icons.calculate,
         ),
-        Padding(
-          padding:
-              const EdgeInsetsDirectional.only(top: 8.0, start: 13, end: 13),
+        const Padding(
+          padding: EdgeInsetsDirectional.only(top: 8.0, start: 13, end: 13),
           child: TextFont(text: "Animation Scale"),
         ),
         SliderSelector(
@@ -530,7 +530,7 @@ class DebugPage extends StatelessWidget {
                   restartAppPopup(context);
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Button(
                 label: "Fix transaction polarity",
                 onTap: () async {
@@ -538,14 +538,13 @@ class DebugPage extends StatelessWidget {
                   openSnackbar(
                     SnackbarMessage(
                       title: "Done",
-                      description:
-                          "Applied to " + result.toString() + " transactions",
+                      description: "Applied to $result transactions",
                       icon: Icons.check,
                     ),
                   );
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Button(
                 label: "Capitalize first letter in all transactions",
                 onTap: () async {
@@ -553,14 +552,13 @@ class DebugPage extends StatelessWidget {
                   openSnackbar(
                     SnackbarMessage(
                       title: "Done",
-                      description:
-                          "Applied to " + result.toString() + " transactions",
+                      description: "Applied to $result transactions",
                       icon: Icons.check,
                     ),
                   );
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Button(
                 label: "Vacuum/Clean DB",
                 onTap: () async {
@@ -582,7 +580,7 @@ class DebugPage extends StatelessWidget {
                   }
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Button(
                   label: "Force full sync",
                   onTap: () async {
@@ -590,7 +588,7 @@ class DebugPage extends StatelessWidget {
                         "dateOfLastSyncedWithClient", "{}");
                     runAllCloudFunctions(context);
                   }),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Button(
                 expandedLayout: true,
                 label:
@@ -600,13 +598,13 @@ class DebugPage extends StatelessWidget {
                   openSnackbar(
                     SnackbarMessage(
                       title: "Done",
-                      description: "Deleted " + result.toString() + " logs",
+                      description: "Deleted $result logs",
                       icon: Icons.check,
                     ),
                   );
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Button(
                   label: "View Delete Logs",
                   onTap: () async {
@@ -620,8 +618,9 @@ class DebugPage extends StatelessWidget {
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 return SliverPadding(
-                                  padding: EdgeInsetsDirectional.symmetric(
-                                      vertical: 7, horizontal: 13),
+                                  padding:
+                                      const EdgeInsetsDirectional.symmetric(
+                                          vertical: 7, horizontal: 13),
                                   sliver: SliverList(
                                     delegate: SliverChildBuilderDelegate(
                                       (BuildContext context, int index) {
@@ -632,16 +631,8 @@ class DebugPage extends StatelessWidget {
                                               const EdgeInsetsDirectional.only(
                                                   bottom: 4),
                                           child: TextFont(
-                                            text: (index + 1).toString() +
-                                                ") " +
-                                                deletelog.type.toString() +
-                                                " " +
-                                                deletelog.dateTimeModified
-                                                    .toString() +
-                                                ": " +
-                                                deletelog.deleteLogPk +
-                                                " for " +
-                                                deletelog.entryPk,
+                                            text:
+                                                "${index + 1}) ${deletelog.type} ${deletelog.dateTimeModified}: ${deletelog.deleteLogPk} for ${deletelog.entryPk}",
                                             maxLines: 10,
                                             fontSize: 12,
                                           ),
@@ -652,7 +643,7 @@ class DebugPage extends StatelessWidget {
                                   ),
                                 );
                               } else {
-                                return SliverToBoxAdapter();
+                                return const SliverToBoxAdapter();
                               }
                             },
                           ),
@@ -660,7 +651,7 @@ class DebugPage extends StatelessWidget {
                       ),
                     );
                   }),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Button(
                   label: "Send Notification",
                   onTap: () async {
@@ -668,17 +659,19 @@ class DebugPage extends StatelessWidget {
                     scheduleDailyNotification(context, TimeOfDay.now(),
                         scheduleNowDebug: true);
                   }),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Button(
                   label: "Force auto backup next launch",
                   onTap: () async {
                     updateSettings(
                       "lastBackup",
-                      DateTime.now().subtract(Duration(days: 50)).toString(),
+                      DateTime.now()
+                          .subtract(const Duration(days: 50))
+                          .toString(),
                       updateGlobalState: false,
                     );
                   }),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               DangerousDebugFlag(
                 child: Button(
                   label: "Create preview data",
@@ -687,7 +680,7 @@ class DebugPage extends StatelessWidget {
                   },
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               DangerousDebugFlag(
                 child: Button(
                   label: "Create random transactions",
@@ -699,7 +692,7 @@ class DebugPage extends StatelessWidget {
                         insert: true,
                         Transaction(
                           transactionPk: "-1",
-                          name: "Test" + randomDouble[i].toString(),
+                          name: "Test${randomDouble[i]}",
                           amount: randomInt[i].toDouble(),
                           note: "",
                           categoryFk: categories[i].categoryPk,
@@ -715,7 +708,7 @@ class DebugPage extends StatelessWidget {
                   },
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Button(
                   label: "Snackbar Test",
                   onTap: () {
@@ -724,7 +717,7 @@ class DebugPage extends StatelessWidget {
                         title:
                             '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}.${DateTime.now().millisecond}',
                         icon: Icons.time_to_leave,
-                        timeout: Duration(milliseconds: 1000),
+                        timeout: const Duration(milliseconds: 1000),
                       ),
                     );
                     openSnackbar(
@@ -733,7 +726,7 @@ class DebugPage extends StatelessWidget {
                         description:
                             '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}.${DateTime.now().millisecond}',
                         icon: Icons.abc,
-                        timeout: Duration(milliseconds: 1000),
+                        timeout: const Duration(milliseconds: 1000),
                         onTap: () {},
                       ),
                     );
@@ -741,7 +734,7 @@ class DebugPage extends StatelessWidget {
                       SnackbarMessage(
                         title:
                             '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}.${DateTime.now().millisecond}',
-                        timeout: Duration(milliseconds: 1000),
+                        timeout: const Duration(milliseconds: 1000),
                       ),
                     );
                     openSnackbar(
@@ -749,28 +742,28 @@ class DebugPage extends StatelessWidget {
                         title:
                             '${DateTime.now().hour}:${DateTime.now().minute}:${DateTime.now().second}.${DateTime.now().millisecond}',
                         description: "Some description",
-                        timeout: Duration(milliseconds: 7000),
+                        timeout: const Duration(milliseconds: 7000),
                       ),
                     );
                     openSnackbar(
                       SnackbarMessage(
                         title:
                             'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation',
-                        timeout: Duration(milliseconds: 10000),
+                        timeout: const Duration(milliseconds: 10000),
                       ),
                     );
                   }),
-              SizedBox(height: 10),
-              HorizontalBreak(),
-              AppLinkTesting(),
-              HorizontalBreak(),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
+              const HorizontalBreak(),
+              const AppLinkTesting(),
+              const HorizontalBreak(),
+              const SizedBox(height: 10),
               TextFont(
                   maxLines: 10,
                   text: kIsWeb
                       ? html.window.navigator.userAgent.toString().toLowerCase()
                       : ""),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Button(
                 label: "Haptic Light",
                 onTap: () => HapticFeedback.lightImpact(),
@@ -798,13 +791,12 @@ class DebugPage extends StatelessWidget {
         ColorBox(
             color: Theme.of(context).colorScheme.onSurface, name: "onSurface"),
         ColorBox(
-            color: Theme.of(context).colorScheme.background,
-            name: "background"),
+            color: Theme.of(context).colorScheme.surface, name: "background"),
         ColorBox(
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
             name: "onBackground"),
         Container(
-          margin: EdgeInsetsDirectional.all(10),
+          margin: const EdgeInsetsDirectional.all(10),
           height: 1,
           color: Colors.grey,
         ),
@@ -818,7 +810,7 @@ class DebugPage extends StatelessWidget {
             color: Theme.of(context).colorScheme.onPrimaryContainer,
             name: "onPrimaryContainer"),
         Container(
-          margin: EdgeInsetsDirectional.all(10),
+          margin: const EdgeInsetsDirectional.all(10),
           height: 1,
           color: Colors.grey,
         ),
@@ -834,7 +826,7 @@ class DebugPage extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSecondaryContainer,
             name: "onSecondaryContainer"),
         Container(
-          margin: EdgeInsetsDirectional.all(10),
+          margin: const EdgeInsetsDirectional.all(10),
           height: 1,
           color: Colors.grey,
         ),
@@ -850,7 +842,7 @@ class DebugPage extends StatelessWidget {
             color: Theme.of(context).colorScheme.onTertiaryContainer,
             name: "onTertiaryContainer"),
         Container(
-          margin: EdgeInsetsDirectional.all(10),
+          margin: const EdgeInsetsDirectional.all(10),
           height: 1,
           color: Colors.grey,
         ),
@@ -889,7 +881,7 @@ class _AppLinkTestingState extends State<AppLinkTesting> {
             appLinkString = value;
           },
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Button(
             label: "Execute App Link",
             onTap: () async {
@@ -916,8 +908,8 @@ class _AppLinkTestingState extends State<AppLinkTesting> {
                     title: "Error Parsing", description: e.toString()));
               }
             }),
-        SizedBox(height: 10),
-        AboutDeepLinking(),
+        const SizedBox(height: 10),
+        const AboutDeepLinking(),
       ],
     );
   }
@@ -935,7 +927,7 @@ class DangerousDebugFlag extends StatelessWidget {
         child: child,
       );
     } else {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
   }
 }

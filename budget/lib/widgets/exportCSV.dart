@@ -93,7 +93,7 @@ class ExportCSV extends StatelessWidget {
               null,
             ),
       );
-      if (transactions.length <= 0) {
+      if (transactions.isEmpty) {
         openSnackbar(SnackbarMessage(
           title: "no-transactions-within-time-range".tr().capitalizeFirstofEach,
           icon: appStateSettings["outlinedIcons"]
@@ -148,28 +148,15 @@ class ExportCSV extends StatelessWidget {
       csvData.add(output.first.keys.toList()); // Add first row headers
       csvData.addAll(output.map((map) => map.values.toList()));
       // print(csvData);
-      String csv = ListToCsvConverter().convert(csvData);
+      String csv = const ListToCsvConverter().convert(csvData);
 
       String fileName;
       if (dateTimeRange != null) {
-        fileName = "cashew-" +
-            (DateTime.now().millisecondsSinceEpoch).toString() +
-            "-" +
-            dateTimeRange.start.year.toString() +
-            "-" +
-            dateTimeRange.start.month.toString() +
-            "-" +
-            dateTimeRange.start.day.toString() +
-            "-to-" +
-            dateTimeRange.end.year.toString() +
-            "-" +
-            dateTimeRange.end.month.toString() +
-            "-" +
-            dateTimeRange.end.day.toString() +
-            ".csv";
+        fileName =
+            "cashew-${DateTime.now().millisecondsSinceEpoch}-${dateTimeRange.start.year}-${dateTimeRange.start.month}-${dateTimeRange.start.day}-to-${dateTimeRange.end.year}-${dateTimeRange.end.month}-${dateTimeRange.end.day}.csv";
       } else {
         fileName =
-            "cashew-" + cleanFileNameString(DateTime.now().toString()) + ".csv";
+            "cashew-${cleanFileNameString(DateTime.now().toString())}.csv";
       }
 
       await saveCSV(boxContext: boxContext, csv: csv, fileName: fileName);
@@ -275,7 +262,7 @@ class _ExportCSVPopupState extends State<ExportCSVPopup> {
                   },
                 ),
               ),
-              SizedBox(width: 15),
+              const SizedBox(width: 15),
               Expanded(
                 child: OutlinedButtonStacked(
                   text: "date-range".tr().capitalizeFirstofEach,

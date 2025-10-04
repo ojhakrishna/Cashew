@@ -98,7 +98,8 @@ class LogPage extends StatelessWidget {
           ),
         ),
         SliverPadding(
-          padding: EdgeInsetsDirectional.symmetric(vertical: 7, horizontal: 13),
+          padding: const EdgeInsetsDirectional.symmetric(
+              vertical: 7, horizontal: 13),
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {

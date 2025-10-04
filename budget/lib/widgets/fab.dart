@@ -42,7 +42,7 @@ class AddFAB extends StatelessWidget {
         openBottomSheet(
           context,
           PopupFramework(
-            child: AddMoreThingsPopup(),
+            child: const AddMoreThingsPopup(),
           ),
         );
       },
@@ -82,11 +82,10 @@ class FAB extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color? containerColor = color != null
-        ? color
-        : isOutlined
+    Color? containerColor = color ??
+        (isOutlined
             ? Theme.of(context).colorScheme.onSecondary
-            : Theme.of(context).colorScheme.secondary;
+            : Theme.of(context).colorScheme.secondary);
     Color? iconColor = color != null
         ? colorIcon
         : isOutlined
@@ -118,10 +117,11 @@ class FAB extends StatelessWidget {
           child: Tappable(
             color: containerColor,
             onTap: () {
-              if (onTap != null)
+              if (onTap != null) {
                 onTap!();
-              else
+              } else {
                 openContainer();
+              }
             },
             onLongPress: onLongPress,
             child: OutlinedContainer(
@@ -138,7 +138,7 @@ class FAB extends StatelessWidget {
                     ),
                   ),
                 );
-                if (label != null)
+                if (label != null) {
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -154,6 +154,7 @@ class FAB extends StatelessWidget {
                       ),
                     ],
                   );
+                }
                 return fabIcon;
               }),
             ),

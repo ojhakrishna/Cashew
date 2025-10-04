@@ -56,7 +56,7 @@ class SubscriptionsPageState extends State<SubscriptionsPage> {
 
     return WillPopScope(
       onWillPop: () async {
-        if ((globalSelectedID.value[pageId] ?? []).length > 0) {
+        if ((globalSelectedID.value[pageId] ?? []).isNotEmpty) {
           globalSelectedID.value[pageId] = [];
           globalSelectedID.notifyListeners();
           return false;
@@ -94,7 +94,7 @@ class SubscriptionsPageState extends State<SubscriptionsPage> {
                     context,
                     PopupFramework(
                       hasPadding: false,
-                      child: SubscriptionSettings(),
+                      child: const SubscriptionSettings(),
                     ),
                   );
                 },
@@ -125,7 +125,7 @@ class SubscriptionsPageState extends State<SubscriptionsPage> {
             stream: database.getAllSubscriptions().$1,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                if (snapshot.data!.length <= 0) {
+                if (snapshot.data!.isEmpty) {
                   return SliverToBoxAdapter(
                       child: NoResults(
                           padding: const EdgeInsetsDirectional.only(
@@ -142,7 +142,7 @@ class SubscriptionsPageState extends State<SubscriptionsPage> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          HorizontalBreak(
+                          const HorizontalBreak(
                               padding: EdgeInsetsDirectional.only(
                                   top: 4, bottom: 6)),
                           TransactionEntry(
@@ -159,7 +159,7 @@ class SubscriptionsPageState extends State<SubscriptionsPage> {
                             listID: pageId,
                           ),
                           if (index == (snapshot.data?.length ?? 0) - 1)
-                            HorizontalBreak(
+                            const HorizontalBreak(
                                 padding: EdgeInsetsDirectional.only(
                                     top: 4, bottom: 6)),
                         ],
@@ -169,11 +169,11 @@ class SubscriptionsPageState extends State<SubscriptionsPage> {
                   ),
                 );
               } else {
-                return SliverToBoxAdapter();
+                return const SliverToBoxAdapter();
               }
             },
           ),
-          SliverToBoxAdapter(child: SizedBox(height: 55)),
+          const SliverToBoxAdapter(child: SizedBox(height: 55)),
         ],
         selectedTransactionsAppBar: SelectedTransactionsAppBar(
           pageID: pageId,
@@ -221,19 +221,12 @@ class UpcomingTransactionDateHeader extends StatelessWidget {
                           textColor: daysDifference > 0
                               ? getColor(context, "unPaidOverdue")
                               : getColor(context, "textLight"),
-                          text: " • " +
-                              daysDifference.abs().toString() +
-                              " " +
-                              (daysDifference.abs() == 1
-                                  ? "day".tr()
-                                  : "days".tr()) +
-                              (daysDifference > 0
-                                  ? " " + "overdue".tr().toLowerCase()
-                                  : ""),
+                          text:
+                              " • ${daysDifference.abs()} ${daysDifference.abs() == 1 ? "day".tr() : "days".tr()}${daysDifference > 0 ? " " + "overdue".tr().toLowerCase() : ""}",
                           fontWeight: FontWeight.bold,
                         ),
                       )
-                    : SizedBox(),
+                    : const SizedBox(),
               ],
             ),
           ),
@@ -254,21 +247,10 @@ class UpcomingTransactionDateHeader extends StatelessWidget {
                             amount: 0.4),
                         size: 14,
                       ),
-                      SizedBox(width: 3),
+                      const SizedBox(width: 3),
                       TextFont(
-                        text: transaction.periodLength.toString() +
-                            " " +
-                            (transaction.periodLength == 1
-                                ? nameRecurrence[transaction.reoccurrence]
-                                    .toString()
-                                    .toLowerCase()
-                                    .tr()
-                                    .toLowerCase()
-                                : namesRecurrence[transaction.reoccurrence]
-                                    .toString()
-                                    .toLowerCase()
-                                    .tr()
-                                    .toLowerCase()),
+                        text:
+                            "${transaction.periodLength} ${transaction.periodLength == 1 ? nameRecurrence[transaction.reoccurrence].toString().toLowerCase().tr().toLowerCase() : namesRecurrence[transaction.reoccurrence].toString().toLowerCase().tr().toLowerCase()}",
                         fontSize: 14,
                         textColor: dynamicPastel(
                             context, Theme.of(context).colorScheme.primary,
@@ -284,24 +266,14 @@ class UpcomingTransactionDateHeader extends StatelessWidget {
                             )
                           : TextFont(
                               key: ValueKey(selectedType.toString()),
-                              text: convertToMoney(
+                              text: "${convertToMoney(
+                                Provider.of<AllWallets>(context),
+                                getTotalSubscriptions(
                                     Provider.of<AllWallets>(context),
-                                    getTotalSubscriptions(
-                                        Provider.of<AllWallets>(context),
-                                        selectedType ??
-                                            SelectedSubscriptionsType.monthly,
-                                        [transaction]),
-                                  ) +
-                                  " / " +
-                                  (selectedType ==
-                                              SelectedSubscriptionsType.monthly
-                                          ? "month".tr()
-                                          : selectedType ==
-                                                  SelectedSubscriptionsType
-                                                      .yearly
-                                              ? "year".tr()
-                                              : "")
-                                      .toLowerCase(),
+                                    selectedType ??
+                                        SelectedSubscriptionsType.monthly,
+                                    [transaction]),
+                              )} / ${(selectedType == SelectedSubscriptionsType.monthly ? "month".tr() : selectedType == SelectedSubscriptionsType.yearly ? "year".tr() : "").toLowerCase()}",
                               fontSize: 14,
                               textColor: dynamicPastel(context,
                                   Theme.of(context).colorScheme.primary,
@@ -310,7 +282,7 @@ class UpcomingTransactionDateHeader extends StatelessWidget {
                     ),
                 ],
               )
-            : SizedBox(),
+            : const SizedBox(),
       ],
     );
   }
@@ -321,7 +293,7 @@ class SubscriptionSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
         AutoPaySubscriptionsSetting(),
         AutoPaySettingDescription(),
@@ -390,7 +362,7 @@ class TotalUpcomingHeaderPeriodSwitcher extends StatelessWidget {
             },
           ),
           Padding(
-            padding: EdgeInsetsDirectional.only(top: 5),
+            padding: const EdgeInsetsDirectional.only(top: 5),
             child: AnimatedSizeSwitcher(
               clipBehavior: Clip.none,
               child: TextFont(
@@ -408,7 +380,7 @@ class TotalUpcomingHeaderPeriodSwitcher extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 AnimatedSwitcher(
-                  duration: Duration(milliseconds: 250),
+                  duration: const Duration(milliseconds: 250),
                   child: Button(
                     key: ValueKey(
                         selectedType != SelectedSubscriptionsType.monthly),
@@ -428,13 +400,13 @@ class TotalUpcomingHeaderPeriodSwitcher extends StatelessWidget {
                           pagesNeedingRefresh: [], updateGlobalState: false);
                     },
                     fontSize: 12,
-                    padding: EdgeInsetsDirectional.symmetric(
+                    padding: const EdgeInsetsDirectional.symmetric(
                         horizontal: 16, vertical: 13),
                   ),
                 ),
-                SizedBox(width: 7),
+                const SizedBox(width: 7),
                 AnimatedSwitcher(
-                  duration: Duration(milliseconds: 250),
+                  duration: const Duration(milliseconds: 250),
                   child: Button(
                     key: ValueKey(
                         selectedType != SelectedSubscriptionsType.yearly),
@@ -454,13 +426,13 @@ class TotalUpcomingHeaderPeriodSwitcher extends StatelessWidget {
                           pagesNeedingRefresh: [], updateGlobalState: false);
                     },
                     fontSize: 12,
-                    padding: EdgeInsetsDirectional.symmetric(
+                    padding: const EdgeInsetsDirectional.symmetric(
                         horizontal: 16, vertical: 13),
                   ),
                 ),
-                SizedBox(width: 7),
+                const SizedBox(width: 7),
                 AnimatedSwitcher(
-                  duration: Duration(milliseconds: 250),
+                  duration: const Duration(milliseconds: 250),
                   child: Button(
                     key: ValueKey(
                         selectedType != SelectedSubscriptionsType.total),
@@ -480,7 +452,7 @@ class TotalUpcomingHeaderPeriodSwitcher extends StatelessWidget {
                           pagesNeedingRefresh: [], updateGlobalState: false);
                     },
                     fontSize: 12,
-                    padding: EdgeInsetsDirectional.symmetric(
+                    padding: const EdgeInsetsDirectional.symmetric(
                         horizontal: 16, vertical: 13),
                   ),
                 ),

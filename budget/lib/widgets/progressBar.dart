@@ -30,7 +30,7 @@ class ProgressBar extends StatelessWidget {
               ),
             ),
             AnimatedContainer(
-              duration: Duration(milliseconds: 100),
+              duration: const Duration(milliseconds: 100),
               width: progressWidth,
               height: height,
               decoration: BoxDecoration(

@@ -4,7 +4,8 @@ class PageIndicator extends StatelessWidget {
   final PageController controller;
   final int itemCount;
 
-  PageIndicator({
+  const PageIndicator({
+    super.key,
     required this.controller,
     required this.itemCount,
   });
@@ -31,16 +32,17 @@ class PageIndicator extends StatelessWidget {
                           .secondary
                           .withOpacity(0.2);
                   return AnimatedScale(
-                    duration: Duration(milliseconds: 900),
+                    duration: const Duration(milliseconds: 900),
                     scale: scaleFactor,
-                    curve: ElasticOutCurve(0.2),
+                    curve: const ElasticOutCurve(0.2),
                     child: AnimatedSwitcher(
-                      duration: Duration(milliseconds: 400),
+                      duration: const Duration(milliseconds: 400),
                       child: Container(
                         key: ValueKey(index == currentPage),
                         width: 6,
                         height: 6,
-                        margin: EdgeInsetsDirectional.symmetric(horizontal: 3),
+                        margin: const EdgeInsetsDirectional.symmetric(
+                            horizontal: 3),
                         decoration: BoxDecoration(
                           color: color,
                           borderRadius: BorderRadiusDirectional.circular(10),

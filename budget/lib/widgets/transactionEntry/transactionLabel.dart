@@ -84,7 +84,7 @@ class TransactionCategoryNameLabel extends StatelessWidget {
                           : false,
                 );
               }
-              return SizedBox.shrink();
+              return const SizedBox.shrink();
             },
           )
         : TextFont(

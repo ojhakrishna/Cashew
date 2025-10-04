@@ -37,7 +37,7 @@ class CustomContextMenu extends StatelessWidget {
               },
             ),
             FadeIn(
-              duration: Duration(milliseconds: 125),
+              duration: const Duration(milliseconds: 125),
               child: getPlatform() == PlatformOS.isAndroid
                   ? CustomTabBar.buttonItems(
                       anchors: TextSelectionToolbarAnchors(
@@ -96,7 +96,7 @@ class _ContextMenuRegionState extends State<ContextMenuRegion> {
     super.dispose();
   }
 
-  Offset position = Offset(0, 0);
+  Offset position = const Offset(0, 0);
 
   @override
   Widget build(BuildContext context) {
@@ -128,8 +128,11 @@ class CustomTabBar extends AdaptiveTextSelectionToolbar {
   })  : children = null,
         super(children: const [], anchors: anchors);
 
+  @override
   final List<ContextMenuButtonItem>? buttonItems;
+  @override
   final List<Widget>? children;
+  @override
   final TextSelectionToolbarAnchors anchors;
 
   @override
@@ -202,7 +205,7 @@ Widget contextMenuBuilder(
         color: getToolbarColor(context, Theme.of(context).colorScheme),
         onTap: buttonItem.onPressed,
         child: ConstrainedBox(
-          constraints: new BoxConstraints(
+          constraints: BoxConstraints(
               minHeight:
                   const Size(kMinInteractiveDimension, kMinInteractiveDimension)
                       .height,
@@ -300,7 +303,6 @@ Widget contextMenuBuilder(
 //     ],
 //   );
 // }
-
 
 // Need to Wrap entire app in ContextMenuWrap
 // and import this package: defer_pointer: ^0.0.2

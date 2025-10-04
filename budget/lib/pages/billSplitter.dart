@@ -50,12 +50,11 @@ class BillSplitterItem {
 
   // Convert a BillSplitterItem object to a JSON Map
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['name'] = this.name;
-    data['cost'] = this.cost;
-    data['evenSplit'] = this.evenSplit;
-    data['userAmounts'] =
-        this.userAmounts.map((person) => person.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['cost'] = cost;
+    data['evenSplit'] = evenSplit;
+    data['userAmounts'] = userAmounts.map((person) => person.toJson()).toList();
     return data;
   }
 
@@ -82,9 +81,9 @@ class SplitPerson {
 
   // Convert a SplitPerson object to a JSON Map
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
-    data['name'] = this.name;
-    data['percent'] = this.percent;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['percent'] = percent;
     return data;
   }
 
@@ -221,7 +220,7 @@ class _BillSplitterState extends State<BillSplitter> {
       title: "bill-splitter".tr(),
       actions: [
         IconButton(
-          padding: EdgeInsetsDirectional.all(15),
+          padding: const EdgeInsetsDirectional.all(15),
           tooltip: "info".tr(),
           onPressed: () {
             openPopup(
@@ -273,7 +272,7 @@ class _BillSplitterState extends State<BillSplitter> {
 
                 for (SplitPerson splitPerson in billSplitterItem.userAmounts) {
                   double percentOfTotal = billSplitterItem.evenSplit
-                      ? billSplitterItem.userAmounts.length == 0
+                      ? billSplitterItem.userAmounts.isEmpty
                           ? 0
                           : 1 / billSplitterItem.userAmounts.length
                       : (splitPerson.percent ?? 0) / 100;
@@ -307,7 +306,7 @@ class _BillSplitterState extends State<BillSplitter> {
                 children: [
                   CountNumber(
                     count: totalAccountedFor,
-                    duration: Duration(milliseconds: 700),
+                    duration: const Duration(milliseconds: 700),
                     initialCount: (0),
                     textBuilder: (number) {
                       return TextFont(
@@ -327,17 +326,16 @@ class _BillSplitterState extends State<BillSplitter> {
                     padding: const EdgeInsetsDirectional.only(bottom: 3.5),
                     child: CountNumber(
                       count: totalCost,
-                      duration: Duration(milliseconds: 700),
+                      duration: const Duration(milliseconds: 700),
                       initialCount: (0),
                       textBuilder: (number) {
                         return TextFont(
                           textAlign: TextAlign.center,
-                          text: " / " +
-                              convertToMoney(
-                                Provider.of<AllWallets>(context),
-                                number,
-                                finalNumber: number.abs(),
-                              ),
+                          text: " / ${convertToMoney(
+                            Provider.of<AllWallets>(context),
+                            number,
+                            finalNumber: number.abs(),
+                          )}",
                           fontSize: 16,
                           textColor: getColor(context, "textLight"),
                         );
@@ -356,10 +354,10 @@ class _BillSplitterState extends State<BillSplitter> {
               Expanded(
                 flex: 1,
                 child: IgnorePointer(
-                  ignoring: billSplitterItems.length <= 0,
+                  ignoring: billSplitterItems.isEmpty,
                   child: AnimatedOpacity(
-                    duration: Duration(milliseconds: 500),
-                    opacity: billSplitterItems.length <= 0 ? 0.5 : 1,
+                    duration: const Duration(milliseconds: 500),
+                    opacity: billSplitterItems.isEmpty ? 0.5 : 1,
                     child: Padding(
                       padding:
                           const EdgeInsetsDirectional.symmetric(horizontal: 4),
@@ -397,10 +395,10 @@ class _BillSplitterState extends State<BillSplitter> {
               Expanded(
                 flex: 1,
                 child: IgnorePointer(
-                  ignoring: billSplitterItems.length <= 0,
+                  ignoring: billSplitterItems.isEmpty,
                   child: AnimatedOpacity(
-                    duration: Duration(milliseconds: 500),
-                    opacity: billSplitterItems.length <= 0 ? 0.5 : 1,
+                    duration: const Duration(milliseconds: 500),
+                    opacity: billSplitterItems.isEmpty ? 0.5 : 1,
                     child: SettingsContainerOpenPage(
                       isOutlinedColumn: true,
                       title: "summary".tr(),
@@ -420,7 +418,7 @@ class _BillSplitterState extends State<BillSplitter> {
             ],
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         for (int i = 0; i < billSplitterItems.length; i++)
           BillSplitterItemEntry(
             splitPersons: splitPersons,
@@ -434,7 +432,7 @@ class _BillSplitterState extends State<BillSplitter> {
             multiplierAmount: multiplierAmount,
             setMultiplierAmount: setMultiplierAmount,
           ),
-        SizedBox(height: 55),
+        const SizedBox(height: 55),
       ],
     );
   }
@@ -475,7 +473,7 @@ Future<List<SplitPerson>> getBillSplitterPersonList() async {
         jsonList.map((json) => SplitPerson.fromJson(json)).toList();
   }
   if (appStateSettings["longTermLoansDifferenceFeature"] == true &&
-      billSplitterPersonList.length <= 0) {
+      billSplitterPersonList.isEmpty) {
     List<Objective> differenceOnlyObjectives = await database.getAllObjectives(
         objectiveType: ObjectiveType.loan,
         showDifferenceLoans: true,
@@ -594,7 +592,7 @@ class BillSplitterItemEntry extends StatelessWidget {
       Provider.of<AllWallets>(context),
       billSplitterItem.cost * multiplierAmount,
     );
-    if (billSplitterItem.evenSplit && billSplitterItem.userAmounts.length > 0) {
+    if (billSplitterItem.evenSplit && billSplitterItem.userAmounts.isNotEmpty) {
       totalString = originalCostString;
     }
     Color? errorColor = totalString == originalCostString
@@ -609,7 +607,7 @@ class BillSplitterItemEntry extends StatelessWidget {
       clipBehavior: Clip.none,
       children: [
         AnimatedSize(
-          duration: Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           alignment: AlignmentDirectional.topCenter,
           child: EditRowEntry(
@@ -635,13 +633,13 @@ class BillSplitterItemEntry extends StatelessWidget {
               hideReorder: true,
               iconAlignment: AlignmentDirectional.bottomCenter,
               padding: getPlatform() == PlatformOS.isIOS
-                  ? EdgeInsetsDirectional.only(
+                  ? const EdgeInsetsDirectional.only(
                       top: 17,
                       bottom: 0,
                       start: 25,
                       end: 5,
                     )
-                  : EdgeInsetsDirectional.only(
+                  : const EdgeInsetsDirectional.only(
                       top: 17,
                       bottom: 0,
                       start: 25,
@@ -675,11 +673,10 @@ class BillSplitterItemEntry extends StatelessWidget {
                             padding:
                                 const EdgeInsetsDirectional.only(bottom: 2),
                             child: TextFont(
-                              text: " / " +
-                                  convertToMoney(
-                                    Provider.of<AllWallets>(context),
-                                    billSplitterItem.cost * multiplierAmount,
-                                  ),
+                              text: " / ${convertToMoney(
+                                Provider.of<AllWallets>(context),
+                                billSplitterItem.cost * multiplierAmount,
+                              )}",
                               fontSize: 15,
                               textColor: getColor(context, "textLight"),
                             ),
@@ -692,24 +689,24 @@ class BillSplitterItemEntry extends StatelessWidget {
               ),
               extraWidgetsBelow: [
                 AnimatedSize(
-                  duration: Duration(milliseconds: 300),
+                  duration: const Duration(milliseconds: 300),
                   curve: Curves.easeInOut,
                   alignment: AlignmentDirectional.topCenter,
                   child: Padding(
-                    padding: EdgeInsetsDirectional.only(
+                    padding: const EdgeInsetsDirectional.only(
                         bottom: 17, start: 25, end: 25),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        billSplitterItem.userAmounts.length <= 0
-                            ? SizedBox.shrink()
-                            : SizedBox(height: 7),
+                        billSplitterItem.userAmounts.isEmpty
+                            ? const SizedBox.shrink()
+                            : const SizedBox(height: 7),
                         for (SplitPerson splitPerson
                             in billSplitterItem.userAmounts)
                           Builder(
                             builder: (context) {
                               double percentOfTotal = billSplitterItem.evenSplit
-                                  ? billSplitterItem.userAmounts.length == 0
+                                  ? billSplitterItem.userAmounts.isEmpty
                                       ? 0
                                       : 1 / billSplitterItem.userAmounts.length
                                   : (splitPerson.percent ?? 0) / 100;
@@ -720,7 +717,7 @@ class BillSplitterItemEntry extends StatelessWidget {
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height: 7),
+                                  const SizedBox(height: 7),
                                   Row(
                                     children: [
                                       Expanded(
@@ -738,7 +735,7 @@ class BillSplitterItemEntry extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 5),
+                                  const SizedBox(height: 5),
                                   ClipRRect(
                                     borderRadius:
                                         BorderRadiusDirectional.circular(100),
@@ -751,10 +748,11 @@ class BillSplitterItemEntry extends StatelessWidget {
                                           height: 5,
                                         ),
                                         AnimatedFractionallySizedBox(
-                                          duration:
-                                              Duration(milliseconds: 1500),
+                                          duration: const Duration(
+                                              milliseconds: 1500),
                                           curve:
                                               Curves.easeInOutCubicEmphasized,
+                                          widthFactor: percentOfTotal,
                                           child: ClipRRect(
                                             borderRadius:
                                                 BorderRadiusDirectional
@@ -766,12 +764,11 @@ class BillSplitterItemEntry extends StatelessWidget {
                                               height: 5,
                                             ),
                                           ),
-                                          widthFactor: percentOfTotal,
                                         ),
                                       ],
                                     ),
                                   ),
-                                  SizedBox(height: 5),
+                                  const SizedBox(height: 5),
                                 ],
                               );
                             },
@@ -783,7 +780,7 @@ class BillSplitterItemEntry extends StatelessWidget {
               ]),
         ),
         getPlatform() == PlatformOS.isIOS
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : PositionedDirectional(
                 top: -11,
                 end: -2,
@@ -792,13 +789,13 @@ class BillSplitterItemEntry extends StatelessWidget {
                     deleteBillSplitterItem(billSplitterItem);
                   },
                   icon: AnimatedContainer(
-                    duration: Duration(milliseconds: 500),
+                    duration: const Duration(milliseconds: 500),
                     decoration: BoxDecoration(
                       color: dynamicPastel(
                           context, Theme.of(context).colorScheme.error),
                       borderRadius: BorderRadiusDirectional.circular(100),
                     ),
-                    padding: EdgeInsetsDirectional.all(5),
+                    padding: const EdgeInsetsDirectional.all(5),
                     child: Icon(
                       appStateSettings["outlinedIcons"]
                           ? Icons.delete_outlined
@@ -855,7 +852,7 @@ class _AddBillItemPageState extends State<AddBillItemPage> {
         );
   late List<SplitPerson> splitPersons = widget.splitPersons;
   List<SplitPerson> selectedSplitPersons = [];
-  late TextEditingController _titleInputController =
+  late final TextEditingController _titleInputController =
       TextEditingController(text: billSplitterItem.name);
   late double multiplierAmount = widget.multiplierAmount;
 
@@ -897,7 +894,7 @@ class _AddBillItemPageState extends State<AddBillItemPage> {
         underTitleSpace: false,
         child: SelectAmount(
           enableWalletPicker: false,
-          padding: EdgeInsetsDirectional.symmetric(horizontal: 18),
+          padding: const EdgeInsetsDirectional.symmetric(horizontal: 18),
           onlyShowCurrencyIcon: true,
           selectedWalletPk: appStateSettings["selectedWalletPk"],
           amountPassed: billSplitterItem.cost.toString(),
@@ -951,7 +948,7 @@ class _AddBillItemPageState extends State<AddBillItemPage> {
                       billSplitterItem.name = text;
                     },
                     textAlign: TextAlign.center,
-                    padding: EdgeInsetsDirectional.only(start: 7, end: 7),
+                    padding: const EdgeInsetsDirectional.only(start: 7, end: 7),
                     fontSize: getIsFullScreen(context) ? 26 : 25,
                     fontWeight: FontWeight.bold,
                     topContentPadding: kIsWeb ? 6.8 : 0,
@@ -960,7 +957,7 @@ class _AddBillItemPageState extends State<AddBillItemPage> {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -982,7 +979,7 @@ class _AddBillItemPageState extends State<AddBillItemPage> {
                   ),
                 ),
               ),
-              TextFont(text: "×"),
+              const TextFont(text: "×"),
               Padding(
                 padding: const EdgeInsetsDirectional.only(bottom: 7.5),
                 child: TappableTextEntry(
@@ -1034,7 +1031,7 @@ class _AddBillItemPageState extends State<AddBillItemPage> {
               ),
             ],
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Container(
             decoration: BoxDecoration(
               borderRadius: getPlatform() == PlatformOS.isIOS
@@ -1053,17 +1050,17 @@ class _AddBillItemPageState extends State<AddBillItemPage> {
               initialValue: billSplitterItem.evenSplit,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           CheckItems(
             minVerticalPadding: 0,
             initial:
                 billSplitterItem.userAmounts.map((item) => item.name).toList(),
-            items: [
+            items: <dynamic>{
               ...splitPersons
                   .map((SplitPerson splitPerson) => splitPerson.name)
                   .toList(),
               ...billSplitterItem.userAmounts.map((item) => item.name).toList(),
-            ].toSet().toList(),
+            }.toList(),
             onChanged: (currentValues) {
               selectedSplitPersons = [];
               for (String name in currentValues) {
@@ -1094,7 +1091,7 @@ class _AddBillItemPageState extends State<AddBillItemPage> {
                     textBuilder: (amount) {
                       return titleBuilder(convertToPercent(amount));
                     },
-                    duration: Duration(milliseconds: 400),
+                    duration: const Duration(milliseconds: 400),
                   );
                 },
                 onTap: () {
@@ -1134,7 +1131,7 @@ class _AddBillItemPageState extends State<AddBillItemPage> {
               );
             },
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           AddButton(
             onTap: () {
               openAddPersonPopup(
@@ -1144,7 +1141,7 @@ class _AddBillItemPageState extends State<AddBillItemPage> {
               );
             },
           ),
-          SizedBox(height: 50),
+          const SizedBox(height: 50),
         ],
         staticOverlay: Align(
           alignment: AlignmentDirectional.bottomCenter,
@@ -1184,7 +1181,7 @@ SplitPerson? getPerson(List<SplitPerson> splitPersons, String personName) {
 
 void openAddPersonPopup({
   required BuildContext context,
-  required void setState(void Function() fn),
+  required void Function(void Function() fn) setState,
   required bool Function(SplitPerson) addPerson,
 }) {
   openBottomSheet(
@@ -1235,11 +1232,11 @@ class _PeoplePageState extends State<PeoplePage> {
       dragDownToDismiss: true,
       horizontalPaddingConstrained: true,
       listWidgets: [
-        widget.splitPersons.length <= 0
+        widget.splitPersons.isEmpty
             ? NoResults(
                 message: "no-names-found".tr(),
               )
-            : SizedBox.shrink(),
+            : const SizedBox.shrink(),
         for (int i = 0; i < widget.splitPersons.length; i++)
           EditRowEntry(
             key: ValueKey(uuid.v4()),
@@ -1250,7 +1247,7 @@ class _PeoplePageState extends State<PeoplePage> {
               setState(() {});
               return result;
             },
-            openPage: SizedBox.shrink(),
+            openPage: const SizedBox.shrink(),
             onTap: () {},
             canReorder: false,
             hideReorder: true,
@@ -1331,7 +1328,7 @@ class SummaryPage extends StatelessWidget {
         if (splitPerson == null) continue;
 
         double percentOfTotal = billSplitterItem.evenSplit
-            ? billSplitterItem.userAmounts.length == 0
+            ? billSplitterItem.userAmounts.isEmpty
                 ? 0
                 : 1 / billSplitterItem.userAmounts.length
             : (splitPerson.percent ?? 0) / 100;
@@ -1372,7 +1369,7 @@ class SummaryPage extends StatelessWidget {
           info: "name".tr(),
           extraInfo: "owed-to-you".tr(),
           sliver: ColumnSliver(
-            children: splitPersonSummaries.length <= 0
+            children: splitPersonSummaries.isEmpty
                 ? [NoResults(message: "missing-data".tr())]
                 : [
                     for (int i = 0; i < splitPersonSummaries.length; i++)
@@ -1385,7 +1382,7 @@ class SummaryPage extends StatelessWidget {
                         index: i,
                         multiplierAmount: multiplierAmount,
                       ),
-                    SizedBox(height: 50),
+                    const SizedBox(height: 50),
                   ],
           ),
         ),
@@ -1465,7 +1462,7 @@ Future<bool> generateLoanTransactionsFromBillSummary(
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             Button(
@@ -1506,7 +1503,7 @@ Future<bool> generateLoanTransactionsFromBillSummary(
         double amountSpent = 0;
         if (splitPerson == null) continue;
         double percentOfTotal = billSplitterItem.evenSplit
-            ? billSplitterItem.userAmounts.length == 0
+            ? billSplitterItem.userAmounts.isEmpty
                 ? 0
                 : 1 / billSplitterItem.userAmounts.length
             : (splitPerson.percent ?? 0) / 100;
@@ -1515,19 +1512,13 @@ Future<bool> generateLoanTransactionsFromBillSummary(
         if (amountSpent == 0) percentOfTotal = 0;
         if (amountSpent == 0) continue;
 
-        note += billSplitterItem.name +
-            ": " +
-            convertToMoney(
+        note += "${billSplitterItem.name}: ${convertToMoney(
+          Provider.of<AllWallets>(context, listen: false),
+          amountSpent,
+        )}${percentOfTotal < 1 ? (" / " + convertToMoney(
               Provider.of<AllWallets>(context, listen: false),
-              amountSpent,
-            ) +
-            (percentOfTotal < 1
-                ? (" / " +
-                    convertToMoney(
-                      Provider.of<AllWallets>(context, listen: false),
-                      billSplitterItem.cost * multiplierAmount,
-                    ))
-                : "");
+              billSplitterItem.cost * multiplierAmount,
+            )) : ""}";
         note += "\n";
       }
       note = note.trim();
@@ -1545,7 +1536,7 @@ Future<bool> generateLoanTransactionsFromBillSummary(
           transactionPk: "-1",
           name: isThePayee || associatedPersonLoan != null
               ? billName.trim()
-              : (summary.splitPerson.name.trim() + " - " + billName.trim()),
+              : ("${summary.splitPerson.name.trim()} - ${billName.trim()}"),
           amount: amountSpentTotal.abs() * -1,
           note: note,
           categoryFk: mainAndSubcategory.main?.categoryPk ?? "0",
@@ -1602,7 +1593,7 @@ class _SummaryPersonRowEntryState extends State<SummaryPersonRowEntry> {
   @override
   Widget build(BuildContext context) {
     return AnimatedSize(
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       alignment: AlignmentDirectional.topCenter,
       child: EditRowEntry(
@@ -1623,7 +1614,7 @@ class _SummaryPersonRowEntryState extends State<SummaryPersonRowEntry> {
         currentReorder: false,
         index: widget.index,
         content: Padding(
-          padding: EdgeInsetsDirectional.only(start: 15),
+          padding: const EdgeInsetsDirectional.only(start: 15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1649,8 +1640,8 @@ class _SummaryPersonRowEntryState extends State<SummaryPersonRowEntry> {
                         fontWeight: FontWeight.bold,
                       ),
                       AnimatedRotation(
-                        duration: Duration(milliseconds: 900),
-                        curve: ElasticOutCurve(0.6),
+                        duration: const Duration(milliseconds: 900),
+                        curve: const ElasticOutCurve(0.6),
                         turns: isExpanded ? 0.5 : 0,
                         child: IconButton(
                           onPressed: () {
@@ -1671,7 +1662,7 @@ class _SummaryPersonRowEntryState extends State<SummaryPersonRowEntry> {
                 sizeAlignment: AlignmentDirectional.topCenter,
                 child: isExpanded == false
                     ? Container(
-                        key: ValueKey(1),
+                        key: const ValueKey(1),
                       )
                     : Column(
                         children: [
@@ -1688,12 +1679,13 @@ class _SummaryPersonRowEntryState extends State<SummaryPersonRowEntry> {
                                     break;
                                   }
                                 }
-                                if (splitPerson == null)
-                                  return SizedBox.shrink();
+                                if (splitPerson == null) {
+                                  return const SizedBox.shrink();
+                                }
 
                                 double percentOfTotal = billSplitterItem
                                         .evenSplit
-                                    ? billSplitterItem.userAmounts.length == 0
+                                    ? billSplitterItem.userAmounts.isEmpty
                                         ? 0
                                         : 1 /
                                             billSplitterItem.userAmounts.length
@@ -1709,7 +1701,7 @@ class _SummaryPersonRowEntryState extends State<SummaryPersonRowEntry> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      SizedBox(height: 7),
+                                      const SizedBox(height: 7),
                                       Row(
                                         children: [
                                           Expanded(
@@ -1727,7 +1719,7 @@ class _SummaryPersonRowEntryState extends State<SummaryPersonRowEntry> {
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 5),
+                                      const SizedBox(height: 5),
                                       ClipRRect(
                                         borderRadius:
                                             BorderRadiusDirectional.circular(
@@ -1741,10 +1733,11 @@ class _SummaryPersonRowEntryState extends State<SummaryPersonRowEntry> {
                                               height: 5,
                                             ),
                                             AnimatedFractionallySizedBox(
-                                              duration:
-                                                  Duration(milliseconds: 1500),
+                                              duration: const Duration(
+                                                  milliseconds: 1500),
                                               curve: Curves
                                                   .easeInOutCubicEmphasized,
+                                              widthFactor: percentOfTotal,
                                               child: ClipRRect(
                                                 borderRadius:
                                                     BorderRadiusDirectional
@@ -1756,12 +1749,11 @@ class _SummaryPersonRowEntryState extends State<SummaryPersonRowEntry> {
                                                   height: 5,
                                                 ),
                                               ),
-                                              widthFactor: percentOfTotal,
                                             ),
                                           ],
                                         ),
                                       ),
-                                      SizedBox(height: 5),
+                                      const SizedBox(height: 5),
                                     ],
                                   ),
                                 );
@@ -1775,10 +1767,10 @@ class _SummaryPersonRowEntryState extends State<SummaryPersonRowEntry> {
                 child: isExpanded
                     ? Container(
                         height: 10,
-                        key: ValueKey(1),
+                        key: const ValueKey(1),
                       )
                     : Container(
-                        key: ValueKey(2),
+                        key: const ValueKey(2),
                       ),
               ),
             ],

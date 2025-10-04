@@ -31,7 +31,7 @@ class FullPageDoubleColumnLayout extends StatelessWidget {
         Padding(
           padding: EdgeInsetsDirectional.only(top: totalHeaderHeight),
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 1600),
+            constraints: const BoxConstraints(maxWidth: 1600),
             child: Row(
               children: [
                 Expanded(
@@ -41,13 +41,13 @@ class FullPageDoubleColumnLayout extends StatelessWidget {
                     children: [
                       Flexible(
                         child: ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: 700),
+                          constraints: const BoxConstraints(maxWidth: 700),
                           child: leftWidget,
                         ),
                       ),
                       Flexible(
                         child: ConstrainedBox(
-                          constraints: BoxConstraints(maxWidth: 700),
+                          constraints: const BoxConstraints(maxWidth: 700),
                           child: rightWidget,
                         ),
                       ),

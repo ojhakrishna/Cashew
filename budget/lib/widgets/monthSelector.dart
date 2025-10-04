@@ -34,7 +34,7 @@ class MonthSelectorState extends State<MonthSelector> {
 
   scrollTo(double position) {
     MultiDirectionalInfiniteScrollKey.currentState!
-        .scrollTo(Duration(milliseconds: 700), position: position);
+        .scrollTo(const Duration(milliseconds: 700), position: position);
   }
 
   setSelectedDateStart(DateTime dateTime, int offset) {
@@ -50,28 +50,32 @@ class MonthSelectorState extends State<MonthSelector> {
   }
 
   _onScroll(double position) {
-    final upperBound = 200;
+    const upperBound = 200;
     final lowerBound = -200 - measureWidth() / 2 - 100;
     if (position > upperBound) {
-      if (showScrollBottom == false)
+      if (showScrollBottom == false) {
         setState(() {
           showScrollBottom = true;
         });
+      }
     } else if (position < lowerBound) {
-      if (showScrollTop == false)
+      if (showScrollTop == false) {
         setState(() {
           showScrollTop = true;
         });
+      }
     }
     if (position > lowerBound && position < upperBound) {
-      if (showScrollTop == true)
+      if (showScrollTop == true) {
         setState(() {
           showScrollTop = false;
         });
-      if (showScrollBottom == true)
+      }
+      if (showScrollBottom == true) {
         setState(() {
           showScrollBottom = false;
         });
+      }
     }
   }
 
@@ -121,7 +125,7 @@ class MonthSelectorState extends State<MonthSelector> {
                     }
                     return true;
                   },
-                  duration: Duration(milliseconds: 1500),
+                  duration: const Duration(milliseconds: 1500),
                   itemBuilder: (index, isFirst, isLast) {
                     DateTime currentDateTime = getDateFromIndex(index);
                     bool isSelected =
@@ -131,7 +135,7 @@ class MonthSelectorState extends State<MonthSelector> {
                         DateTime.now().firstDayOfMonth();
                     double spacePadding = measureWidth() / 2 - monthWidth / 2;
                     return Container(
-                      color: Theme.of(context).colorScheme.background,
+                      color: Theme.of(context).colorScheme.surface,
                       padding: EdgeInsetsDirectional.only(
                         start: isFirst &&
                                 getDateFromIndex(index)
@@ -146,7 +150,7 @@ class MonthSelectorState extends State<MonthSelector> {
                       ),
                       child: Stack(
                         children: [
-                          Container(
+                          SizedBox(
                             height: 50,
                             child: Tappable(
                               onTap: () {
@@ -156,17 +160,18 @@ class MonthSelectorState extends State<MonthSelector> {
                               borderRadius: 10,
                               child: Container(
                                 width: monthWidth,
-                                padding: EdgeInsetsDirectional.symmetric(
+                                padding: const EdgeInsetsDirectional.symmetric(
                                     horizontal: 5),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     AnimatedSwitcher(
-                                      duration: Duration(milliseconds: 300),
+                                      duration:
+                                          const Duration(milliseconds: 300),
                                       child: isSelected
                                           ? TextFont(
-                                              key: ValueKey(1),
+                                              key: const ValueKey(1),
                                               fontSize: 14,
                                               text: getMonth(currentDateTime),
                                               textColor:
@@ -179,7 +184,7 @@ class MonthSelectorState extends State<MonthSelector> {
                                               textAlign: TextAlign.center,
                                             )
                                           : TextFont(
-                                              key: ValueKey(2),
+                                              key: const ValueKey(2),
                                               fontSize: 14,
                                               text: getMonth(currentDateTime),
                                               textColor: getColor(
@@ -194,11 +199,11 @@ class MonthSelectorState extends State<MonthSelector> {
                                     ),
                                     DateTime.now().year != currentDateTime.year
                                         ? AnimatedSwitcher(
-                                            duration:
-                                                Duration(milliseconds: 300),
+                                            duration: const Duration(
+                                                milliseconds: 300),
                                             child: isSelected
                                                 ? TextFont(
-                                                    key: ValueKey(1),
+                                                    key: const ValueKey(1),
                                                     fontSize: 9,
                                                     text: currentDateTime.year
                                                         .toString(),
@@ -206,7 +211,7 @@ class MonthSelectorState extends State<MonthSelector> {
                                                         context, "black"),
                                                   )
                                                 : TextFont(
-                                                    key: ValueKey(2),
+                                                    key: const ValueKey(2),
                                                     fontSize: 9,
                                                     text: currentDateTime.year
                                                         .toString(),
@@ -214,7 +219,7 @@ class MonthSelectorState extends State<MonthSelector> {
                                                         context, "textLight"),
                                                   ),
                                           )
-                                        : SizedBox(),
+                                        : const SizedBox(),
                                   ],
                                 ),
                               ),
@@ -230,7 +235,8 @@ class MonthSelectorState extends State<MonthSelector> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadiusDirectional.only(
+                                              const BorderRadiusDirectional
+                                                  .only(
                                             topEnd: Radius.circular(40),
                                             topStart: Radius.circular(40),
                                           ),
@@ -252,7 +258,7 @@ class MonthSelectorState extends State<MonthSelector> {
                                     ),
                                   ),
                                 )
-                              : SizedBox(),
+                              : const SizedBox(),
                           Align(
                             alignment: AlignmentDirectional.bottomCenter,
                             child: Container(
@@ -273,7 +279,7 @@ class MonthSelectorState extends State<MonthSelector> {
                           Align(
                             alignment: AlignmentDirectional.bottomCenter,
                             child: AnimatedScaleOpacity(
-                              duration: Duration(milliseconds: 500),
+                              duration: const Duration(milliseconds: 500),
                               durationOpacity:
                                   const Duration(milliseconds: 300),
                               animateIn: isSelected,
@@ -282,7 +288,8 @@ class MonthSelectorState extends State<MonthSelector> {
                                   : Curves.easeOutQuart,
                               child: Container(
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadiusDirectional.only(
+                                  borderRadius:
+                                      const BorderRadiusDirectional.only(
                                     topEnd: Radius.circular(40),
                                     topStart: Radius.circular(40),
                                   ),
@@ -314,11 +321,11 @@ class MonthSelectorState extends State<MonthSelector> {
                         color: Theme.of(context).colorScheme.primary,
                         onTap: () {
                           MultiDirectionalInfiniteScrollKey.currentState!
-                              .scrollTo(Duration(milliseconds: 700));
+                              .scrollTo(const Duration(milliseconds: 700));
                           widget.setSelectedDateStart(
                               DateTime.now().firstDayOfMonth(), 0);
                         },
-                        child: Container(
+                        child: SizedBox(
                           width: 44,
                           height: 34,
                           child: Transform.scale(
@@ -351,11 +358,11 @@ class MonthSelectorState extends State<MonthSelector> {
                         color: Theme.of(context).colorScheme.primary,
                         onTap: () {
                           MultiDirectionalInfiniteScrollKey.currentState!
-                              .scrollTo(Duration(milliseconds: 700));
+                              .scrollTo(const Duration(milliseconds: 700));
                           widget.setSelectedDateStart(
                               DateTime.now().firstDayOfMonth(), 0);
                         },
-                        child: Container(
+                        child: SizedBox(
                           width: 44,
                           height: 34,
                           child: Transform.scale(

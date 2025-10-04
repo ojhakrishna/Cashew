@@ -6,7 +6,7 @@ import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/colors.dart';
 
 class PopupFramework extends StatelessWidget {
-  PopupFramework({
+  const PopupFramework({
     Key? key,
     required this.child,
     this.title,
@@ -40,7 +40,7 @@ class PopupFramework extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (title != null) SizedBox(height: 14),
+              if (title != null) const SizedBox(height: 14),
               getPlatform() == PlatformOS.isIOS
                   ? Stack(
                       alignment: AlignmentDirectional.topStart,
@@ -52,7 +52,7 @@ class PopupFramework extends StatelessWidget {
                           children: [
                             if (title != null)
                               Padding(
-                                padding: EdgeInsetsDirectional.symmetric(
+                                padding: const EdgeInsetsDirectional.symmetric(
                                     horizontal: 18),
                                 child: TextFont(
                                   text: (title ?? "").capitalizeFirstofEach,
@@ -65,7 +65,7 @@ class PopupFramework extends StatelessWidget {
                             if (subtitle != null ||
                                 customSubtitleWidget != null)
                               Padding(
-                                padding: EdgeInsetsDirectional.symmetric(
+                                padding: const EdgeInsetsDirectional.symmetric(
                                     horizontal: 18),
                                 child: customSubtitleWidget ??
                                     TextFont(
@@ -83,23 +83,23 @@ class PopupFramework extends StatelessWidget {
                                         .colorScheme
                                         .secondaryContainer
                                     : getColor(context, "canvasContainer"),
-                                margin: EdgeInsetsDirectional.only(
+                                margin: const EdgeInsetsDirectional.only(
                                     top: 10, bottom: 5),
                               )
                             else
-                              SizedBox(height: 5),
+                              const SizedBox(height: 5),
                           ],
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.only(
                             start: 10,
                           ),
-                          child: icon ?? SizedBox.shrink(),
+                          child: icon ?? const SizedBox.shrink(),
                         )
                       ],
                     )
                   : Padding(
-                      padding: EdgeInsetsDirectional.only(
+                      padding: const EdgeInsetsDirectional.only(
                           start: 18, end: 18, top: 5),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,7 +121,7 @@ class PopupFramework extends StatelessWidget {
                                 if (subtitle != null ||
                                     customSubtitleWidget != null)
                                   Padding(
-                                    padding: EdgeInsetsDirectional.only(
+                                    padding: const EdgeInsetsDirectional.only(
                                         start: 2, bottom: 4),
                                     child: customSubtitleWidget ??
                                         TextFont(
@@ -133,15 +133,15 @@ class PopupFramework extends StatelessWidget {
                               ],
                             ),
                           ),
-                          icon ?? SizedBox.shrink()
+                          icon ?? const SizedBox.shrink()
                         ],
                       ),
                     ),
               if (title != null || underTitleSpace == true)
-                SizedBox(height: 13),
+                const SizedBox(height: 13),
               Padding(
                 padding: hasPadding
-                    ? EdgeInsetsDirectional.symmetric(horizontal: 18)
+                    ? const EdgeInsetsDirectional.symmetric(horizontal: 18)
                     : EdgeInsetsDirectional.zero,
                 child: child,
               ),
@@ -169,7 +169,7 @@ class PopupFramework extends StatelessWidget {
                     );
                   },
                 ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
             ],
           ),
         ),

@@ -88,18 +88,20 @@ Future openBottomSheet(
 }) async {
   //minimize keyboard when open
   minimizeKeyboard(context);
-  if (reAssignBottomSheetControllerGlobal)
-    bottomSheetControllerGlobal = new SheetController();
-  if (useCustomController == true)
-    bottomSheetControllerGlobalCustomAssigned = new SheetController();
+  if (reAssignBottomSheetControllerGlobal) {
+    bottomSheetControllerGlobal = SheetController();
+  }
+  if (useCustomController == true) {
+    bottomSheetControllerGlobalCustomAssigned = SheetController();
+  }
 
   // Fix over-scroll stretch when keyboard pops up quickly
   if (popupWithKeyboard) {
-    Future.delayed(Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       (useCustomController
               ? bottomSheetControllerGlobalCustomAssigned
               : bottomSheetControllerGlobal)
-          ?.scrollTo(0, duration: Duration(milliseconds: 100));
+          ?.scrollTo(0, duration: const Duration(milliseconds: 100));
     });
   }
 
@@ -142,7 +144,7 @@ Future openBottomSheet(
         // Add a header builder so that we get proper extension when full screen sliding sheets
         // extend properly past that notification bar
         headerBuilder: (context, state) {
-          return SizedBox(height: 0);
+          return const SizedBox(height: 0);
         },
         // headerBuilder: (context, _) {
         //   if (handle) {
@@ -203,7 +205,7 @@ Future openBottomSheet(
         },
         color: bottomPaddingColor,
         cornerRadius: getPlatform() == PlatformOS.isIOS ? 10 : 20,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         builder: customBuilder != null
             ? null
             : (context, state) {
@@ -238,8 +240,8 @@ bool checkIfDefaultThemeData(BuildContext? context) {
         Theme.of(context).primaryColor == ThemeData().primaryColor &&
         Theme.of(context).secondaryHeaderColor ==
             ThemeData().secondaryHeaderColor &&
-        Theme.of(context).colorScheme.background ==
-            ThemeData().colorScheme.background &&
+        Theme.of(context).colorScheme.surface ==
+            ThemeData().colorScheme.surface &&
         Theme.of(context).cardColor == ThemeData().cardColor;
   } catch (e) {
     return true;

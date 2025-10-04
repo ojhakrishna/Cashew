@@ -49,6 +49,7 @@ class MultiDirectionalInfiniteScrollState
   List<int> top = [1];
   List<int> bottom = [-1, 0];
 
+  @override
   void initState() {
     super.initState();
     if (widget.initialItems != null) {
@@ -66,7 +67,7 @@ class MultiDirectionalInfiniteScrollState
       _scrollController.animateTo(
         widget.startingScrollPosition,
         duration: widget.duration,
-        curve: ElasticOutCurve(0.7),
+        curve: const ElasticOutCurve(0.7),
       );
     });
   }
@@ -81,8 +82,7 @@ class MultiDirectionalInfiniteScrollState
   }
 
   scrollTo(duration, {double? position}) {
-    double positionToScroll =
-        position == null ? widget.startingScrollPosition : position;
+    double positionToScroll = position ?? widget.startingScrollPosition;
     double clampedPosition = positionToScroll.clamp(
         _scrollController.position.minScrollExtent,
         _scrollController.position.maxScrollExtent);
@@ -91,7 +91,7 @@ class MultiDirectionalInfiniteScrollState
         _scrollController.position.maxScrollExtent == clampedPosition) {
       // Update the scroll position for the possibility of a new item being added
       _scrollController.notifyListeners();
-      Future.delayed(Duration(milliseconds: 1), () {
+      Future.delayed(const Duration(milliseconds: 1), () {
         clampedPosition = positionToScroll.clamp(
             _scrollController.position.minScrollExtent,
             _scrollController.position.maxScrollExtent);
@@ -140,18 +140,20 @@ class MultiDirectionalInfiniteScrollState
 
   _onEndReached() {
     int indexToAdd = bottom.length;
-    if (widget.shouldAddBottom(indexToAdd))
+    if (widget.shouldAddBottom(indexToAdd)) {
       setState(() {
         bottom.add(indexToAdd);
       });
+    }
   }
 
   _onStartReached() {
     int indexToAdd = -top.length - 1;
-    if (widget.shouldAddTop(indexToAdd))
+    if (widget.shouldAddTop(indexToAdd)) {
       setState(() {
         top.add(indexToAdd);
       });
+    }
   }
 
   @override
@@ -171,7 +173,7 @@ class MultiDirectionalInfiniteScrollState
             _scrollController.animateTo(
               _scrollController.offset + event.scrollDelta.dy,
               curve: Curves.linear,
-              duration: Duration(milliseconds: 100),
+              duration: const Duration(milliseconds: 100),
             );
           }
         },
@@ -179,15 +181,17 @@ class MultiDirectionalInfiniteScrollState
           if (_scrollController.offset >=
                   _scrollController.position.maxScrollExtent ||
               _scrollController.offset <=
-                  _scrollController.position.minScrollExtent) _onScrollCheck();
+                  _scrollController.position.minScrollExtent) {
+            _onScrollCheck();
+          }
         },
-        child: Container(
+        child: SizedBox(
           height: widget.height,
           child: CustomScrollView(
             physics: widget.physics,
             scrollDirection: widget.axis,
             controller: _scrollController,
-            center: ValueKey('second-sliver-list'),
+            center: const ValueKey('second-sliver-list'),
             slivers: <Widget>[
               SliverList(
                 delegate: SliverChildBuilderDelegate(
@@ -202,7 +206,7 @@ class MultiDirectionalInfiniteScrollState
                 ),
               ),
               SliverList(
-                key: ValueKey('second-sliver-list'),
+                key: const ValueKey('second-sliver-list'),
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
                     return SizedBox(

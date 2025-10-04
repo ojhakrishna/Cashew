@@ -18,13 +18,13 @@ class ChangePagesArrows extends StatelessWidget {
       children: [
         child,
         getIsFullScreen(context) == false
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : Padding(
                 padding: const EdgeInsetsDirectional.all(8.0),
                 child: Align(
                   alignment: AlignmentDirectional.centerStart,
                   child: IconButton(
-                      padding: EdgeInsetsDirectional.all(15),
+                      padding: const EdgeInsetsDirectional.all(15),
                       icon: Icon(
                         appStateSettings["outlinedIcons"]
                             ? Icons.arrow_left_outlined
@@ -35,13 +35,13 @@ class ChangePagesArrows extends StatelessWidget {
                 ),
               ),
         getIsFullScreen(context) == false
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : Padding(
                 padding: const EdgeInsetsDirectional.all(8.0),
                 child: Align(
                   alignment: AlignmentDirectional.centerEnd,
                   child: IconButton(
-                      padding: EdgeInsetsDirectional.all(15),
+                      padding: const EdgeInsetsDirectional.all(15),
                       icon: Icon(
                         appStateSettings["outlinedIcons"]
                             ? Icons.arrow_right_outlined

@@ -51,14 +51,12 @@ class SelectedTransactionsAppBar extends StatelessWidget {
           amountRatioToPrimaryCurrency(allWallets,
                   allWallets.indexedByPk[transaction.walletFk]?.currency) *
               (transaction.amount.abs() * (transaction.income ? 1 : -1)));
-      transactionOutput.add(name + "  •  " + amount);
+      transactionOutput.add("$name  •  $amount");
     }
     String outString = "";
-    outString += "**" +
-        "total".tr() +
-        "**  •  " +
-        convertToMoney(allWallets, totalAmount);
-    outString += "\n" + transactionOutput.join("\n");
+    outString +=
+        "**${"total".tr()}**  •  ${convertToMoney(allWallets, totalAmount)}";
+    outString += "\n${transactionOutput.join("\n")}";
 
     if (shareInsteadOfCopy == false || kIsWeb) {
       copyToClipboard(
@@ -81,11 +79,11 @@ class SelectedTransactionsAppBar extends StatelessWidget {
       builder: (context, _, __) {
         List<String> listOfIDs = globalSelectedID.value[pageID] ?? [];
         bool animateIn =
-            globalSelectedID.value[pageID] != null && listOfIDs.length > 0;
+            globalSelectedID.value[pageID] != null && listOfIDs.isNotEmpty;
         return AnimatedPositionedDirectional(
           start: 0,
           end: 0,
-          duration: Duration(milliseconds: 500),
+          duration: const Duration(milliseconds: 500),
           top: animateIn ? 0 : -(MediaQuery.paddingOf(context).top + 80),
           curve: Curves.easeInOutCubic,
           child: Align(
@@ -109,7 +107,7 @@ class SelectedTransactionsAppBar extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        padding: EdgeInsetsDirectional.all(15),
+                        padding: const EdgeInsetsDirectional.all(15),
                         color: Theme.of(context).colorScheme.secondary,
                         icon: Icon(
                           getPlatform() == PlatformOS.isIOS
@@ -142,7 +140,7 @@ class SelectedTransactionsAppBar extends StatelessWidget {
                                   child: Builder(
                                     builder: (context) {
                                       return Transform.translate(
-                                        offset: Offset(-10, 0)
+                                        offset: const Offset(-10, 0)
                                             .withDirectionality(context),
                                         child: Tappable(
                                           color: Colors.transparent,
@@ -167,9 +165,7 @@ class SelectedTransactionsAppBar extends StatelessWidget {
                                                     10),
                                             child: TextFont(
                                               text:
-                                                  listOfIDs.length.toString() +
-                                                      " " +
-                                                      "selected".tr(),
+                                                  "${listOfIDs.length} ${"selected".tr()}",
                                               fontSize: 17.5,
                                               textAlign: TextAlign.start,
                                               maxLines: 1,
@@ -184,11 +180,11 @@ class SelectedTransactionsAppBar extends StatelessWidget {
                                 ),
                                 CountNumber(
                                   count: snapshot.hasData ? snapshot.data! : 0,
-                                  duration: Duration(milliseconds: 250),
+                                  duration: const Duration(milliseconds: 250),
                                   initialCount: (0),
                                   textBuilder: (number) {
                                     return Transform.translate(
-                                      offset: Offset(10, 0)
+                                      offset: const Offset(10, 0)
                                           .withDirectionality(context),
                                       child: Tappable(
                                         color: Colors.transparent,
@@ -285,9 +281,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                 ? Icons.file_copy_outlined
                 : Icons.file_copy_rounded,
             title: "created-copy-for-current-time".tr(),
-            description: selectedTransactionPks.length.toString() +
-                " " +
-                "transactions".tr().toLowerCase(),
+            description:
+                "${selectedTransactionPks.length} ${"transactions".tr().toLowerCase()}",
           ),
         );
       } else {
@@ -297,9 +292,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                 ? Icons.file_copy_outlined
                 : Icons.file_copy_rounded,
             title: "created-copy".tr(),
-            description: selectedTransactionPks.length.toString() +
-                " " +
-                "transactions".tr().toLowerCase(),
+            description:
+                "${selectedTransactionPks.length} ${"transactions".tr().toLowerCase()}",
           ),
         );
       }
@@ -322,11 +316,11 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
               stream: database.watchAllAddableBudgets(),
               builder: (context, addableBudgetsSnapshot) {
                 bool enableObjectiveLoansSection =
-                    (loansSnapshot.data ?? []).length > 0;
+                    (loansSnapshot.data ?? []).isNotEmpty;
                 bool enableObjectiveSelection =
-                    (goalsSnapshot.data ?? []).length > 0;
+                    (goalsSnapshot.data ?? []).isNotEmpty;
                 bool enableAddableBudgetSelection =
-                    (addableBudgetsSnapshot.data ?? []).length > 0;
+                    (addableBudgetsSnapshot.data ?? []).isNotEmpty;
                 bool enableWalletSelection =
                     Provider.of<AllWallets>(context, listen: true)
                             .indexedByPk
@@ -380,9 +374,7 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                   : Icons.check_circle_rounded,
                               title: "settled-and-collected".tr(),
                               description:
-                                  selectedTransactionPks.length.toString() +
-                                      " " +
-                                      "transactions".tr().toLowerCase(),
+                                  "${selectedTransactionPks.length} ${"transactions".tr().toLowerCase()}",
                             ),
                           );
                           globalSelectedID.value[pageID] = [];
@@ -408,12 +400,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                     ? Icons.rule_outlined
                                     : Icons.rule_rounded,
                                 title: "maximum-transactions".tr(),
-                                description: "only-the-first".tr() +
-                                    " " +
-                                    maxSelectableTransactionsListedOnPage
-                                        .toString() +
-                                    " " +
-                                    "selected".tr().toLowerCase(),
+                                description:
+                                    "${"only-the-first".tr()} $maxSelectableTransactionsListedOnPage ${"selected".tr().toLowerCase()}",
                               ),
                             );
                           }
@@ -459,7 +447,7 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                               List<Transaction> transactions =
                                   await database.getTransactionsFromPk(
                                       selectedTransactionPks);
-                              if (transactions.length <= 0) return;
+                              if (transactions.isEmpty) return;
                               DateTime? selectedDate =
                                   await selectDateAndTimeSequence(
                                       context, transactions.first.dateCreated);
@@ -474,13 +462,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                       ? Icons.calendar_month_outlined
                                       : Icons.calendar_month_rounded,
                                   title: "changed-date".tr(),
-                                  description: "for".tr().capitalizeFirst +
-                                      " " +
-                                      transactions.length.toString() +
-                                      " " +
-                                      (transactions.length == 1
-                                          ? "transaction".tr().toLowerCase()
-                                          : "transactions".tr().toLowerCase()),
+                                  description:
+                                      "${"for".tr().capitalizeFirst} ${transactions.length} ${transactions.length == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()}",
                                 ),
                               );
                               globalSelectedID.value[pageID] = [];
@@ -529,7 +512,7 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 15,
                                       ),
                                       Button(
@@ -543,8 +526,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                 ),
                               );
 
-                              if (result != true || setText.trim() == "")
+                              if (result != true || setText.trim() == "") {
                                 return;
+                              }
 
                               List<Transaction> transactions =
                                   await database.getTransactionsFromPk(
@@ -558,13 +542,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                       ? Icons.title_outlined
                                       : Icons.title_rounded,
                                   title: "changed-title".tr(),
-                                  description: "for".tr().capitalizeFirst +
-                                      " " +
-                                      transactions.length.toString() +
-                                      " " +
-                                      (transactions.length == 1
-                                          ? "transaction".tr().toLowerCase()
-                                          : "transactions".tr().toLowerCase()),
+                                  description:
+                                      "${"for".tr().capitalizeFirst} ${transactions.length} ${transactions.length == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()}",
                                 ),
                               );
 
@@ -612,13 +591,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                       ? Icons.category_outlined
                                       : Icons.category_rounded,
                                   title: "changed-category".tr(),
-                                  description: "for".tr().capitalizeFirst +
-                                      " " +
-                                      transactions.length.toString() +
-                                      " " +
-                                      (transactions.length == 1
-                                          ? "transaction".tr().toLowerCase()
-                                          : "transactions".tr().toLowerCase()),
+                                  description:
+                                      "${"for".tr().capitalizeFirst} ${transactions.length} ${transactions.length == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()}",
                                 ),
                               );
                               globalSelectedID.value[pageID] = [];
@@ -656,15 +630,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                         ? Icons.account_balance_wallet_outlined
                                         : Icons.account_balance_wallet_rounded,
                                     title: "changed-account".tr(),
-                                    description: "for".tr().capitalizeFirst +
-                                        " " +
-                                        transactions.length.toString() +
-                                        " " +
-                                        (transactions.length == 1
-                                            ? "transaction".tr().toLowerCase()
-                                            : "transactions"
-                                                .tr()
-                                                .toLowerCase()),
+                                    description:
+                                        "${"for".tr().capitalizeFirst} ${transactions.length} ${transactions.length == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()}",
                                   ),
                                 );
                                 globalSelectedID.value[pageID] = [];
@@ -713,15 +680,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                     title: budget == "none"
                                         ? "removed-from-budget".tr()
                                         : "added-to-budget".tr(),
-                                    description: "for".tr().capitalizeFirst +
-                                        " " +
-                                        numberMoved.toString() +
-                                        " " +
-                                        (numberMoved == 1
-                                            ? "transaction".tr().toLowerCase()
-                                            : "transactions"
-                                                .tr()
-                                                .toLowerCase()),
+                                    description:
+                                        "${"for".tr().capitalizeFirst} $numberMoved ${numberMoved == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()}",
                                   ),
                                 );
 
@@ -767,15 +727,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                     title: objective == "none"
                                         ? "removed-from-goal".tr()
                                         : "added-to-goal-action".tr(),
-                                    description: "for".tr().capitalizeFirst +
-                                        " " +
-                                        numberMoved.toString() +
-                                        " " +
-                                        (numberMoved == 1
-                                            ? "transaction".tr().toLowerCase()
-                                            : "transactions"
-                                                .tr()
-                                                .toLowerCase()),
+                                    description:
+                                        "${"for".tr().capitalizeFirst} $numberMoved ${numberMoved == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()}",
                                   ),
                                 );
 
@@ -819,15 +772,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                     title: objective == "none"
                                         ? "removed-from-loan".tr()
                                         : "added-to-loan-action".tr(),
-                                    description: "for".tr().capitalizeFirst +
-                                        " " +
-                                        numberMoved.toString() +
-                                        " " +
-                                        (numberMoved == 1
-                                            ? "transaction".tr().toLowerCase()
-                                            : "transactions"
-                                                .tr()
-                                                .toLowerCase()),
+                                    description:
+                                        "${"for".tr().capitalizeFirst} $numberMoved ${numberMoved == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()}",
                                   ),
                                 );
 
@@ -871,13 +817,8 @@ class EditSelectedTransactionsPopup extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupFramework(
       title: "edit-transactions".tr(),
-      subtitle: numTransactions.toString() +
-          " " +
-          (numTransactions == 1
-              ? "transaction".tr().toLowerCase()
-              : "transactions".tr().toLowerCase()) +
-          " " +
-          "selected".tr(),
+      subtitle:
+          "$numTransactions ${numTransactions == 1 ? "transaction".tr().toLowerCase() : "transactions".tr().toLowerCase()} ${"selected".tr()}",
       child: Column(
         children: editSelectedTransactionsContainers,
       ),
@@ -913,8 +854,8 @@ class EditSelectedTransactionsContainer extends StatelessWidget {
               filled: false,
               alignStart: true,
               alignBeside: true,
-              padding:
-                  EdgeInsetsDirectional.symmetric(horizontal: 20, vertical: 15),
+              padding: const EdgeInsetsDirectional.symmetric(
+                  horizontal: 20, vertical: 15),
               text: text,
               iconData: iconData,
               iconScale: iconScale,
@@ -959,14 +900,14 @@ Future duplicateTransaction(
   // Add one second so when transactions sorted, they don't change positions when updated
   // Since the transaction list is sorted by date created
   transaction = transaction.copyWith(
-    dateCreated: transaction.dateCreated.add(Duration(seconds: 1)),
-    pairedTransactionFk: Value(null),
+    dateCreated: transaction.dateCreated.add(const Duration(seconds: 1)),
+    pairedTransactionFk: const Value(null),
   );
   int? rowId = await database.createOrUpdateTransaction(
     transaction,
     insert: true,
   );
-  Transaction? transactionJustAdded = null;
+  Transaction? transactionJustAdded;
   if (rowId != null) {
     transactionJustAdded = await database.getTransactionFromRowId(rowId);
   }
@@ -986,9 +927,9 @@ Future duplicateTransaction(
               ? Icons.file_copy_outlined
               : Icons.file_copy_rounded,
           title: "created-copy-for-current-time".tr(),
-          description: "copied".tr() + " " + transactionName,
+          description: "${"copied".tr()} $transactionName",
           onTap: () {
-            if (transactionJustAdded != null)
+            if (transactionJustAdded != null) {
               pushRoute(
                 null,
                 AddTransactionPage(
@@ -996,6 +937,7 @@ Future duplicateTransaction(
                   transaction: transactionJustAdded,
                 ),
               );
+            }
           },
         ),
       );
@@ -1006,9 +948,9 @@ Future duplicateTransaction(
               ? Icons.file_copy_outlined
               : Icons.file_copy_rounded,
           title: "created-copy".tr(),
-          description: "copied".tr() + " " + transactionName,
+          description: "${"copied".tr()} $transactionName",
           onTap: () {
-            if (transactionJustAdded != null)
+            if (transactionJustAdded != null) {
               pushRoute(
                 null,
                 AddTransactionPage(
@@ -1016,6 +958,7 @@ Future duplicateTransaction(
                   transaction: transactionJustAdded,
                 ),
               );
+            }
           },
         ),
       );
@@ -1047,7 +990,8 @@ Future duplicateMultipleTransactions(
   // Since the transaction list is sorted by date created
   transactions = transactions
       .map((transaction) => transaction.copyWith(
-            dateCreated: transaction.dateCreated.add(Duration(seconds: 1)),
+            dateCreated:
+                transaction.dateCreated.add(const Duration(seconds: 1)),
             dateTimeModified: Value(DateTime.now()),
             transactionPk: null,
           ))
@@ -1068,7 +1012,7 @@ Future duplicateMultipleTransactions(
       // print("usingPaired: " +
       //     (generatedMatchingPairKeys[transaction.pairedTransactionFk] ?? ""));
       return transaction.toCompanion(true).copyWith(
-            transactionPk: Value.absent(),
+            transactionPk: const Value.absent(),
             pairedTransactionFk: Value(
                 generatedMatchingPairKeys[transaction.pairedTransactionFk]),
           );
@@ -1080,12 +1024,12 @@ Future duplicateMultipleTransactions(
       return transaction.toCompanion(true).copyWith(
             transactionPk: Value(
                 generatedMatchingPairKeys[transaction.transactionPk] ?? ""),
-            pairedTransactionFk: Value.absent(),
+            pairedTransactionFk: const Value.absent(),
           );
     }
 
     return transaction.toCompanion(true).copyWith(
-          transactionPk: Value.absent(),
+          transactionPk: const Value.absent(),
         );
   }).toList();
 

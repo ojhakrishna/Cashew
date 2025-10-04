@@ -74,7 +74,7 @@ class TransactionEntryActionButton extends StatelessWidget {
                           icon: appStateSettings["outlinedIcons"]
                               ? Icons.check_circle_outlined
                               : Icons.check_circle_rounded,
-                          timeout: Duration(milliseconds: 2500),
+                          timeout: const Duration(milliseconds: 2500),
                         ),
                       );
                     } else {
@@ -144,9 +144,8 @@ class ActionButton extends StatelessWidget {
                 child: Icon(
                   iconData,
                   color: dealtWith
-                      ? (containerColor == null
-                          ? Theme.of(context).colorScheme.background
-                          : containerColor)
+                      ? (containerColor ??
+                          Theme.of(context).colorScheme.surface)
                       : iconColor.withOpacity(0.8),
                   size: 23,
                 ),
@@ -185,8 +184,8 @@ class TransactionEntryTypeButton extends StatelessWidget {
                                   .primary
                                   .withOpacity(0.1)
                               : getColor(context, "lightDarkAccent"),
-                          borderRadius:
-                              BorderRadiusDirectional.all(Radius.circular(10))),
+                          borderRadius: const BorderRadiusDirectional.all(
+                              Radius.circular(10))),
                       child: TextFont(
                         text: getTransactionActionNameFromType(transaction),
                         fontSize: 14,
@@ -201,7 +200,7 @@ class TransactionEntryTypeButton extends StatelessWidget {
               ),
             ],
           )
-        : SizedBox();
+        : const SizedBox();
   }
 }
 
@@ -252,21 +251,21 @@ bool isTransactionActionDealtWith(Transaction transaction) {
 String getTransactionActionNameFromType(Transaction transaction) {
   return transaction.type == TransactionSpecialType.credit
       ? transaction.paid
-          ? "collect".tr() + "?"
+          ? "${"collect".tr()}?"
           : "collected".tr()
       : transaction.type == TransactionSpecialType.debt
           ? transaction.paid
-              ? "settle".tr() + "?"
+              ? "${"settle".tr()}?"
               : "settled".tr()
           : transaction.income
               ? (transaction.paid
                   ? "deposited".tr()
                   : transaction.skipPaid
                       ? "skipped".tr()
-                      : "deposit".tr() + "?")
+                      : "${"deposit".tr()}?")
               : (transaction.paid
                   ? "paid".tr()
                   : transaction.skipPaid
                       ? "skipped".tr()
-                      : "pay".tr() + "?");
+                      : "${"pay".tr()}?");
 }

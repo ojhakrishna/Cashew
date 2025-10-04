@@ -30,7 +30,7 @@ class _EditBudgetLimitsPageState extends State<EditBudgetLimitsPage> {
 
   @override
   void initState() {
-    Future.delayed(Duration(milliseconds: 0), () async {
+    Future.delayed(const Duration(milliseconds: 0), () async {
       await database.fixWanderingCategoryLimitsInBudget(
         allWallets: Provider.of<AllWallets>(context, listen: false),
       );
@@ -61,7 +61,7 @@ class _EditBudgetLimitsPageState extends State<EditBudgetLimitsPage> {
                   ? Icons.confirmation_num_outlined
                   : Icons.confirmation_num_rounded,
               initial: selectedIsAbsoluteSpendingLimit.toString(),
-              items: ["true", "false"],
+              items: const ["true", "false"],
               onChanged: (value) async {
                 bool result = value == "true";
                 if (result != selectedIsAbsoluteSpendingLimit) {
@@ -86,7 +86,7 @@ class _EditBudgetLimitsPageState extends State<EditBudgetLimitsPage> {
             ),
           ),
         ),
-        SliverToBoxAdapter(child: HorizontalBreak()),
+        const SliverToBoxAdapter(child: HorizontalBreak()),
         CategoryLimits(
           isIncomeBudget: widget.budget.income,
           isAbsoluteSpendingLimit: selectedIsAbsoluteSpendingLimit,

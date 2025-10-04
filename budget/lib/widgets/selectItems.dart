@@ -48,6 +48,7 @@ class _SelectItemsState extends State<SelectItems> {
     currentItems = widget.initialItems;
   }
 
+  @override
   void didUpdateWidget(oldWidget) {
     if (oldWidget != widget && widget.syncWithInitial) {
       setState(() {
@@ -99,18 +100,20 @@ class _SelectItemsState extends State<SelectItems> {
                       ? Theme.of(context).colorScheme.secondaryContainer
                       : Colors.transparent,
               onTap: () {
-                if (currentItems.contains(item))
+                if (currentItems.contains(item)) {
                   currentItems.remove(item);
-                else
+                } else {
                   currentItems.add(item);
+                }
                 setState(() {});
                 if (widget.onChanged != null) widget.onChanged!(currentItems);
-                if (widget.onChangedSingleItem != null)
+                if (widget.onChangedSingleItem != null) {
                   widget.onChangedSingleItem!(item);
+                }
               },
               child: ListTile(
                 title: Transform.translate(
-                  offset: Offset(-12, 0).withDirectionality(context),
+                  offset: const Offset(-12, 0).withDirectionality(context),
                   child: TextFont(
                       fontSize: 18,
                       text: widget.displayFilter == null
@@ -124,7 +127,7 @@ class _SelectItemsState extends State<SelectItems> {
                         padding: const EdgeInsetsDirectional.only(end: 8.0),
                         child: ScaledAnimatedSwitcher(
                           keyToWatch: selected.toString(),
-                          duration: Duration(milliseconds: 400),
+                          duration: const Duration(milliseconds: 400),
                           child: Opacity(
                             opacity: selected ? 1 : 0.8,
                             child: Icon(

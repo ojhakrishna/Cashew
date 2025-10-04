@@ -32,7 +32,7 @@ class _PinWheelRevealState extends State<PinWheelReveal>
     _controller = AnimationController(duration: widget.duration, vsync: this);
 
     _animation = Tween(begin: 0.0, end: 1.0)
-        .animate(new CurvedAnimation(parent: _controller, curve: widget.curve))
+        .animate(CurvedAnimation(parent: _controller, curve: widget.curve))
       ..addListener(() {
         setState(() {
           _fraction = _animation.value;

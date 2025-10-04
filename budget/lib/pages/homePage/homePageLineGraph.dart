@@ -48,9 +48,10 @@ class HomePageLineGraph extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsetsDirectional.only(bottom: 13),
         child: Container(
-          margin: EdgeInsetsDirectional.symmetric(horizontal: 13),
+          margin: const EdgeInsetsDirectional.symmetric(horizontal: 13),
           decoration: BoxDecoration(
-            borderRadius: BorderRadiusDirectional.all(Radius.circular(15)),
+            borderRadius:
+                const BorderRadiusDirectional.all(Radius.circular(15)),
             color: getColor(context, "lightDarkAccentHeavyLight"),
             boxShadow: boxShadowCheck(boxShadowGeneral(context)),
           ),
@@ -93,7 +94,7 @@ class HomePageLineGraph extends StatelessWidget {
                                 showPastSpending: false,
                               );
                             }
-                            return SizedBox.shrink();
+                            return const SizedBox.shrink();
                           },
                         ),
         ),
@@ -215,11 +216,11 @@ class PastSpendingGraph extends StatelessWidget {
                   builder: (context, snapshotPoints) {
                     Widget lineChartWidget;
                     if (snapshotPoints.hasData == false) {
-                      lineChartWidget = IndeterminateProgressBar();
+                      lineChartWidget = const IndeterminateProgressBar();
                     } else {
                       List<Pair> points = snapshotPoints.data ?? [];
                       if (points.length <= 1 && hideIfOnlyOneEntry == true) {
-                        return SizedBox.shrink();
+                        return const SizedBox.shrink();
                       }
                       lineChartWidget = LineChartWrapper(
                         points: [points],
@@ -237,11 +238,11 @@ class PastSpendingGraph extends StatelessWidget {
                   },
                 );
               }
-              return SizedBox.shrink();
+              return const SizedBox.shrink();
             },
           );
         }
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
       },
     );
   }
@@ -253,7 +254,7 @@ class PastSpendingGraph extends StatelessWidget {
         stream: database.watchEarliestLatestTransactionDateTime(
             searchFilters: searchFilters),
         builder: (context, snapshot) {
-          if (snapshot.hasData == false) return SizedBox.shrink();
+          if (snapshot.hasData == false) return const SizedBox.shrink();
           return buildLineChart(
             context,
             earliestTransactionDate: snapshot.data?.earliest,
@@ -286,7 +287,7 @@ class CalculatePointsParams {
     required this.customEndDate,
     required this.totalSpentBefore,
     required this.isIncome,
-    this.removeBalanceCorrection = null,
+    this.removeBalanceCorrection,
     required this.allWallets,
     required this.showCumulativeSpending,
     required this.appStateSettingsPassed,
@@ -307,8 +308,9 @@ List<Pair> calculatePoints(CalculatePointsParams p) {
     // Remove balance correction transactions if not showing all transactions
     if (p.isIncome != null && transaction.categoryFk == "0") continue;
 
-    if (p.removeBalanceCorrection == true && transaction.categoryFk == "0")
+    if (p.removeBalanceCorrection == true && transaction.categoryFk == "0") {
       continue;
+    }
 
     if (p.isPaidOnly && transaction.paid == false) continue;
 
@@ -375,11 +377,13 @@ List<Pair> calculatePoints(CalculatePointsParams p) {
             !date.isAfter(customEndDateStatic))
         .toList();
 
-    if (!filteredDates.contains(customStartDateStatic))
+    if (!filteredDates.contains(customStartDateStatic)) {
       filteredDates.add(customStartDateStatic);
+    }
 
-    if (!filteredDates.contains(customEndDateStatic))
+    if (!filteredDates.contains(customEndDateStatic)) {
       filteredDates.insert(0, customEndDateStatic);
+    }
 
     // We assume the transactions are passed in in order!
 
@@ -390,7 +394,9 @@ List<Pair> calculatePoints(CalculatePointsParams p) {
       cumulativeTotal += totalForDay;
       if (indexDay != customStartDateStatic &&
           indexDay != customEndDateStatic &&
-          index % resolution >= 1) continue;
+          index % resolution >= 1) {
+        continue;
+      }
       points.add(
         Pair(
           index.toDouble(),

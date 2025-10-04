@@ -29,7 +29,7 @@ import 'package:flutter/services.dart' hide TextInput;
 // }
 
 class SelectCategoryImage extends StatefulWidget {
-  SelectCategoryImage({
+  const SelectCategoryImage({
     Key? key,
     required this.setSelectedImage,
     this.selectedImage,
@@ -83,7 +83,7 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
             FilteringTextInputFormatter.allow(RegExp(
                 r'(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])'))
           ],
-          placeholder: "enter-emoji-placeholder".tr() + " 😀...",
+          placeholder: "${"enter-emoji-placeholder".tr()} 😀...",
           autoFocus: true,
         ),
       ),
@@ -101,7 +101,7 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
                   popRoute(context);
                   openEmojiSelectorPopup();
                 })
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
           context.locale.toString() == "en"
               ? Row(
                   mainAxisSize: MainAxisSize.min,
@@ -135,12 +135,12 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
                           });
                           bottomSheetControllerGlobal.snapToExtent(0);
                         },
-                        padding: EdgeInsetsDirectional.all(0),
+                        padding: const EdgeInsetsDirectional.all(0),
                         autoFocus: kIsWeb,
                       ),
                       // ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     ButtonIcon(
                       onTap: () {
                         popRoute(context);
@@ -152,8 +152,8 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
                     ),
                   ],
                 )
-              : SizedBox.shrink(),
-          SizedBox(height: 5),
+              : const SizedBox.shrink(),
+          const SizedBox(height: 5),
           Center(
             child: Wrap(
               alignment: WrapAlignment.center,
@@ -171,21 +171,22 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
                 } else {
                   show = true;
                 }
-                if (show)
+                if (show) {
                   return ImageIcon(
                     sizePadding: 8,
-                    margin: EdgeInsetsDirectional.all(5),
+                    margin: const EdgeInsetsDirectional.all(5),
                     color: Colors.transparent,
                     size: 55,
-                    iconPath: "assets/categories/" + image.icon,
+                    iconPath: "assets/categories/${image.icon}",
                     onTap: () {
                       widget.setSelectedImage(image.icon);
-                      if (context.locale.toString() == "en")
+                      if (context.locale.toString() == "en") {
                         widget.setSelectedTitle(image.mostLikelyCategoryName);
+                      }
                       setState(() {
                         selectedImage = image.icon;
                       });
-                      Future.delayed(Duration(milliseconds: 70), () {
+                      Future.delayed(const Duration(milliseconds: 70), () {
                         popRoute(context);
                         if (widget.next != null) {
                           widget.next!();
@@ -194,7 +195,8 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
                     },
                     outline: selectedImage == image.icon,
                   );
-                return SizedBox.shrink();
+                }
+                return const SizedBox.shrink();
               }).toList(),
             ),
           ),
@@ -206,9 +208,9 @@ class _SelectCategoryImageState extends State<SelectCategoryImage> {
                     openEmojiSelectorPopup();
                   }),
                 )
-              : SizedBox.shrink(),
-          Padding(
-            padding: const EdgeInsetsDirectional.only(top: 8.0),
+              : const SizedBox.shrink(),
+          const Padding(
+            padding: EdgeInsetsDirectional.only(top: 8.0),
             child: SuggestIcon(),
           ),
         ],
@@ -272,7 +274,7 @@ class SuggestIcon extends StatelessWidget {
       onTap: () {
         openBottomSheet(
           context,
-          SuggestIconPopup(),
+          const SuggestIconPopup(),
           popupWithKeyboard: true,
           reAssignBottomSheetControllerGlobal: false,
           useCustomController: true,
@@ -324,7 +326,7 @@ class SuggestIconPopup extends StatefulWidget {
 }
 
 class _SuggestIconPopupState extends State<SuggestIconPopup> {
-  TextEditingController _feedbackController = TextEditingController();
+  final TextEditingController _feedbackController = TextEditingController();
 
   @override
   void initState() {
@@ -348,7 +350,7 @@ class _SuggestIconPopupState extends State<SuggestIconPopup> {
               setState(() {});
             },
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Opacity(
             opacity: 0.4,
             child: TextFont(
@@ -358,7 +360,7 @@ class _SuggestIconPopupState extends State<SuggestIconPopup> {
               maxLines: 5,
             ),
           ),
-          SizedBox(height: 15),
+          const SizedBox(height: 15),
           Button(
             label: "submit".tr(),
             onTap: () async {
@@ -374,7 +376,7 @@ class _SuggestIconPopupState extends State<SuggestIconPopup> {
 }
 
 class ImageIcon extends StatelessWidget {
-  ImageIcon({
+  const ImageIcon({
     Key? key,
     required this.color,
     required this.size,
@@ -396,9 +398,9 @@ class ImageIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 250),
       margin: margin ??
-          EdgeInsetsDirectional.only(start: 8, end: 8, top: 8, bottom: 8),
+          const EdgeInsetsDirectional.only(start: 8, end: 8, top: 8, bottom: 8),
       height: size,
       width: size,
       decoration: outline
@@ -407,14 +409,16 @@ class ImageIcon extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
                 width: 2,
               ),
-              borderRadius: BorderRadiusDirectional.all(Radius.circular(500)),
+              borderRadius:
+                  const BorderRadiusDirectional.all(Radius.circular(500)),
             )
           : BoxDecoration(
               border: Border.all(
                 color: color,
                 width: 0,
               ),
-              borderRadius: BorderRadiusDirectional.all(Radius.circular(500)),
+              borderRadius:
+                  const BorderRadiusDirectional.all(Radius.circular(500)),
             ),
       child: Tappable(
         color: color,

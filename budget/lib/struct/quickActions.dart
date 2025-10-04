@@ -16,18 +16,18 @@ import "package:quick_actions/quick_actions.dart";
 import 'package:budget/pages/addWalletPage.dart';
 
 Throttler quickActionThrottler =
-    Throttler(duration: Duration(milliseconds: 350));
+    Throttler(duration: const Duration(milliseconds: 350));
 
 void runQuickActionsPayLoads(context) async {
   if (kIsWeb) return;
-  final QuickActions quickActions = const QuickActions();
+  const QuickActions quickActions = QuickActions();
   quickActions.initialize((String quickAction) async {
     if (!quickActionThrottler.canProceed()) return;
 
     if (Navigator.of(context).canPop() == false || entireAppLoaded) {
       if (quickAction == "addTransaction") {
         // Add a delay so the keyboard can focus
-        Future.delayed(Duration(milliseconds: 50), () {
+        Future.delayed(const Duration(milliseconds: 50), () {
           pushRoute(
             context,
             AddTransactionPage(
@@ -80,7 +80,7 @@ void runQuickActionsPayLoads(context) async {
       ),
     for (Budget budget in budgets)
       ShortcutItem(
-        type: "openBudget-" + budget.budgetPk.toString(),
+        type: "openBudget-${budget.budgetPk}",
         localizedTitle: budget.name,
         icon: "piggybank",
       ),

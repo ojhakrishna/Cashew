@@ -11,7 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class _LineChart extends StatefulWidget {
-  _LineChart({
+  const _LineChart({
     required this.spots,
     required this.maxPair,
     required this.minPair,
@@ -50,7 +50,7 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds: 0), () {
+    Future.delayed(const Duration(milliseconds: 0), () {
       setState(() {
         loaded = true;
       });
@@ -67,7 +67,7 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
           data,
           duration: const Duration(milliseconds: 2000),
           curve: Curves.fastLinearToSlowEaseIn,
-          chartRendererKey: ValueKey(1),
+          chartRendererKey: const ValueKey(1),
         ),
       ),
     );
@@ -162,7 +162,7 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
             showTitles: true,
             getTitlesWidget: (value, titleMeta) {
               if (value == widget.maxPair.x + 1) {
-                return SizedBox.shrink();
+                return const SizedBox.shrink();
               }
               DateTime currentDate =
                   widget.endDate == null ? DateTime.now() : widget.endDate!;
@@ -185,7 +185,7 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
 
               return MediaQuery(
                 data: MediaQuery.of(context)
-                    .copyWith(textScaler: TextScaler.linear(1.0)),
+                    .copyWith(textScaler: const TextScaler.linear(1.0)),
                 child: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: TextFont(
@@ -215,7 +215,7 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
             ) {
               bool show = false;
               if (value == titleMeta.max || value == titleMeta.min) {
-                return SizedBox.shrink();
+                return const SizedBox.shrink();
               } else if (value == 0) {
                 show = true;
               } else if (value < widget.maxPair.y &&
@@ -227,14 +227,14 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
                   value > titleMeta.min) {
                 show = true;
               } else {
-                return SizedBox.shrink();
+                return const SizedBox.shrink();
               }
 
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: MediaQuery(
                   data: MediaQuery.of(context)
-                      .copyWith(textScaler: TextScaler.linear(1.0)),
+                      .copyWith(textScaler: const TextScaler.linear(1.0)),
                   child: TextFont(
                     overflow: TextOverflow.fade,
                     maxLines: 1,
@@ -280,10 +280,10 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
             //     5,
           ),
         ),
-        topTitles: AxisTitles(
+        topTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
-        rightTitles: AxisTitles(
+        rightTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
       );
@@ -300,7 +300,7 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
   //       ),
   //     );
 
-  int? touchedValue = null;
+  int? touchedValue;
 
   LineTouchData get lineTouchData => LineTouchData(
         enabled: true,
@@ -362,7 +362,8 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
           tooltipRoundedRadius: 8,
           fitInsideVertically: true,
           fitInsideHorizontally: true,
-          tooltipPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          tooltipPadding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           getTooltipItems: (List<LineBarSpot> lineBarsSpot) {
             return lineBarsSpot.map((LineBarSpot lineBarSpot) {
               // only show touch data for primary colored lines
@@ -375,14 +376,10 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
               DateTime tooltipDate = currentDate.justDay(
                   dayOffset: -widget.maxPair.x.toInt() + lineBarSpot.x.toInt());
               return LineTooltipItem(
-                getWordedDateShort(
-                      tooltipDate,
-                      includeYear: DateTime.now().year != tooltipDate.year,
-                    ) +
-                    "\n" +
-                    convertToMoney(
-                        Provider.of<AllWallets>(context, listen: false),
-                        lineBarSpot.y),
+                "${getWordedDateShort(
+                  tooltipDate,
+                  includeYear: DateTime.now().year != tooltipDate.year,
+                )}\n${convertToMoney(Provider.of<AllWallets>(context, listen: false), lineBarSpot.y)}",
                 const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -455,12 +452,12 @@ class _LineChartState extends State<_LineChart> with WidgetsBindingObserver {
 
   LineChartBarData lineChartBarData(List<FlSpot> spots, int index) {
     return LineChartBarData(
-      color: widget.colors.length > 0
+      color: widget.colors.isNotEmpty
           ? lightenPastel(widget.colors[index], amount: 0.3)
           : lightenPastel(widget.color, amount: 0.3),
       barWidth: 3,
       isStrokeCapRound: true,
-      dotData: FlDotData(show: false),
+      dotData: const FlDotData(show: false),
       isCurved: widget.isCurved,
       curveSmoothness:
           appStateSettings["removeZeroTransactionEntries"] ? 0.1 : 0.3,
@@ -535,7 +532,9 @@ class Pair {
 
   static Map<DateTime?, double> convertListToDateTimeMap(List<Pair> pairs) {
     Map<DateTime?, double> resultMap = {};
-    for (Pair pair in pairs) resultMap[pair.dateTime] = pair.y;
+    for (Pair pair in pairs) {
+      resultMap[pair.dateTime] = pair.y;
+    }
     return resultMap;
   }
 }
@@ -585,7 +584,7 @@ class LineChartWrapper extends StatelessWidget {
           pointsOut.add(Pair(point.x, point.y));
         }
       }
-      if (pointsOut.length <= 0) {
+      if (pointsOut.isEmpty) {
         return [Pair(0, 0)];
       }
       pointsOut.last.x != points.last.x
@@ -603,7 +602,7 @@ class LineChartWrapper extends StatelessWidget {
         }
         previousTotal = point.y;
       }
-      if (pointsOut.length <= 0) {
+      if (pointsOut.isEmpty) {
         return [Pair(0, 0)];
       }
       pointsOut.last.x != points.last.x
@@ -660,7 +659,7 @@ class LineChartWrapper extends StatelessWidget {
       min.y = pointsList[0][0].y;
     }
     for (List<Pair> points in pointsList) {
-      if (points.length <= 0 && min.x == 0 && min.y == 0) {
+      if (points.isEmpty && min.x == 0 && min.y == 0) {
         min = Pair(0, 0);
       }
       for (Pair pair in points) {
@@ -690,7 +689,7 @@ class LineChartWrapper extends StatelessWidget {
     return ClipRect(
       child: Container(
         // Left padding is omitted and added in the reserved size of the side titles
-        margin: EdgeInsets.only(bottom: 12, top: 18, right: 7),
+        margin: const EdgeInsets.only(bottom: 12, top: 18, right: 7),
         height: MediaQuery.sizeOf(context).width > 700 ? 300 : 175,
         child: _LineChart(
           spots: convertPoints(filterPointsList(points)),

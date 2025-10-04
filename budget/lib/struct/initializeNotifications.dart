@@ -39,7 +39,7 @@ Future<String?> initializeNotifications() async {
       await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
   NotificationResponse? payload =
       notificationAppLaunchDetails?.notificationResponse;
-  String? response = await payload?.payload;
+  String? response = payload?.payload;
   return response;
 }
 
@@ -63,12 +63,12 @@ runNotificationPayLoadsNoContext() {
 }
 
 Future<bool> runNotificationPayLoads(context) async {
-  print("Notification payload: " + notificationPayload.toString());
+  print("Notification payload: $notificationPayload");
   if (kIsWeb) return false;
   if (notificationPayload == null) return false;
   if (notificationPayload == "addTransaction") {
     // Add a delay so the keyboard can focus
-    await Future.delayed(Duration(milliseconds: 50), () async {
+    await Future.delayed(const Duration(milliseconds: 50), () async {
       pushRoute(
         context,
         AddTransactionPage(
@@ -81,13 +81,14 @@ Future<bool> runNotificationPayLoads(context) async {
     // When the notification comes in, the transaction is past due!
     pushRoute(
       context,
-      UpcomingOverdueTransactions(overdueTransactions: null),
+      const UpcomingOverdueTransactions(overdueTransactions: null),
     );
     return true;
   } else if (notificationPayload?.split("?")[0] == "openTransaction") {
     Uri notificationPayloadUri = Uri.parse(notificationPayload ?? "");
-    if (notificationPayloadUri.queryParameters["transactionPk"] == null)
+    if (notificationPayloadUri.queryParameters["transactionPk"] == null) {
       return false;
+    }
     String transactionPk =
         notificationPayloadUri.queryParameters["transactionPk"] ?? "";
     Transaction? transaction =
@@ -123,8 +124,7 @@ Future<void> setDailyNotifications(context) async {
       }
       await scheduleDailyNotification(context, timeOfDay);
     } catch (e) {
-      print(e.toString() +
-          " Error setting up notifications for upcoming transactions");
+      print("$e Error setting up notifications for upcoming transactions");
     }
   }
 }
@@ -137,8 +137,7 @@ Future<void> setUpcomingNotifications(context) async {
     try {
       await scheduleUpcomingTransactionsNotification(context);
     } catch (e) {
-      print(e.toString() +
-          " Error setting up notifications for upcoming transactions");
+      print("$e Error setting up notifications for upcoming transactions");
     }
   }
   return;
