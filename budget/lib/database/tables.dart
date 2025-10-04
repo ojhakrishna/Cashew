@@ -2673,8 +2673,9 @@ class FinanceDatabase extends _$FinanceDatabase {
     if (type == DeleteLogType.Transaction) {
       Transaction? transactionToDelete =
           await database.tryGetTransactionFromPk(deletedPk);
-      if (transactionToDelete != null)
+      if (transactionToDelete != null) {
         addTransactionToRecentlyDeleted(transactionToDelete, save: true);
+      }
     }
     await into(deleteLogs).insert(
       DeleteLogsCompanion.insert(
@@ -4824,9 +4825,9 @@ class FinanceDatabase extends _$FinanceDatabase {
     if (budget.sharedKey != null) {
       loadingIndeterminateKey.currentState?.setVisibility(true);
       if (budget.sharedOwnerMember == SharedOwnerMember.owner) {
-        bool result = await removedSharedFromBudget(budget);
+        await removedSharedFromBudget(budget);
       } else {
-        bool result = await leaveSharedBudget(budget);
+        await leaveSharedBudget(budget);
       }
       loadingIndeterminateKey.currentState?.setVisibility(false);
     }
@@ -5065,8 +5066,6 @@ class FinanceDatabase extends _$FinanceDatabase {
                 ..orderBy([(w) => OrderingTerm.asc(w.order)]))
               .get())
           .firstOrNull;
-      if (newPrimaryCandidate == null)
-        throw "Can't find another wallet to make default";
     }
 
     if (appStateSettings["selectedWalletPk"] == walletPk) {
@@ -5932,9 +5931,8 @@ class FinanceDatabase extends _$FinanceDatabase {
     }
 
     String? noteContains = searchFilters.noteContains;
-    Expression<bool> isInNoteContains = noteContains == null
-        ? Constant(true)
-        : tbl.note.collate(Collate.noCase).like("%" + noteContains + "%");
+    Expression<bool> isInNoteContains =
+        tbl.note.collate(Collate.noCase).like("%" + (noteContains ?? "") + "%");
 
     return isInWalletPks &
         isInCategoryPks &
@@ -6002,9 +6000,8 @@ class FinanceDatabase extends _$FinanceDatabase {
   Expression<bool> onlyShowIfSearchQueryAmount(
       String searchQuery, GeneratedColumn<num> amount) {
     (double, double)? bounds = parseSearchQueryForAmountText(searchQuery);
-    if (bounds == null) return Constant(false);
-    double lowerBound = bounds.$1;
-    double upperBound = bounds.$2;
+    double lowerBound = bounds?.$1 ?? 0;
+    double upperBound = bounds?.$2 ?? 0;
 
     final Expression<bool> condition =
         (amount.isBiggerOrEqualValue(lowerBound.abs()) &
@@ -6302,12 +6299,8 @@ class FinanceDatabase extends _$FinanceDatabase {
               DateTime.now();
       DateTime? endDate =
           getEndDateOfSelectedCustomPeriod(cycleSettingsExtension);
-      if (endDate != null) {
-        return onlyShowBasedOnTimeRange(tbl, startDate, endDate, null,
-            allTime: false);
-      } else {
-        return tbl.dateCreated.isBiggerOrEqualValue(startDate);
-      }
+      return onlyShowBasedOnTimeRange(tbl, startDate, endDate, null,
+          allTime: false);
     }
     return Constant(true);
   }
@@ -6895,71 +6888,70 @@ class FinanceDatabase extends _$FinanceDatabase {
           leftOuterJoin(objectives,
               objectives.objectivePk.equalsExp(transactions.objectiveLoanFk)),
         ])
-        ..where(
-          onlyShowIfFollowsSearchFilters(
-                transactions,
-                searchFilters,
-                joinedWithSubcategoriesTable: null,
-                joinedWithCategories: false,
-                joinedWithBudgets: false,
-                joinedWithObjectives: false,
-                joinedWithObjectiveLoans: null,
-              ) &
-              (cycleSettingsExtension == null
-                  ? Constant(true)
-                  : onlyShowIfFollowCustomPeriodCycle(
-                      transactions,
-                      followCustomPeriodCycle,
-                      cycleSettingsExtension: cycleSettingsExtension,
-                      forcedDateTimeRange: forcedDateTimeRange,
-                    )) &
-              (transactions.objectiveLoanFk.isNull() |
-                  objectives.archived.equals(false)) &
-              (selectedTab == 0 && searchString != null
-                  ? transactions.objectiveLoanFk.isNull()
-                  : selectedTab == 1 && searchString != null
-                      ? transactions.objectiveLoanFk.isNotNull()
-                      : Constant(true)) &
-              (selectedTab == 0 ||
-                      selectedTab == null ||
-                      searchString == null ||
-                      searchString == ""
-                  ? (onlyShowTransactionBasedOnSearchQuery(
-                      transactions,
-                      searchString,
-                      withCategories: true,
-                      joinedWithSubcategoriesTable: subCategories,
-                      joinedWithObjectiveLoans: null,
-                    ))
-                  // Only apply this tab specific total when searching
-                  : ((objectives.name
-                      .collate(Collate.noCase)
-                      .like("%" + (searchString ?? "") + "%")))) &
-              transactions.paid.equals(true) &
-              transactions.walletFk.equals(wallet.walletPk) &
-              (isCredit == null
-                  ? transactions.type
-                          .equals(TransactionSpecialType.credit.index) |
-                      transactions.type
-                          .equals(TransactionSpecialType.debt.index) |
-                      transactions.objectiveLoanFk.isNotNull()
-                  : isCredit
-                      ? transactions.type
-                              .equals(TransactionSpecialType.credit.index) |
-                          (transactions.objectiveLoanFk.isNotNull() &
-                              objectives.income.equals(true))
-                      : transactions.type
-                              .equals(TransactionSpecialType.debt.index) |
-                          (transactions.objectiveLoanFk.isNotNull() &
-                              objectives.income.equals(false))),
-        );
-      mergedStreams.add(query.map((row) {
-        // print(row.rawData.data);
-        return TotalWithCount(
+        ..where(onlyShowIfFollowsSearchFilters(
+              transactions,
+              searchFilters,
+              joinedWithSubcategoriesTable: null,
+              joinedWithCategories: false,
+              joinedWithBudgets: false,
+              joinedWithObjectives: false,
+              joinedWithObjectiveLoans: null,
+            ) &
+            (cycleSettingsExtension == null
+                ? Constant(true)
+                : onlyShowIfFollowCustomPeriodCycle(
+                    transactions,
+                    followCustomPeriodCycle,
+                    cycleSettingsExtension: cycleSettingsExtension,
+                    forcedDateTimeRange: forcedDateTimeRange,
+                  )) &
+            (transactions.objectiveLoanFk.isNull() |
+                objectives.archived.equals(false)) &
+            (selectedTab == 0 && searchString != null
+                ? transactions.objectiveLoanFk.isNull()
+                : selectedTab == 1 && searchString != null
+                    ? transactions.objectiveLoanFk.isNotNull()
+                    : Constant(true)) &
+            ((selectedTab == 0 ||
+                    selectedTab == null ||
+                    searchString == null ||
+                    searchString == "")
+                ? onlyShowTransactionBasedOnSearchQuery(
+                    transactions,
+                    searchString,
+                    withCategories: true,
+                    joinedWithSubcategoriesTable: subCategories,
+                    joinedWithObjectiveLoans: null,
+                  )
+                : (objectives.name
+                        .collate(Collate.noCase)
+                        .like("%" + searchString + "%") &
+                    transactions.paid.equals(true) &
+                    transactions.walletFk.equals(wallet.walletPk) &
+                    (isCredit == null
+                        ? transactions.type
+                                .equals(TransactionSpecialType.credit.index) |
+                            transactions.type
+                                .equals(TransactionSpecialType.debt.index) |
+                            transactions.objectiveLoanFk.isNotNull()
+                        : isCredit
+                            ? transactions.type.equals(
+                                    TransactionSpecialType.credit.index) |
+                                (transactions.objectiveLoanFk.isNotNull() &
+                                    objectives.income.equals(true))
+                            : transactions.type
+                                    .equals(TransactionSpecialType.debt.index) |
+                                (transactions.objectiveLoanFk.isNotNull() &
+                                    objectives.income.equals(false))))));
+      mergedStreams.add(
+        query.map((row) {
+          return TotalWithCount(
             total: (row.read(totalAmt) ?? 0) *
                 (amountRatioToPrimaryCurrency(allWallets, wallet.currency)),
-            count: row.read(totalCount) ?? 0);
-      }).watchSingle());
+            count: row.read(totalCount) ?? 0,
+          );
+        }).watchSingle(),
+      );
     }
     return totalTotalWithCountStream(mergedStreams);
   }
@@ -6992,28 +6984,29 @@ class FinanceDatabase extends _$FinanceDatabase {
             (selectedTab == 0 && searchString != null
                 ? Constant(false)
                 : Constant(true)) &
-            (selectedTab == 0 ||
+            ((selectedTab == 0 ||
                     selectedTab == null ||
                     searchString == null ||
-                    searchString == ""
+                    searchString == "")
                 ? Constant(true)
-                // Only apply this tab specific total when searching
-                : (objectives.name
+                : objectives.name
                     .collate(Collate.noCase)
-                    .like("%" + (searchString ?? "") + "%"))) &
+                    .like("%" + searchString + "%")) &
             (isCredit == null
                 ? Constant(true)
                 : isCredit
                     ? objectives.income.equals(true)
                     : objectives.income.equals(false)));
-      mergedStreams.add(queryTotalObjectiveAmountOffset.map((row) {
-        // print(row.rawData.data);
-        return TotalWithCount(
+      mergedStreams.add(
+        queryTotalObjectiveAmountOffset.map((row) {
+          return TotalWithCount(
             total: (row.read(totalAmtObjective) ?? 0).abs() *
                 ((row.read(objectiveIncome) ?? true) ? -1 : 1) *
                 (amountRatioToPrimaryCurrency(allWallets, wallet.currency)),
-            count: 0);
-      }).watchSingle());
+            count: 0,
+          );
+        }).watchSingle(),
+      );
     }
     return totalTotalWithCountStream(mergedStreams);
   }
@@ -7470,8 +7463,8 @@ class FinanceDatabase extends _$FinanceDatabase {
   // Is not the current balance transaction
   Future<Transaction?> getCloselyRelatedBalanceCorrectionTransaction(
       Transaction originalBalanceCorrection) async {
-    bool isOtherIncome = !originalBalanceCorrection.income;
-    DateTime otherDateTime = originalBalanceCorrection.dateCreated;
+    // bool isOtherIncome = !originalBalanceCorrection.income;
+    // DateTime otherDateTime = originalBalanceCorrection.dateCreated;
     try {
       // In the future can take advantage of pairedTransactionFk!
       Transaction? pairedTransaction = await (select(transactions)
@@ -7481,46 +7474,8 @@ class FinanceDatabase extends _$FinanceDatabase {
                 t.transactionPk.equals(
                     originalBalanceCorrection.pairedTransactionFk ?? "")))
           .getSingleOrNull();
-      if (pairedTransaction != null) {
-        print("Found related transaction with pairing!");
-        return pairedTransaction;
-      }
-
-      return (await (select(transactions)
-                ..where(
-                  (t) =>
-                      t.categoryFk.equals("0") &
-                      evaluateIfNull(
-                        t.type
-                            .equals(originalBalanceCorrection.type?.index ?? 0),
-                        originalBalanceCorrection.type?.index,
-                        true,
-                      ) &
-                      t.transactionPk
-                          .equals(originalBalanceCorrection.transactionPk)
-                          .not() &
-                      t.income.equals(isOtherIncome) &
-                      t.dateCreated.isBetweenValues(
-                        DateTime(
-                          otherDateTime.year,
-                          otherDateTime.month,
-                          otherDateTime.day,
-                          otherDateTime.hour,
-                          otherDateTime.minute,
-                          otherDateTime.second - 1,
-                        ),
-                        DateTime(
-                          otherDateTime.year,
-                          otherDateTime.month,
-                          otherDateTime.day,
-                          otherDateTime.hour,
-                          otherDateTime.minute,
-                          otherDateTime.second + 1,
-                        ),
-                      ),
-                ))
-              .get())
-          .firstOrNull;
+      print("Found related transaction with pairing!");
+      return pairedTransaction;
     } catch (e) {
       print("No relating transfer transaction found");
     }

@@ -90,13 +90,13 @@ class _AppLinksNativeState extends State<AppLinksNative> {
 
   Future<void> initAppLinks() async {
     Uri? appLink = await _appLinks.getInitialLink();
-    if (appLink != null) {
-      // This delay may or may not be needed...
-      // we need to make sure Material navigator is accessible by the context though!
-      Future.delayed(Duration(milliseconds: 0), () {
+    // This delay may or may not be needed...
+    // we need to make sure Material navigator is accessible by the context though!
+    Future.delayed(Duration(milliseconds: 0), () {
+      if (appLink != null) {
         executeAppLink(navigatorKey.currentContext, appLink);
-      });
-    }
+      }
+    });
 
     _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
       executeAppLink(navigatorKey.currentContext, uri);
@@ -431,7 +431,7 @@ DateTime? getDateTimeFromParams(
       DateTime? result;
       for (String commonFormat in getCommonDateFormats()) {
         result = tryDateFormatting(context, commonFormat, dateToParse);
-        if (result != null) break;
+        break;
       }
       dateCreated = result;
     }

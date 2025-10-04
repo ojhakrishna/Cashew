@@ -29,9 +29,6 @@ import 'package:budget/widgets/transactionEntry/transactionEntryAmount.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntryNote.dart';
 import 'package:budget/widgets/transactionEntry/transactionEntryTag.dart';
 
-ValueNotifier<Map<String, List<String>>> globalSelectedID =
-    ValueNotifier<Map<String, List<String>>>({});
-
 ValueNotifier<Map<String, bool>> globalCollapsedFutureID =
     ValueNotifier<Map<String, bool>>({});
 
@@ -52,10 +49,10 @@ class RecentlyAddedTransactionInfo {
   void triggerAnimation() {
     shouldAnimate = false;
     isRunningAnimation = true;
-    recentlyAddedTransactionInfo.notifyListeners();
+    recentlyAddedTransactionInfo.value = recentlyAddedTransactionInfo.value;
     Future.delayed(Duration(milliseconds: 100), () {
       isRunningAnimation = false;
-      recentlyAddedTransactionInfo.notifyListeners();
+      recentlyAddedTransactionInfo.value = recentlyAddedTransactionInfo.value;
     });
   }
 }
@@ -150,7 +147,7 @@ class TransactionEntry extends StatelessWidget {
       globalSelectedID.value[listID ?? "0"]!.remove(transaction.transactionPk);
       if (isSwiping) selectingTransactionsActive = -1;
     }
-    globalSelectedID.notifyListeners();
+    globalSelectedID.value = globalSelectedID.value;
 
     if (onSelected != null) onSelected!(transaction, selected);
   }
@@ -356,7 +353,6 @@ class TransactionEntry extends StatelessWidget {
                                 dateCreated: transaction.dateCreated,
                                 endDate: transaction.endDate,
                               );
-                    if (numberRepeats == null) return SizedBox.shrink();
                     return Container(
                       transform: Matrix4.translationValues(
                           (padding.start - padding.end) / 2, 0, 0),
@@ -656,7 +652,7 @@ class TransactionEntry extends StatelessWidget {
                         ),
                       ),
                       closedColor: containerColor == null
-                          ? Theme.of(context).colorScheme.background
+                          ? Theme.of(context).colorScheme.surface
                           : containerColor,
                       button: (openContainer) {
                         return FlashingContainer(
@@ -802,7 +798,7 @@ class CollapseFutureTransactions extends StatelessWidget {
 void toggleFutureTransactionsSection(String? listID) {
   globalCollapsedFutureID.value[listID ?? "0"] =
       !(globalCollapsedFutureID.value[listID ?? "0"] ?? false);
-  globalCollapsedFutureID.notifyListeners();
+  globalCollapsedFutureID.value = globalCollapsedFutureID.value;
   sharedPreferences.setString(
       "globalCollapsedFutureID", jsonEncode(globalCollapsedFutureID.value));
 }
@@ -811,7 +807,7 @@ void flashTransaction(String transactionPk, {int flashCount = 5}) {
   recentlyAddedTransactionInfo.value.shouldAnimate = true;
   recentlyAddedTransactionInfo.value.transactionPk = transactionPk;
   recentlyAddedTransactionInfo.value.loopCount = flashCount;
-  recentlyAddedTransactionInfo.notifyListeners();
+  recentlyAddedTransactionInfo.value = recentlyAddedTransactionInfo.value;
 }
 
 class FlashingContainer extends StatefulWidget {

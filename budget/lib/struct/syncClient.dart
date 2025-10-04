@@ -126,11 +126,6 @@ Future<bool> createSyncBackup(
   final authHeaders = await googleUser!.authHeaders;
   final authenticateClient = GoogleAuthClient(authHeaders);
   drive.DriveApi driveApi = drive.DriveApi(authenticateClient);
-  if (driveApi == null) {
-    if (changeMadeSync)
-      loadingIndeterminateKey.currentState?.setVisibility(false);
-    throw "Failed to login to Google Drive";
-  }
 
   drive.FileList fileList = await driveApi.files.list(
       spaces: 'appDataFolder', $fields: 'files(id, name, modifiedTime, size)');
@@ -247,9 +242,6 @@ Future<bool> _syncData(BuildContext context) async {
   final authHeaders = await googleUser!.authHeaders;
   final authenticateClient = GoogleAuthClient(authHeaders);
   drive.DriveApi driveApi = drive.DriveApi(authenticateClient);
-  if (driveApi == null) {
-    throw "Failed to login to Google Drive";
-  }
 
   await createSyncBackup();
 
@@ -257,14 +249,12 @@ Future<bool> _syncData(BuildContext context) async {
       spaces: 'appDataFolder', $fields: 'files(id, name, modifiedTime, size)');
   List<drive.File>? files = fileList.files;
 
-  if (files == null) {
-    throw "No backups found.";
-  }
-
   List<drive.File> filesToDownloadSyncChanges = [];
-  for (drive.File file in files) {
-    if (isSyncBackupFile(file.name)) {
-      filesToDownloadSyncChanges.add(file);
+  if (files != null) {
+    for (drive.File file in files) {
+      if (isSyncBackupFile(file.name)) {
+        filesToDownloadSyncChanges.add(file);
+      }
     }
   }
 
@@ -306,13 +296,12 @@ Future<bool> _syncData(BuildContext context) async {
     }
 
     String? fileId = file.id;
-    if (fileId == null) continue;
     print("SYNCING WITH " + (file.name ?? ""));
     filesSyncing.add(file);
 
     List<int> dataStore = [];
     dynamic response = await driveApi.files
-        .get(fileId, downloadOptions: drive.DownloadOptions.fullMedia);
+        .get(fileId ?? "", downloadOptions: drive.DownloadOptions.fullMedia);
     await for (var data in response.stream) {
       dataStore.insertAll(dataStore.length, data);
     }

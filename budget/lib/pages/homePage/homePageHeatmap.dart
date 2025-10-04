@@ -246,31 +246,26 @@ class HeatMap extends StatelessWidget {
                                   );
                                   return Tooltip(
                                     waitDuration: Duration(milliseconds: 200),
-                                    message: day == null
-                                        ? ""
-                                        : getWordedDate(
+                                    message: day != null
+                                        ? getWordedDate(
                                             day,
                                             includeMonthDate: true,
                                             includeYearIfNotCurrentYear: true,
-                                          ),
+                                          )
+                                        : '',
                                     child: Tappable(
                                       onTap: () {
-                                        if (amount != null)
+                                        if (day != null) {
                                           openTransactionsOnDayBottomSheet(
                                               context, day);
+                                        }
                                       },
                                       child: Container(
                                         height: dayWidth,
                                         width: dayWidth,
                                         decoration: BoxDecoration(
                                           border: Border.all(
-                                            color: amount == null
-                                                ? Theme.of(context)
-                                                            .brightness ==
-                                                        Brightness.light
-                                                    ? color.withOpacity(0.05)
-                                                    : color.withOpacity(0.2)
-                                                : color.withOpacity(0.3),
+                                            color: color.withOpacity(0.3),
                                             width: 1,
                                           ),
                                           borderRadius:

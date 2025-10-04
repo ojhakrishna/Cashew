@@ -251,7 +251,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
 
   void setSelectedType(String type) {
     setState(() {
-      selectedType = transactionTypeDisplayToEnum[type];
+      selectedType = transactionTypeDisplayToEnum[type] ?? selectedType;
       if (selectedType == TransactionSpecialType.credit) {
         selectedIncome = false;
       } else if (selectedType == TransactionSpecialType.debt) {
@@ -626,9 +626,7 @@ class _AddTransactionPageState extends State<AddTransactionPage>
     bool? createdAnotherFutureTransaction = widget.transaction != null
         ? widget.transaction!.createdAnotherFutureTransaction
         : null;
-    bool paid = widget.transaction != null
-        ? widget.transaction!.paid
-        : selectedType == null;
+    // Removed unused variable 'paid'
     bool skipPaid = widget.transaction != null
         ? widget.transaction!.skipPaid
         : selectedType == null;
@@ -640,10 +638,8 @@ class _AddTransactionPageState extends State<AddTransactionPage>
 
       if ([TransactionSpecialType.credit, TransactionSpecialType.debt]
           .contains(selectedType)) {
-        paid = true;
         skipPaid = false;
       } else {
-        paid = false;
         skipPaid = false;
       }
     }
@@ -1347,23 +1343,18 @@ class _AddTransactionPageState extends State<AddTransactionPage>
                                       endDate: selectedEndDate,
                                     );
                               return AnimatedSizeSwitcher(
-                                child: numberRepeats != null
-                                    ? Padding(
-                                        padding: const EdgeInsetsDirectional
-                                            .symmetric(horizontal: 4),
-                                        child: TextFont(
-                                          key: ValueKey(1),
-                                          fontSize: 14.5,
-                                          textColor:
-                                              getColor(context, "textLight"),
-                                          text: "( ×" +
-                                              numberRepeats.toString() +
-                                              " )",
-                                        ),
-                                      )
-                                    : Container(
-                                        key: ValueKey(2),
-                                      ),
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsetsDirectional.symmetric(
+                                          horizontal: 4),
+                                  child: TextFont(
+                                    key: ValueKey(1),
+                                    fontSize: 14.5,
+                                    textColor: getColor(context, "textLight"),
+                                    text:
+                                        "( ×" + numberRepeats.toString() + " )",
+                                  ),
+                                ),
                               );
                             }),
                             AnimatedSizeSwitcher(
@@ -2548,13 +2539,13 @@ class _SelectTitleState extends State<SelectTitle> {
               onPressed: () async {
                 DateTime? dateTimeSelected =
                     await selectDateAndTimeSequence(context, selectedDateTime);
-                if (dateTimeSelected != null) {
-                  setState(() {
-                    customDateTimeSelected = true;
+                setState(() {
+                  customDateTimeSelected = true;
+                  if (dateTimeSelected != null) {
                     selectedDateTime = dateTimeSelected;
-                  });
-                  widget.setSelectedDateTime(selectedDateTime);
-                }
+                  }
+                });
+                widget.setSelectedDateTime(selectedDateTime);
                 // Update the size of the bottom sheet
                 Future.delayed(Duration(milliseconds: 100), () {
                   bottomSheetControllerGlobal.snapToExtent(0);
@@ -3713,10 +3704,8 @@ class SelectTransactionTypePopup extends StatelessWidget {
                     highlightActionButton: true,
                     useHorizontalPaddingConstrained: false,
                     openPage: Container(),
-                    containerColor: Theme.of(context)
-                        .colorScheme
-                        .background
-                        .withOpacity(0.5),
+                    containerColor:
+                        Theme.of(context).colorScheme.surface.withOpacity(0.5),
                     transaction: Transaction(
                       transactionPk: "-1",
                       name: "",
@@ -4441,8 +4430,7 @@ class _TransactionNotesTextInputState extends State<TransactionNotesTextInput> {
                                         true) {
                                       String? result = await getPhotoAndUpload(
                                           source: ImageSource.camera);
-                                      if (result != null)
-                                        addAttachmentLinkToNote(result);
+                                      addAttachmentLinkToNote(result);
                                     }
                                   },
                                 ),
@@ -4745,7 +4733,7 @@ class SelectSubcategoryChips extends StatelessWidget {
                         allowMultipleSelected: false,
                         selectedColor: Theme.of(context)
                             .colorScheme
-                            .background
+                            .surface
                             .withOpacity(0.6),
                         onLongPress: (category) {
                           pushRoute(

@@ -202,9 +202,9 @@ class _PullDownToRefreshSyncState extends State<PullDownToRefreshSync>
                             maxLines: 3,
                             text: "synced".tr().capitalizeFirst +
                                 " " +
-                                (dateTimeLastSynced == null
-                                    ? "never".tr()
-                                    : getTimeAgo(dateTimeLastSynced)),
+                                (dateTimeLastSynced != null
+                                    ? getTimeAgo(dateTimeLastSynced)
+                                    : ""),
                           ),
                         );
                       },

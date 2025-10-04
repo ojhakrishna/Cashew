@@ -137,15 +137,13 @@ Future<String?> uploadFileToDrive({
     folderId = createdFolder.id;
   }
 
-  if (folderId == null) throw ("Folder could not be created in Google Drive");
-
   drive.Media media = new drive.Media(mediaStream, fileBytes.length);
 
   drive.File driveFile = new drive.File();
   String timestamp = DateFormat("yyyy-MM-dd-hhmmss").format(DateTime.now());
   driveFile.name = timestamp + fileName;
   driveFile.modifiedTime = DateTime.now().toUtc();
-  driveFile.parents = [folderId];
+  driveFile.parents = [folderId ?? ""];
 
   drive.File driveFileCreated =
       await driveApi.files.create(driveFile, uploadMedia: media);

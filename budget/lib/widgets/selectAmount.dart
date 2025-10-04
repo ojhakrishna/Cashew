@@ -484,21 +484,19 @@ class _SelectAmountState extends State<SelectAmount> {
 
   pasteFromClipboard() async {
     double? amount = await readAmountFromClipboard();
+    setState(() {
+      this.amount = amount.toString();
+    });
     if (amount != null) {
-      setState(() {
-        this.amount = amount.toString();
-      });
       widget.setSelectedAmount(amount, amount.toString());
-      bottomSheetControllerGlobal.reMeasure();
     }
+    bottomSheetControllerGlobal.reMeasure();
   }
 
   pasteFromClipboardIntoCalculation() async {
     double? amount = await readAmountFromClipboard();
-    if (amount != null) {
-      for (String number in removeTrailingZeroes(amount.toString()).split("")) {
-        addToAmount(number, hapticFeedback: false);
-      }
+    for (String number in removeTrailingZeroes(amount.toString()).split("")) {
+      addToAmount(number, hapticFeedback: false);
     }
   }
 
@@ -1428,7 +1426,7 @@ class _SelectAmountValueState extends State<SelectAmountValue> {
     }
 
     if (input == "." && widget.enableDecimal == false) return;
-    String amountClone = amount;
+    // Removed unused variable 'amountClone'
     if (input == "." && amount.contains(".")) {
     } else {
       if (amount == "0" || amount == "") {

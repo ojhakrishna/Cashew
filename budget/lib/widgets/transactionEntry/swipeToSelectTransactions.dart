@@ -2,6 +2,7 @@ import 'package:budget/widgets/transactionEntry/transactionEntry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:budget/struct/databaseGlobal.dart';
 
 class SwipeToSelectTransactions extends StatefulWidget {
   const SwipeToSelectTransactions({
@@ -46,7 +47,7 @@ class _SwipeToSelectTransactionsState extends State<SwipeToSelectTransactions> {
                       .contains(target.transactionKey!)) {
                     globalSelectedID.value[widget.listID]!
                         .add(target.transactionKey!);
-                    globalSelectedID.notifyListeners();
+                    globalSelectedID.value = globalSelectedID.value;
                     HapticFeedback.selectionClick();
                   }
                 } else if (selectingTransactionsActive == -1) {
@@ -54,7 +55,7 @@ class _SwipeToSelectTransactionsState extends State<SwipeToSelectTransactions> {
                       .contains(target.transactionKey!)) {
                     globalSelectedID.value[widget.listID]!
                         .remove(target.transactionKey);
-                    globalSelectedID.notifyListeners();
+                    globalSelectedID.value = globalSelectedID.value;
                     HapticFeedback.selectionClick();
                   }
                 }

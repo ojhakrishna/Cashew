@@ -9,7 +9,6 @@ import 'package:budget/pages/objectivesListPage.dart';
 import 'package:budget/struct/currencyFunctions.dart';
 import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/struct/settings.dart';
-import 'package:budget/widgets/animatedExpanded.dart';
 import 'package:budget/widgets/categoryIcon.dart';
 import 'package:budget/widgets/dropdownSelect.dart';
 import 'package:budget/widgets/fab.dart';
@@ -418,7 +417,7 @@ Future<DeletePopupAction?> deleteObjectivePopup(
     int? numTransactions = await database
         .getTotalCountOfTransactionsInObjective(objective.objectivePk)
         .$2;
-    if (numTransactions != null && numTransactions > 0) {
+    if ((numTransactions ?? 0) > 0) {
       result = await openPopup(
         context,
         title: objective.type == ObjectiveType.loan

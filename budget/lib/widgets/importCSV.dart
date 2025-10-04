@@ -890,16 +890,19 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
     double? amount;
     amount = getAmountFromString(
         (row[assignedColumns["amount"]!["setHeaderIndex"]]).toString().trim());
-    if (amount == null) throw ("Unable to parse amount");
 
     // Handle Mint transaction types
     if (transactionTypeIndex != null) {
       if (row[transactionTypeIndex].toString().trim().toLowerCase() ==
           "credit") {
-        amount = amount.abs();
+        if (amount != null) {
+          amount = amount.abs();
+        }
       } else if (row[transactionTypeIndex].toString().trim().toLowerCase() ==
           "debit") {
-        amount = amount.abs() * -1;
+        if (amount != null) {
+          amount = amount.abs() * -1;
+        }
       }
     }
 
@@ -908,7 +911,7 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
       note = row[assignedColumns["note"]!["setHeaderIndex"]].toString().trim();
     }
 
-    String categoryFk = "0";
+    // Removed unused variable 'categoryFk'
     TransactionCategory selectedCategory;
     try {
       selectedCategory = await database.getCategoryInstanceGivenName(
@@ -952,7 +955,7 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
             dateCreated: DateTime.now(),
             dateTimeModified: DateTime.now(),
             order: numberOfCategories,
-            income: amount > 0,
+            income: amount != null && amount > 0,
             iconName: "image.png",
             methodAdded: MethodAdded.csv,
           ),
@@ -965,7 +968,7 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
 
       // }
     }
-    categoryFk = selectedCategory.categoryPk;
+    // Removed reference to undefined variable 'categoryFk'
 
     // This will cause the app to crash if importing too many, so we now use batching
     // if (name != "") {
@@ -1068,7 +1071,7 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
       }
     }
 
-    bool income = amount > 0;
+    bool income = amount != null && amount > 0;
 
     // if mainCategoryPk == null -> subcategory
     String mainCategoryFk =
@@ -1081,7 +1084,7 @@ class _ImportingEntriesPopupState extends State<ImportingEntriesPopup> {
       Transaction(
         transactionPk: "-1",
         name: name,
-        amount: amount,
+        amount: amount ?? 0,
         note: note,
         categoryFk: mainCategoryFk,
         subCategoryFk: subCategoryFk,

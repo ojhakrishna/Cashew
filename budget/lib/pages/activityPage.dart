@@ -59,18 +59,16 @@ Future<void> loadRecentlyDeletedTransactions() async {
   String? jsonString =
       sharedPreferences.getString("recentlyDeletedTransactions");
 
-  if (jsonString != null) {
-    try {
-      List<dynamic> decodedData = jsonDecode(jsonString);
-      recentlyDeletedTransactions = decodedData
-          .map((entry) => MapEntry<String, Transaction>(
-                entry['key'] as String,
-                Transaction.fromJson(entry['value'] as Map<String, dynamic>),
-              ))
-          .toList();
-    } catch (e) {
-      print("Error loading recently deleted transactions: " + e.toString());
-    }
+  try {
+    List<dynamic> decodedData = jsonDecode(jsonString ?? "[]");
+    recentlyDeletedTransactions = decodedData
+        .map((entry) => MapEntry<String, Transaction>(
+              entry['key'] as String,
+              Transaction.fromJson(entry['value'] as Map<String, dynamic>),
+            ))
+        .toList();
+  } catch (e) {
+    print("Error loading recently deleted transactions: " + e.toString());
   }
 }
 
@@ -154,7 +152,7 @@ class ActivityPageState extends State<ActivityPage> {
       onWillPop: () async {
         if ((globalSelectedID.value[pageId] ?? []).length > 0) {
           globalSelectedID.value[pageId] = [];
-          globalSelectedID.notifyListeners();
+          globalSelectedID.value = globalSelectedID.value;
           return false;
         } else {
           return true;

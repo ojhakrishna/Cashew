@@ -71,7 +71,7 @@ AppColors getAppColors(
                 ? Color(0x0F000000)
                 : Color(0xFFF0F0F0),
             "standardContainerColor": getPlatform() == PlatformOS.isIOS
-                ? themeData.colorScheme.background
+                ? themeData.colorScheme.surface
                 : appStateSettings["materialYou"]
                     ? lightenPastel(
                         themeData.colorScheme.secondaryContainer,
@@ -109,7 +109,7 @@ AppColors getAppColors(
                 ? Color(0x13FFFFFF)
                 : Color(0x6F363636),
             "standardContainerColor": getPlatform() == PlatformOS.isIOS
-                ? themeData.colorScheme.background
+                ? themeData.colorScheme.surface
                 : appStateSettings["materialYou"]
                     ? darkenPastel(
                         themeData.colorScheme.secondaryContainer,
@@ -435,10 +435,7 @@ ColorScheme getGrayScaleColorScheme(Brightness brightness) {
       onErrorContainer: Colors.black,
       surface: Colors.grey[200]!,
       onSurface: Colors.black,
-      background:
-          appStateSettings["materialYou"] ? Colors.blueGrey[50]! : Colors.white,
-      onBackground: Colors.black,
-      surfaceVariant: Colors.grey[100]!,
+      surfaceContainerHighest: Colors.grey[100]!,
       onSurfaceVariant: Colors.black,
       outline: Colors.grey[500]!,
       outlineVariant: Colors.grey[400],
@@ -470,13 +467,7 @@ ColorScheme getGrayScaleColorScheme(Brightness brightness) {
       onErrorContainer: Colors.white,
       surface: Colors.grey[900]!,
       onSurface: Colors.white,
-      background: appStateSettings["forceFullDarkBackground"] == true
-          ? Colors.black
-          : appStateSettings["materialYou"]
-              ? Color(0xFF0F0F0F)
-              : Colors.black,
-      onBackground: Colors.white,
-      surfaceVariant: Colors.grey[800]!,
+      surfaceContainerHighest: Colors.grey[800]!,
       onSurfaceVariant: Colors.white,
       outline: Colors.grey[600]!,
       outlineVariant: Colors.grey[500],

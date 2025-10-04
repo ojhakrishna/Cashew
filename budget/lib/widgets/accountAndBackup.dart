@@ -216,7 +216,7 @@ Future<bool> testIfHasGmailAccess() async {
     final authHeaders = await googleUser!.authHeaders;
     final authenticateClient = GoogleAuthClient(authHeaders);
     gMail.GmailApi gmailApi = gMail.GmailApi(authenticateClient);
-    gMail.ListMessagesResponse results = await gmailApi.users.messages
+    await gmailApi.users.messages
         .list(googleUser!.id.toString(), maxResults: 1);
   } catch (e) {
     print(e.toString());
@@ -426,8 +426,6 @@ Future<void> createBackup(
         currentDBFileInfo.mediaStream, currentDBFileInfo.dbFileBytes.length);
 
     var driveFile = new drive.File();
-    final timestamp =
-        DateFormat("yyyy-MM-dd-hhmmss").format(DateTime.now().toUtc());
     // -$timestamp
     driveFile.name =
         "db-v$schemaVersionGlobal-${getCurrentDeviceName()}.sqlite";
@@ -438,8 +436,7 @@ Future<void> createBackup(
     driveFile.parents = ["appDataFolder"];
 
     await driveApi.files.create(driveFile, uploadMedia: media);
-
-    if (clientIDForSync == null)
+    if (clientIDForSync == null) {
       openSnackbar(
         SnackbarMessage(
           title: "backup-created".tr(),
@@ -449,6 +446,7 @@ Future<void> createBackup(
               : Icons.backup_rounded,
         ),
       );
+    }
     if (clientIDForSync == null)
       await updateSettings("lastBackup", DateTime.now().toString(),
           pagesNeedingRefresh: [], updateGlobalState: false);
@@ -492,18 +490,15 @@ Future<void> deleteRecentBackups(context, amountToKeep,
       $fields: 'files(id, name, modifiedTime, size)',
     );
     List<drive.File>? files = fileList.files;
-    if (files == null) {
-      throw "No backups found.";
-    }
 
     int index = 0;
-    files.forEach((file) {
-      // subtract 1 because we just made a backup
+    files?.forEach((file) {
       if (index >= amountToKeep - 1) {
-        // only delete excess backups that don't belong to a client sync
-        if (!isSyncBackupFile(file.name)) deleteBackup(driveApi, file.id ?? "");
+        if (!isSyncBackupFile(file.name)) {
+          deleteBackup(driveApi, file.id ?? "");
+        }
       }
-      if (!isSyncBackupFile(file.name)) index++;
+      index++;
     });
     if (silentDelete == false || silentDelete == null) {
       loadingIndeterminateKey.currentState?.setVisibility(false);

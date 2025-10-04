@@ -3,6 +3,7 @@ import 'package:budget/pages/addTransactionPage.dart';
 import 'package:budget/pages/transactionFilters.dart';
 import 'package:budget/struct/defaultPreferences.dart';
 import 'package:budget/struct/settings.dart';
+import 'package:budget/struct/databaseGlobal.dart';
 import 'package:budget/widgets/fab.dart';
 import 'package:budget/widgets/fadeIn.dart';
 import 'package:budget/widgets/openPopup.dart';
@@ -14,7 +15,6 @@ import 'package:budget/widgets/tappable.dart';
 import 'package:budget/widgets/textInput.dart';
 import 'package:budget/widgets/textWidgets.dart';
 import 'package:budget/widgets/transactionEntries.dart';
-import 'package:budget/widgets/transactionEntry/transactionEntry.dart';
 import 'package:budget/widgets/util/debouncer.dart';
 import 'package:budget/widgets/util/showDatePicker.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -161,7 +161,7 @@ class TransactionsSearchPageState extends State<TransactionsSearchPage>
       onWillPop: () async {
         if ((globalSelectedID.value["TransactionsSearch"] ?? []).length > 0) {
           globalSelectedID.value["TransactionsSearch"] = [];
-          globalSelectedID.notifyListeners();
+          globalSelectedID.value = globalSelectedID.value;
           return false;
         } else {
           return true;

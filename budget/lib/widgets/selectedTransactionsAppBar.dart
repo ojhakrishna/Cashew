@@ -123,7 +123,9 @@ class SelectedTransactionsAppBar extends StatelessWidget {
                         ),
                         onPressed: () {
                           globalSelectedID.value[pageID] = [];
-                          globalSelectedID.notifyListeners();
+                          globalSelectedID.value =
+                              Map<String, List<String>>.from(
+                                  globalSelectedID.value);
                         },
                       ),
                       Expanded(
@@ -303,7 +305,8 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
       }
     }
     globalSelectedID.value[pageID] = [];
-    globalSelectedID.notifyListeners();
+    globalSelectedID.value =
+        Map<String, List<String>>.from(globalSelectedID.value);
   }
 
   @override
@@ -349,7 +352,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                         );
                         if (result == DeletePopupAction.Delete) {
                           globalSelectedID.value[pageID] = [];
-                          globalSelectedID.notifyListeners();
+                          globalSelectedID.value =
+                              Map<String, List<String>>.from(
+                                  globalSelectedID.value);
                         }
                       },
                     ),
@@ -381,7 +386,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                             ),
                           );
                           globalSelectedID.value[pageID] = [];
-                          globalSelectedID.notifyListeners();
+                          globalSelectedID.value =
+                              Map<String, List<String>>.from(
+                                  globalSelectedID.value);
                         },
                       ),
                     if (globalTransactionsListedOnPageID[pageID] != null)
@@ -412,7 +419,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                           }
                           globalSelectedID.value[pageID] =
                               globalTransactionsListedOnPageID[pageID] ?? [];
-                          globalSelectedID.notifyListeners();
+                          globalSelectedID.value =
+                              Map<String, List<String>>.from(
+                                  globalSelectedID.value);
                         },
                       ),
                     if (enableDuplicate)
@@ -454,10 +463,11 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                               DateTime? selectedDate =
                                   await selectDateAndTimeSequence(
                                       context, transactions.first.dateCreated);
-                              if (selectedDate == null) return;
-                              await database
-                                  .updateDateTimeCreatedOfTransactions(
-                                      transactions, selectedDate);
+                              if (selectedDate != null) {
+                                await database
+                                    .updateDateTimeCreatedOfTransactions(
+                                        transactions, selectedDate);
+                              }
                               openSnackbar(
                                 SnackbarMessage(
                                   icon: appStateSettings["outlinedIcons"]
@@ -474,7 +484,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                 ),
                               );
                               globalSelectedID.value[pageID] = [];
-                              globalSelectedID.notifyListeners();
+                              globalSelectedID.value =
+                                  Map<String, List<String>>.from(
+                                      globalSelectedID.value);
                             },
                           ),
                           EditSelectedTransactionsContainer(
@@ -557,7 +569,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                               );
 
                               globalSelectedID.value[pageID] = [];
-                              globalSelectedID.notifyListeners();
+                              globalSelectedID.value =
+                                  Map<String, List<String>>.from(
+                                      globalSelectedID.value);
                             },
                           ),
                           EditSelectedTransactionsContainer(
@@ -608,7 +622,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                 ),
                               );
                               globalSelectedID.value[pageID] = [];
-                              globalSelectedID.notifyListeners();
+                              globalSelectedID.value =
+                                  Map<String, List<String>>.from(
+                                      globalSelectedID.value);
                             },
                           ),
                           if (enableWalletSelection)
@@ -652,7 +668,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                   ),
                                 );
                                 globalSelectedID.value[pageID] = [];
-                                globalSelectedID.notifyListeners();
+                                globalSelectedID.value =
+                                    Map<String, List<String>>.from(
+                                        globalSelectedID.value);
                               },
                             ),
                           if (enableAddableBudgetSelection)
@@ -708,7 +726,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                 );
 
                                 globalSelectedID.value[pageID] = [];
-                                globalSelectedID.notifyListeners();
+                                globalSelectedID.value =
+                                    Map<String, List<String>>.from(
+                                        globalSelectedID.value);
                               },
                             ),
                           if (enableObjectiveSelection)
@@ -760,7 +780,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                 );
 
                                 globalSelectedID.value[pageID] = [];
-                                globalSelectedID.notifyListeners();
+                                globalSelectedID.value =
+                                    Map<String, List<String>>.from(
+                                        globalSelectedID.value);
                               },
                             ),
                           if (enableObjectiveLoansSection)
@@ -810,7 +832,9 @@ class SelectedTransactionsAppBarMenu extends StatelessWidget {
                                 );
 
                                 globalSelectedID.value[pageID] = [];
-                                globalSelectedID.notifyListeners();
+                                globalSelectedID.value =
+                                    Map<String, List<String>>.from(
+                                        globalSelectedID.value);
                               },
                             ),
                         ];
@@ -945,6 +969,8 @@ Future duplicateTransaction(
   Transaction? transactionJustAdded = null;
   if (rowId != null) {
     transactionJustAdded = await database.getTransactionFromRowId(rowId);
+  }
+  if (transactionJustAdded != null) {
     flashTransaction(transactionJustAdded.transactionPk);
   }
   String transactionName = transaction.name;
